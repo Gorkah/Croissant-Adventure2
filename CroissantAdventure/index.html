@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croissant Adventure</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- Core Game Engine -->
+    <script src="js/game.js"></script>
+    
+    <!-- Scenes -->
+    <script src="js/scenes/scene.js"></script>
+    <script src="js/scenes/mainMenu.js"></script>
+    <script src="js/scenes/worldMap_simple.js"></script>
+    
+    <!-- Minigames -->
+    <script src="js/minigames/minigame.js"></script>
+    <script src="js/minigames/coinCollector.js"></script>
+    <script src="js/minigames/roulette.js"></script>
+    <script src="js/minigames/chess.js"></script>
+    <script src="js/minigames/maze.js"></script>
+    <script src="js/minigames/shooter.js"></script>
+    
+    <!-- Nuevos Minijuegos -->
+    <script src="js/minigames/platform.js"></script>
+    <script src="js/minigames/memory.js"></script>
+    <script src="js/minigames/snake.js"></script>
+    <script src="js/minigames/puzzle.js"></script>
+    <script src="js/minigames/rhythm.js"></script>
+    <script src="js/minigames/towerDefense.js"></script>
+    
+    <!-- Initialize Game -->
+    <script>
+        window.addEventListener('load', () => {
+            const game = new Game();
+            game.start();
+        });
+    </script>
+</body>
+</html>
