@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croissant Adventure - El Mundo de Migalandia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe9c7;
+            color: #5c4a38;
+        }
+        #header {
+            background-color: #ff9900;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #game-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            position: relative;
+        }
+        #intro {
+            text-align: center;
+            margin: 30px auto;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #fff8e6;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(210, 156, 76, 0.15);
+        }
+        .back-button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        #game-info {
+            margin: 20px;
+            padding: 15px;
+            background-color: #fffbf2;
+            border-radius: 10px;
+            border-left: 5px solid #ff9900;
+        }
+        #welcome-title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #ff9900;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .game-icon {
+            font-size: 2em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .game-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .game-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #ff9900;
+            color: white;
+            border-radius: 20px;
+            text-decoration: none;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .game-button:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+        }
+        #instructions {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #fff3d4;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>Croissant Adventure</h1>
+        <p>¡Explora el mágico mundo de Migalandia con Croissi el croissant!</p>
+    </div>
+
+    <div id="intro">
+        <div id="game-prompt">
+            <h2 id="welcome-title">¡Bienvenido a Migalandia!</h2>
+            <p>Habla con Croissi, nuestro guía mágico, para que te recomiende aventuras según tus gustos.</p>
+            <p>Croissi te contará una historia y te ayudará a encontrar el juego perfecto para ti.</p>
+            
+            <div id="instructions">
+                <h3>¿Cómo funciona?</h3>
+                <p>1. Haz clic en el ícono del chat en la esquina inferior derecha</p>
+                <p>2. Cuéntale a Croissi qué tipo de aventura te gustaría vivir</p>
+                <p>3. Croissi te recomendará uno o varios juegos que te podrían gustar</p>
+                <p>4. ¡Haz clic en el botón del juego recomendado para comenzar a jugar!</p>
+            </div>
+            
+            <div class="game-buttons">
+                <a href="juego.html?game=coinCollector" class="game-button">🪙 El Tesoro del Valle Dorado</a>
+                <a href="juego.html?game=roulette" class="game-button">🎰 La Rueda de la Fortuna</a>
+                <a href="juego.html?game=chess" class="game-button">♞ El Reino Cuadriculado</a>
+                <a href="juego.html?game=maze" class="game-button">🧩 El Bosque Enredado</a>
+                <a href="juego.html?game=shooter" class="game-button">🔫 El Cielo Azucarado</a>
+                <a href="juego.html?game=platform" class="game-button">🏃 Islas Flotantes</a>
+                <a href="juego.html?game=memory" class="game-button">🃏 Las Cartas Gemelas</a>
+                <a href="juego.html?game=snake" class="game-button">🐍 Silbi la Serpiente</a>
+                <a href="juego.html?game=puzzle" class="game-button">🧠 El Cuadro Mágico</a>
+                <a href="juego.html?game=rhythm" class="game-button">🎵 La Orquesta Dulce</a>
+                <a href="juego.html?game=towerDefense" class="game-button">🏰 El Castillo de Azúcar</a>
+            </div>
+        </div>
+        
+        <div id="game-info" style="display: none;">
+            <!-- Contenido dinámico según el juego seleccionado -->
+        </div>
+    </div>
+
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div style="text-align: center;">
+            <a href="juego.html" class="back-button" id="back-button" style="display: none;">Volver a Migalandia</a>
+        </div>
+    </div>
+
+    <!-- Core Game Engine -->
+    <script src="js/game.js"></script>
+    
+    <!-- Scenes -->
+    <script src="js/scenes/scene.js"></script>
+    <script src="js/scenes/mainMenu.js"></script>
+    <script src="js/scenes/worldMap_simple.js"></script>
+    
+    <!-- Minigames -->
+    <script src="js/minigames/minigame.js"></script>
+    <script src="js/minigames/coinCollector.js"></script>
+    <script src="js/minigames/roulette.js"></script>
+    <script src="js/minigames/chess.js"></script>
+    <script src="js/minigames/maze.js"></script>
+    <script src="js/minigames/shooter.js"></script>
+    
+    <!-- Nuevos Minijuegos -->
+    <script src="js/minigames/platform.js"></script>
+    <script src="js/minigames/memory.js"></script>
+    <script src="js/minigames/snake.js"></script>
+    <script src="js/minigames/puzzle.js"></script>
+    <script src="js/minigames/rhythm.js"></script>
+    <script src="js/minigames/towerDefense.js"></script>
+    
+    <!-- Script del Chatbot con interceptor -->
+    <script src="https://bots.easy-peasy.ai/chat.min.js" data-chat-url="https://bots.easy-peasy.ai/bot/9070d911-01ca-4d29-a339-f98a6e589b43" data-btn-position="bottom-right" data-widget-btn-color="#6366f1" defer></script>
+    
+    <!-- Script para detectar menciones de juegos en los mensajes del chatbot -->
+    <script>
+        // Función para procesar menciones de juegos en un mensaje
+        function processGameMentions(messageElement) {
+            const messageText = messageElement.textContent;
+            const gamePatterns = [
+                // Versión completa
+                { name: "El Tesoro del Valle Dorado", game: "coinCollector", emoji: "🪙" },
+                { name: "La Rueda de la Fortuna Mágica", game: "roulette", emoji: "🎰" },
+                { name: "Los Guardianes del Reino Cuadriculado", game: "chess", emoji: "♞" },
+                { name: "El Bosque Enredado de Migalandia", game: "maze", emoji: "🧩" },
+                { name: "Los Burbujeadores del Cielo Azucarado", game: "shooter", emoji: "🔫" },
+                { name: "Las Islas Flotantes de Bizcocho", game: "platform", emoji: "🏃" },
+                { name: "El Misterio de las Cartas Gemelas", game: "memory", emoji: "🃏" },
+                { name: "Las Aventuras de Silbi la Serpiente Golosa", game: "snake", emoji: "🐍" },
+                { name: "El Cuadro Mágico Despiezado", game: "puzzle", emoji: "🧠" },
+                { name: "La Orquesta Dulce de Migalandia", game: "rhythm", emoji: "🎵" },
+                { name: "Los Guardianes del Castillo de Azúcar", game: "towerDefense", emoji: "🏰" },
+                
+                // Versión corta para detectar menciones parciales
+                { name: "Valle Dorado", game: "coinCollector", emoji: "🪙" },
+                { name: "Tesoro", game: "coinCollector", emoji: "🪙" },
+                { name: "monedas", game: "coinCollector", emoji: "🪙" },
+                { name: "Fortuna", game: "roulette", emoji: "🎰" },
+                { name: "Ruleta", game: "roulette", emoji: "🎰" },
+                { name: "Rueda", game: "roulette", emoji: "🎰" },
+                { name: "Ajedrez", game: "chess", emoji: "♞" },
+                { name: "Reino Cuadriculado", game: "chess", emoji: "♞" },
+                { name: "Laberinto", game: "maze", emoji: "🧩" },
+                { name: "Bosque Enredado", game: "maze", emoji: "🧩" },
+                { name: "Disparos", game: "shooter", emoji: "🔫" },
+                { name: "burbujas", game: "shooter", emoji: "🔫" },
+                { name: "Cielo Azucarado", game: "shooter", emoji: "🔫" },
+                { name: "Plataformas", game: "platform", emoji: "🏃" },
+                { name: "saltar", game: "platform", emoji: "🏃" },
+                { name: "Islas Flotantes", game: "platform", emoji: "🏃" },
+                { name: "Memoria", game: "memory", emoji: "🃏" },
+                { name: "Cartas Gemelas", game: "memory", emoji: "🃏" },
+                { name: "Serpiente", game: "snake", emoji: "🐍" },
+                { name: "Silbi", game: "snake", emoji: "🐍" },
+                { name: "Puzzle", game: "puzzle", emoji: "🧠" },
+                { name: "Rompecabezas", game: "puzzle", emoji: "🧠" },
+                { name: "Cuadro Mágico", game: "puzzle", emoji: "🧠" },
+                { name: "Ritmo", game: "rhythm", emoji: "🎵" },
+                { name: "música", game: "rhythm", emoji: "🎵" },
+                { name: "melodía", game: "rhythm", emoji: "🎵" },
+                { name: "Orquesta", game: "rhythm", emoji: "🎵" },
+                { name: "Torres", game: "towerDefense", emoji: "🏰" },
+                { name: "Castillo", game: "towerDefense", emoji: "🏰" },
+                { name: "defensa", game: "towerDefense", emoji: "🏰" }
+            ];
+
+            // Verificar si el mensaje menciona alguno de los juegos
+            let mentionedGames = [];
+            let html = messageElement.innerHTML;
+            
+            // Crear un mapa para eliminar duplicados
+            const uniqueGames = new Map();
+
+            gamePatterns.forEach(pattern => {
+                // Hacer la búsqueda case-insensitive
+                const regex = new RegExp(pattern.name, 'gi');
+                if (regex.test(messageText)) {
+                    // Agregar juego al mapa usando la ID del juego como clave
+                    uniqueGames.set(pattern.game, pattern);
+                }
+            });
+            
+            // Convertir el mapa en array
+            mentionedGames = Array.from(uniqueGames.values());
+
+            // Si se mencionan juegos, añadir botones de juego al final del mensaje
+            if (mentionedGames.length > 0) {
+                let gameButtons = '<div class="game-buttons">';
+                mentionedGames.forEach(game => {
+                    gameButtons += `<a href="juego.html?game=${game.game}" class="game-button">${game.emoji} Jugar a ${game.name}</a>`;
+                });
+                gameButtons += '</div>';
+                html += gameButtons;
+                messageElement.innerHTML = html;
+            }
+        }
+
+        // Configuración del interceptor de mensajes
+        function setupChatInterceptor() {
+            console.log("Configurando interceptor de chat...");
+            
+            // Función que busca mensajes de chat cada 500ms
+            function checkForMessages() {
+                // Buscar todos los contenedores de mensajes del chatbot
+                const chatMessages = document.querySelectorAll('.easy-peasy-ai-chat div[class*="message"], .easy-peasy-ai-chat-message-content');
+                
+                chatMessages.forEach(message => {
+                    // Verificar si este mensaje ya ha sido procesado
+                    if (!message.dataset.processed) {
+                        console.log("Nuevo mensaje detectado:", message.textContent);
+                        processGameMentions(message);
+                        message.dataset.processed = 'true';
+                    }
+                });
+            }
+            
+            // Iniciar verificación periódica
+            setInterval(checkForMessages, 500);
+            
+            // Configurar un MutationObserver como respaldo
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        // Si se detecta un nuevo nodo, verificar mensajes
+                        checkForMessages();
+                    }
+                });
+            });
+
+            // Comenzar a observar cambios en el cuerpo del documento
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        // Iniciar el interceptor cuando la página esté cargada
+        window.addEventListener('load', function() {
+            // Esperar a que el chat se cargue
+            console.log("Página cargada. Esperando al chat...");
+            setTimeout(setupChatInterceptor, 2000);
+        });
+        
+        // Hacer una segunda comprobación después de un tiempo
+        setTimeout(function() {
+            console.log("Segunda comprobación de chat...");
+            setupChatInterceptor();
+        }, 5000);
+        
+        // Comprobar el botón del chat para detectar cuando se abre
+        document.addEventListener('click', function(e) {
+            // Si se hace clic en el botón del chat, establecer el interceptor
+            if (e.target.matches('.easy-peasy-ai-chat-button, .easy-peasy-ai-chat-button *')) {
+                console.log("Clic en botón de chat detectado");
+                setTimeout(setupChatInterceptor, 1000);
+            }
+        }, true);
+    </script>
+    
+    <!-- Initialize Game -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Obtener el parámetro 'game' de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameParam = urlParams.get('game');
+            
+            const gameInfoElement = document.getElementById('game-info');
+            const gamePromptElement = document.getElementById('game-prompt');
+            const backButton = document.getElementById('back-button');
+            
+            // Información de los juegos
+            const games = {
+                coinCollector: {
+                    name: "El Tesoro del Valle Dorado",
+                    icon: "🪙",
+                    description: "Recoge las monedas doradas antes de que se acabe el tiempo en este mágico valle."
+                },
+                roulette: {
+                    name: "La Rueda de la Fortuna Mágica",
+                    icon: "🎰",
+                    description: "Gira la rueda y prueba tu suerte en la Ciudad de los Deseos."
+                },
+                chess: {
+                    name: "Los Guardianes del Reino Cuadriculado",
+                    icon: "♞",
+                    description: "Planifica tus movimientos estratégicos en el Reino Cuadriculado."
+                },
+                maze: {
+                    name: "El Bosque Enredado de Migalandia",
+                    icon: "🧩",
+                    description: "Encuentra el camino a través del misterioso Bosque Enredado."
+                },
+                shooter: {
+                    name: "Los Burbujeadores del Cielo Azucarado",
+                    icon: "🔫",
+                    description: "Revienta las burbujas mágicas en el colorido Cielo Azucarado."
+                },
+                platform: {
+                    name: "Las Islas Flotantes de Bizcocho",
+                    icon: "🏃",
+                    description: "Salta entre las plataformas flotantes y recoge estrellas fugaces."
+                },
+                memory: {
+                    name: "El Misterio de las Cartas Gemelas",
+                    icon: "🃏",
+                    description: "Encuentra los pares coincidentes en la Villa de los Recuerdos."
+                },
+                snake: {
+                    name: "Las Aventuras de Silbi la Serpiente Golosa",
+                    icon: "🐍",
+                    description: "Ayuda a Silbi a recoger manzanas mágicas sin tropezar con su cola."
+                },
+                puzzle: {
+                    name: "El Cuadro Mágico Despiezado",
+                    icon: "🧠",
+                    description: "Desliza las piezas para completar las imágenes mágicas de la Galería."
+                },
+                rhythm: {
+                    name: "La Orquesta Dulce de Migalandia",
+                    icon: "🎵",
+                    description: "Sigue el ritmo de las notas musicales en el Valle de la Melodía."
+                },
+                towerDefense: {
+                    name: "Los Guardianes del Castillo de Azúcar",
+                    icon: "🏰",
+                    description: "Construye torres para defender el Castillo Glaseado de los invasores."
+                }
+            };
+            
+            // Si hay un juego especificado en la URL
+            if (gameParam && games[gameParam]) {
+                const game = games[gameParam];
+                
+                // Mostrar información del juego
+                gameInfoElement.innerHTML = `
+                    <h3><span class="game-icon">${game.icon}</span> ${game.name}</h3>
+                    <p>${game.description}</p>
+                `;
+                
+                gameInfoElement.style.display = 'block';
+                gamePromptElement.style.display = 'none';
+                backButton.style.display = 'inline-block';
+                
+                // Inicializar el juego
+                window.addEventListener('load', () => {
+                    const gameInstance = new Game();
+                    gameInstance.start();
+                    
+                    // Cambiar directamente a la escena del juego seleccionado
+                    setTimeout(() => {
+                        if (gameInstance.scenes[gameParam]) {
+                            gameInstance.switchScene(gameParam);
+                        } else {
+                            console.error(`No se encontró la escena para el juego: ${gameParam}`);
+                        }
+                    }, 500);
+                });
+            } else {
+                // Si no hay juego especificado, mostrar la pantalla de inicio
+                gamePromptElement.style.display = 'block';
+                gameInfoElement.style.display = 'none';
+                
+                // Inicializar el juego en modo mapa del mundo
+                window.addEventListener('load', () => {
+                    const game = new Game();
+                    game.start();
+                    setTimeout(() => {
+                        if (game.scenes['worldMap']) {
+                            game.switchScene('worldMap');
+                        }
+                    }, 500);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -10,16 +10,19 @@ class TowerDefenseMinigame extends Minigame {
     
     reset() {
         // Game state
-        this.money = 150;
-        this.lives = 10;
+        this.money = 150; // Aumentado para dar más opciones al jugador
+        this.lives = 15; // Más vidas para ser más tolerante con los errores
         this.score = 0;
         this.gameOver = false;
         this.victory = false;
         this.waveNumber = 0;
         this.waveInProgress = false;
         this.enemiesRemaining = 0;
-        this.waveDelay = 5; // Seconds between waves
+        this.waveDelay = 10; // Más tiempo entre oleadas
         this.waveTimer = this.waveDelay;
+        
+        // Bandera para tutorial
+        this.isFirstGame = true; // Para mostrar mensajes adicionales
         
         // Map properties
         this.gridSize = 40; // Size of each grid cell
@@ -58,7 +61,7 @@ class TowerDefenseMinigame extends Minigame {
             fire: {
                 name: 'Fire Tower',
                 description: 'Daño en área a todos los enemigos en rango',
-                cost: 100,
+                cost: 70,
                 damage: 14, // Más daño
                 range: 2.2, // Más alcance
                 fireRate: 0.6, // Ligeramente más rápido
@@ -73,7 +76,7 @@ class TowerDefenseMinigame extends Minigame {
             ice: {
                 name: 'Ice Tower',
                 description: 'Ralentiza a los enemigos y anula la regeneración',
-                cost: 75,
+                cost: 80,
                 damage: 8, // Más daño
                 range: 2.7, // Más alcance
                 fireRate: 0.8, // Más rápido
@@ -89,7 +92,7 @@ class TowerDefenseMinigame extends Minigame {
             sniper: {
                 name: 'Sniper Tower',
                 description: 'Gran alcance y daño, ignora armadura y evasión',
-                cost: 150,
+                cost: 120,
                 damage: 70, // Mucho más daño
                 range: 6, // Mayor alcance
                 fireRate: 0.4, // Ligeramente más rápido
@@ -105,7 +108,7 @@ class TowerDefenseMinigame extends Minigame {
             lightning: {
                 name: 'Lightning Tower',
                 description: 'Ataca múltiples enemigos con rayos en cadena',
-                cost: 200, // Coste alto
+                cost: 150, // Coste alto
                 damage: 30, // Daño medio
                 range: 4, // Buen alcance
                 fireRate: 0.7, // Velocidad media
@@ -125,7 +128,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Normal',
                 speed: 65, // Más rápido
                 health: 150, // Mucho más resistente
-                reward: 15, 
+                reward: 10, 
                 color: '#888888',
                 size: 0.6,
                 armor: 0.05, // Ahora incluso los normales tienen algo de armadura
@@ -135,7 +138,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Fast',
                 speed: 140, // Extremadamente rápido
                 health: 100, 
-                reward: 22,
+                reward: 20,
                 color: '#55cc55',
                 size: 0.5,
                 armor: 0.05, 
@@ -146,7 +149,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Tank',
                 speed: 40, 
                 health: 500, 
-                reward: 35,
+                reward: 30,
                 color: '#cc5555',
                 size: 0.7,
                 armor: 0.35, // Gran resistencia al daño
@@ -158,7 +161,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Boss',
                 speed: 50,
                 health: 1800, 
-                reward: 150,
+                reward: 75,
                 color: '#cc00cc',
                 size: 0.9,
                 armor: 0.4, 
@@ -176,7 +179,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Elite',
                 speed: 85,
                 health: 900,
-                reward: 100,
+                reward: 30,
                 color: '#ffaa00', // Naranja dorado
                 size: 0.75,
                 armor: 0.25,
@@ -194,7 +197,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Stealth',
                 speed: 100,
                 health: 200,
-                reward: 40,
+                reward: 25,
                 color: '#445566', // Gris azulado
                 size: 0.55,
                 armor: 0.1,
@@ -207,7 +210,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Healer',
                 speed: 60,
                 health: 300,
-                reward: 60,
+                reward: 30,
                 color: '#22cc88', // Verde turquesa
                 size: 0.65,
                 armor: 0.15,
@@ -220,7 +223,7 @@ class TowerDefenseMinigame extends Minigame {
                 name: 'Titan',
                 speed: 30, // Muy lento
                 health: 5000, // Extremadamente resistente
-                reward: 300,
+                reward: 100,
                 color: '#ddaa33', // Dorado
                 size: 1.2, // Más grande que un jefe
                 armor: 0.6, // Armadura extrema
@@ -256,19 +259,17 @@ class TowerDefenseMinigame extends Minigame {
             }
         };
         
-        // Wave definitions - OLEADAS EXTREMAS
+        // Wave definitions - Oleadas con progresión equilibrada
         this.waves = [
-            // Wave 1 - No más introducción amable
+            // Wave 1 - Introducción suave para permitir al jugador prepararse
             [
-                { type: 'normal', count: 20, delay: 0.8 },
-                { type: 'fast', count: 8, delay: 0.7 },
-                { type: 'stealth', count: 2, delay: 1.0 } // Enemigos sigilosos desde el principio
+                { type: 'normal', count: 15, delay: 3.5, startDelay: 2.0 } // Pocos enemigos, muy separados, con retraso inicial
             ],
-            // Wave 2 - Asalto temprano
+            // Wave 2 - Un poco más desafiante pero todavía manejable
             [
-                { type: 'normal', count: 15, delay: 0.7 },
-                { type: 'fast', count: 12, delay: 0.5 },
-                { type: 'tank', count: 3, delay: 1.0 },
+                { type: 'normal', count: 15, delay: 1 },
+                { type: 'fast', count: 12, delay: 1 },
+                { type: 'tank', count: 3, delay: 1 },
                 { type: 'stealth', count: 5, delay: 1.2 }
             ],
             // Wave 3 - Primer reto serio
@@ -1173,9 +1174,9 @@ class TowerDefenseMinigame extends Minigame {
             const startDelay = enemyGroup.startDelay || 0;
             const groupDelay = delay + startDelay;
             
-            // Limitar el multiSpawn para que sea más regulado
-            // Si multiSpawn es mayor a 2, lo reducimos para evitar que muchos enemigos aparezcan a la vez
-            const multiSpawn = Math.min(enemyGroup.multiSpawn || 1, 2);
+            // Reducir a 1 el número de enemigos que pueden aparecer a la vez
+            // para garantizar una aparición más gradual
+            const multiSpawn = 1;
             
             // Procesar propiedades personalizadas del grupo
             const customProps = {};
@@ -1185,27 +1186,34 @@ class TowerDefenseMinigame extends Minigame {
                 }
             }
             
-            // Distribuir los enemigos de forma más regular a lo largo del tiempo
-            const baseDelay = enemyGroup.delay || 1.0;
-            const totalDuration = baseDelay * (enemyGroup.count / multiSpawn);
-            const distributionFactor = totalDuration / enemyGroup.count;
+            // Asegurar un retraso mínimo entre enemigos (debe ser al menos 0.5 segundos)
+            const minDelay = 0.75;
+            const baseDelay = Math.max(enemyGroup.delay || 1.0, minDelay);
             
-            // Poner en cola los enemigos con una distribución más uniforme
-            for (let i = 0; i < enemyGroup.count; i += multiSpawn) {
-                // Calcular cuántos enemigos quedan por generar en este grupo
-                const remainingCount = Math.min(multiSpawn, enemyGroup.count - i);
+            // Calcular un factor de progresión que haga que los enemigos aparezcan más lentamente al principio
+            // y más rápidamente hacia el final de la oleada (generando una rampa de dificultad)
+            const totalDuration = Math.max(15, baseDelay * enemyGroup.count * 0.8);
+            
+            // Poner en cola los enemigos con un espaciado progresivo
+            for (let i = 0; i < enemyGroup.count; i++) {
+                // Distribución progresiva - a medida que avanza la oleada, los enemigos aparecen más rápidamente
+                // Usamos una curva no lineal para que el inicio sea más lento
+                const progress = i / enemyGroup.count; // 0 a 1
+                const speedFactor = 0.5 + progress * 0.5; // 0.5 a 1.0 (los enemigos aparecen más rápidamente al final)
+                const enemyDelay = groupDelay + (i * baseDelay * speedFactor); 
                 
-                // Calcular un retraso más distribuido para este enemigo o grupo
-                const enemyDelay = groupDelay + i * distributionFactor;
+                // Asegurar que los primeros enemigos tengan un retraso mayor
+                const firstEnemiesDelay = (i < 3) ? (3 - i) * 1.5 : 0;
                 
-                // Añadir una pequeña variación aleatoria para hacerlo más natural (±10%)
-                const randomVariation = (Math.random() * 0.2 - 0.1) * distributionFactor;
-                const finalDelay = enemyDelay + randomVariation;
+                // Añadir una pequeña variación aleatoria (±15%)
+                const randomVariation = (Math.random() * 0.3 - 0.15) * baseDelay;
+                const finalDelay = enemyDelay + randomVariation + firstEnemiesDelay;
                 
                 this.enemyQueue.push({
                     type: enemyGroup.type,
-                    count: remainingCount,
+                    count: 1, // Sólo un enemigo a la vez
                     delay: finalDelay,
+                    baseDelayForSpawning: baseDelay, // Guardamos esto para usarlo en la lógica de spawn
                     ...customProps
                 });
             }
@@ -1674,20 +1682,29 @@ class TowerDefenseMinigame extends Minigame {
         const x = pathPoint.x * this.gridSize + this.gridSize / 2;
         const y = pathPoint.y * this.gridSize + this.gridSize / 2;
         
-        // Crear el enemigo
+        // Calcular el multiplicador de salud basado en el número de oleada
+        // 1 para la primera oleada, 3 para la segunda, 9 para la tercera, etc.
+        const waveHealthMultiplier = Math.pow(3, this.waveNumber - 1);
+        
+        // Base de salud del enemigo escalada según la oleada
+        const baseHealth = enemyType.health * waveHealthMultiplier;
+        
+        // Crear el enemigo con la salud multiplicada
         const enemy = {
             type: type,
             x: x,
             y: y,
-            health: enemyType.health,
-            maxHealth: enemyType.health,
+            health: baseHealth,
+            maxHealth: baseHealth,
+            baseHealth: enemyType.health, // Guardamos la salud base original para referencia
             speed: enemyType.speed,
             size: this.gridSize * enemyType.size,
             color: enemyType.color,
-            reward: enemyType.reward,
+            reward: enemyType.reward * Math.sqrt(waveHealthMultiplier), // Aumentar la recompensa proporcionalmente
             pathIndex: pathIndex,
             slowEffect: 1,
-            slowTimer: 0
+            slowTimer: 0,
+            waveNumber: this.waveNumber // Guardamos la oleada para referencia
         };
         
         // Copiar propiedades especiales desde el tipo de enemigo
@@ -1768,23 +1785,44 @@ class TowerDefenseMinigame extends Minigame {
             // Spawn enemies from queue con soporte para propiedades personalizadas
             if (this.enemyQueue.length > 0) {
                 this.enemySpawnTimer += deltaTime;
-                while (this.enemyQueue.length > 0 && this.enemySpawnTimer >= this.enemyQueue[0].delay) {
+                
+                // Limitar el número de enemigos que pueden aparecer en un solo frame
+                // Esto ayuda a que los enemigos aparezcan más gradualmente
+                let enemiesSpawnedThisFrame = 0;
+                const maxEnemiesPerFrame = 1; // Sólo permitir 1 enemigo por frame
+                
+                while (this.enemyQueue.length > 0 && 
+                      this.enemySpawnTimer >= this.enemyQueue[0].delay && 
+                      enemiesSpawnedThisFrame < maxEnemiesPerFrame) {
+                    
                     const enemy = this.enemyQueue.shift();
                     
                     // Procesar propiedades personalizadas si existen
                     let customProps = {};
                     for (const prop in enemy) {
-                        if (prop !== 'type' && prop !== 'delay') {
+                        if (!['type', 'delay', 'count', 'baseDelayForSpawning'].includes(prop)) {
                             customProps[prop] = enemy[prop];
                         }
                     }
                     
-                    // Generar múltiples enemigos simultáneos si está configurado
+                    // Generar los enemigos (sólo uno a la vez)
                     const count = enemy.count || 1;
                     for (let i = 0; i < count; i++) {
                         this.spawnEnemy(enemy.type, customProps);
+                        enemiesSpawnedThisFrame++;
                     }
-                    this.enemySpawnTimer -= enemy.delay;
+                    
+                    // Usar el retraso base para decrementar el timer
+                    const baseDelay = enemy.baseDelayForSpawning || 0.75;
+                    this.enemySpawnTimer -= baseDelay;
+                    
+                    // Si la cola todavía tiene elementos y este enemigo apareció antes del tiempo previsto,
+                    // ajustar los tiempos de los siguientes enemigos para evitar que aparezcan todos juntos
+                    if (this.enemyQueue.length > 0 && this.enemySpawnTimer >= this.enemyQueue[0].delay) {
+                        // Asegurar que los siguientes enemigos tengan que esperar un tiempo mínimo
+                        const minDelayBetweenEnemies = 0.5; // Medio segundo mínimo entre enemigos
+                        this.enemySpawnTimer = Math.min(this.enemySpawnTimer, this.enemyQueue[0].delay - minDelayBetweenEnemies);
+                    }
                 }
             }
             

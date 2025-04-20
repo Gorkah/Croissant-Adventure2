@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croissant Adventure - El Mundo de Migalandia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe9c7;
+            color: #5c4a38;
+            overflow: hidden;
+        }
+        
+        #header {
+            background-color: #ff9900;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+        
+        #chat-container {
+            flex: 0 0 400px;
+            border-right: 3px solid #ff9900;
+            height: 100%;
+        }
+        
+        #game-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #chat-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+        }
+        
+        #game-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: rgba(255, 248, 230, 0.9);
+            border-radius: 10px;
+            text-align: center;
+            z-index: 5;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            #chat-container {
+                flex: 0 0 300px;
+                border-right: none;
+                border-bottom: 3px solid #ff9900;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>Croissant Adventure</h1>
+    </div>
+
+    <div class="container">
+        <!-- Columna izquierda - Chatbot -->
+        <div id="chat-container">
+            <iframe id="chat-frame" src="https://bots.easy-peasy.ai/bot/9070d911-01ca-4d29-a339-f98a6e589b43?mode=iframe" width="100%" height="100%" allowfullscreen></iframe>
+        </div>
+        
+        <!-- Columna derecha - Juego -->
+        <div id="game-container">
+            <a href="juego_nuevo.html" class="back-button" id="back-button">Volver al Mapa</a>
+            <div id="game-info" style="display: none;">
+                <!-- Contenido dinámico según el juego seleccionado -->
+            </div>
+            <canvas id="game-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Core Game Engine -->
+    <script src="js/game.js"></script>
+    
+    <!-- Scenes -->
+    <script src="js/scenes/scene.js"></script>
+    <script src="js/scenes/mainMenu.js"></script>
+    <script src="js/scenes/worldMap_simple.js"></script>
+    
+    <!-- Minigames -->
+    <script src="js/minigames/minigame.js"></script>
+    <script src="js/minigames/coinCollector.js"></script>
+    <script src="js/minigames/roulette.js"></script>
+    <script src="js/minigames/chess.js"></script>
+    <script src="js/minigames/maze.js"></script>
+    <script src="js/minigames/shooter.js"></script>
+    
+    <!-- Nuevos Minijuegos -->
+    <script src="js/minigames/platform.js"></script>
+    <script src="js/minigames/memory.js"></script>
+    <script src="js/minigames/snake.js"></script>
+    <script src="js/minigames/puzzle.js"></script>
+    <script src="js/minigames/rhythm.js"></script>
+    <script src="js/minigames/towerDefense.js"></script>
+    
+    <!-- Initialize Game -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Obtener el parámetro 'game' de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameParam = urlParams.get('game');
+            
+            const gameInfoElement = document.getElementById('game-info');
+            const backButton = document.getElementById('back-button');
+            
+            // Información de los juegos
+            const games = {
+                coinCollector: {
+                    name: "El Tesoro del Valle Dorado",
+                    icon: "🪙",
+                    description: "Recoge las monedas doradas antes de que se acabe el tiempo en este mágico valle."
+                },
+                roulette: {
+                    name: "La Rueda de la Fortuna Mágica",
+                    icon: "🎰",
+                    description: "Gira la rueda y prueba tu suerte en la Ciudad de los Deseos."
+                },
+                chess: {
+                    name: "Los Guardianes del Reino Cuadriculado",
+                    icon: "♞",
+                    description: "Planifica tus movimientos estratégicos en el Reino Cuadriculado."
+                },
+                maze: {
+                    name: "El Bosque Enredado de Migalandia",
+                    icon: "🧩",
+                    description: "Encuentra el camino a través del misterioso Bosque Enredado."
+                },
+                shooter: {
+                    name: "Los Burbujeadores del Cielo Azucarado",
+                    icon: "🔫",
+                    description: "Revienta las burbujas mágicas en el colorido Cielo Azucarado."
+                },
+                platform: {
+                    name: "Las Islas Flotantes de Bizcocho",
+                    icon: "🏃",
+                    description: "Salta entre las plataformas flotantes y recoge estrellas fugaces."
+                },
+                memory: {
+                    name: "El Misterio de las Cartas Gemelas",
+                    icon: "🃏",
+                    description: "Encuentra los pares coincidentes en la Villa de los Recuerdos."
+                },
+                snake: {
+                    name: "Las Aventuras de Silbi la Serpiente Golosa",
+                    icon: "🐍",
+                    description: "Ayuda a Silbi a recoger manzanas mágicas sin tropezar con su cola."
+                },
+                puzzle: {
+                    name: "El Cuadro Mágico Despiezado",
+                    icon: "🧠",
+                    description: "Desliza las piezas para completar las imágenes mágicas de la Galería."
+                },
+                rhythm: {
+                    name: "La Orquesta Dulce de Migalandia",
+                    icon: "🎵",
+                    description: "Sigue el ritmo de las notas musicales en el Valle de la Melodía."
+                },
+                towerDefense: {
+                    name: "Los Guardianes del Castillo de Azúcar",
+                    icon: "🏰",
+                    description: "Construye torres para defender el Castillo Glaseado de los invasores."
+                }
+            };
+            
+            // Si hay un juego especificado en la URL
+            if (gameParam && games[gameParam]) {
+                const game = games[gameParam];
+                
+                // Mostrar información del juego
+                gameInfoElement.innerHTML = `
+                    <h3><span style="font-size: 1.5em; margin-right: 10px;">${game.icon}</span> ${game.name}</h3>
+                    <p>${game.description}</p>
+                `;
+                
+                gameInfoElement.style.display = 'block';
+                
+                // Inicializar el juego
+                window.addEventListener('load', () => {
+                    const gameInstance = new Game();
+                    gameInstance.start();
+                    
+                    // Cambiar directamente a la escena del juego seleccionado
+                    setTimeout(() => {
+                        if (gameInstance.scenes[gameParam]) {
+                            gameInstance.switchScene(gameParam);
+                        } else {
+                            console.error(`No se encontró la escena para el juego: ${gameParam}`);
+                        }
+                    }, 500);
+                });
+
+                // Para asegurar que la información del juego desaparezca después de unos segundos
+                setTimeout(() => {
+                    gameInfoElement.style.opacity = '0';
+                    gameInfoElement.style.transition = 'opacity 1s ease-out';
+                    setTimeout(() => {
+                        gameInfoElement.style.display = 'none';
+                    }, 1000);
+                }, 5000);
+            } else {
+                // Si no hay juego especificado, mostrar el mapa del mundo
+                backButton.style.display = 'none';
+                
+                // Inicializar el juego en modo mapa del mundo
+                window.addEventListener('load', () => {
+                    const game = new Game();
+                    game.start();
+                    setTimeout(() => {
+                        if (game.scenes['worldMap']) {
+                            game.switchScene('worldMap');
+                        }
+                    }, 500);
+                });
+            }
+            
+            // Ajustar el link del botón de volver
+            backButton.href = 'juego_nuevo.html'; // Sin parámetro game para volver al mapa
+        });
+    </script>
+</body>
+</html>
