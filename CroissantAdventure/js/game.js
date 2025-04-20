@@ -269,6 +269,30 @@ class Game {
                 console.error('Error registering TowerDefenseMinigame:', e);
             }
             
+            // Registrar Paint Game minigame
+            try {
+                if (typeof PaintGameMinigame !== 'undefined') {
+                    this.registerScene('paintGame', new PaintGameMinigame(this));
+                    console.log('PaintGameMinigame registered');
+                } else {
+                    console.error('PaintGameMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering PaintGameMinigame:', e);
+            }
+            
+            // Registrar Trivia Game minigame
+            try {
+                if (typeof TriviaGameMinigame !== 'undefined') {
+                    this.registerScene('triviaGame', new TriviaGameMinigame(this));
+                    console.log('TriviaGameMinigame registered');
+                } else {
+                    console.error('TriviaGameMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering TriviaGameMinigame:', e);
+            }
+            
             // Start with main menu
             console.log('Switching to main menu scene');
             this.switchScene('mainMenu');

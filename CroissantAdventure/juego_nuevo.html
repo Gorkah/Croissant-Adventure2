@@ -12,7 +12,7 @@
             padding: 0;
             background-color: #ffe9c7;
             color: #5c4a38;
-            overflow: hidden;
+            overflow-x: hidden;
         }
         
         #header {
@@ -87,17 +87,56 @@
             border-radius: 10px;
             text-align: center;
             z-index: 5;
+            transition: opacity 1s ease-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
-        @media (max-width: 900px) {
+        @media (max-width: 1200px) {
             .container {
                 flex-direction: column;
+                height: auto;
+                overflow: visible;
             }
             
             #chat-container {
-                flex: 0 0 300px;
+                flex: 0 0 400px;
+                width: 100%;
                 border-right: none;
                 border-bottom: 3px solid #ff9900;
+            }
+            
+            #game-container {
+                height: calc(100vh - 460px);
+                min-height: 400px;
+            }
+            
+            #game-canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            #header h1 {
+                font-size: 1.5rem;
+            }
+            
+            #chat-container {
+                flex: 0 0 350px;
+            }
+            
+            #game-container {
+                height: calc(100vh - 410px);
+                min-height: 350px;
+            }
+            
+            .back-button {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            
+            #game-info h3 {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -146,6 +185,8 @@
     <script src="js/minigames/puzzle.js"></script>
     <script src="js/minigames/rhythm.js"></script>
     <script src="js/minigames/towerDefense.js"></script>
+    <script src="js/minigames/paintGame.js"></script>
+    <script src="js/minigames/triviaGame.js"></script>
     
     <!-- Initialize Game -->
     <script>
@@ -213,7 +254,18 @@
                     name: "Los Guardianes del Castillo de Azúcar",
                     icon: "🏰",
                     description: "Construye torres para defender el Castillo Glaseado de los invasores."
-                }
+                },
+                paintGame: {
+                    name: "Estudio Artístico de Migalandia",
+                    icon: "🎨",
+                    description: "Dibuja y pinta deliciosos pasteles y divertidos personajes."
+                },
+                triviaGame: {
+                    name: "Trivia de Pastelería",
+                    icon: "🥨",
+                    description: "Pon a prueba tus conocimientos sobre croissants y pasteles."
+                },
+
             };
             
             // Si hay un juego especificado en la URL
@@ -269,6 +321,43 @@
             
             // Ajustar el link del botón de volver
             backButton.href = 'juego_nuevo.html'; // Sin parámetro game para volver al mapa
+            
+            // Función para ajustar el tamaño del canvas con respecto al contenedor
+            function resizeCanvas() {
+                const container = document.getElementById('game-container');
+                const canvas = document.getElementById('game-canvas');
+                
+                // Mantener proporciones adecuadas
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+                
+                // Mantener relación de aspecto 3:2 (1200x800)
+                const aspectRatio = 3/2;
+                
+                let width, height;
+                
+                if (containerWidth / containerHeight > aspectRatio) {
+                    // Contenedor más ancho que el aspecto deseado
+                    height = containerHeight;
+                    width = height * aspectRatio;
+                } else {
+                    // Contenedor más alto que el aspecto deseado
+                    width = containerWidth;
+                    height = width / aspectRatio;
+                }
+                
+                // Asegurar que el canvas no sea demasiado grande
+                width = Math.min(width, 1200);
+                height = Math.min(height, 800);
+                
+                // Aplicar dimensiones
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+            }
+            
+            // Ajustar tamaño inicialmente y cuando cambie la ventana
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('load', resizeCanvas);
         });
     </script>
 </body>
