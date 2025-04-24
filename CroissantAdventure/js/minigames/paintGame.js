@@ -65,34 +65,58 @@ class PaintGameMinigame extends Minigame {
     }
     
     /**
-     * Inicializar el juego
+     * Setup enter method for PaintGame
      */
     enter() {
         console.log("Entrando al minijuego Paint Game");
+        this.clearCanvas();
+        this.setupPrompt();
         
-        // Limpiar el canvas
-        this.ctx.fillStyle = "#ffffff";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Reiniciar estado
+        // Limpiar el canvas y reiniciar estado
         this.isDrawing = false;
         this.timeLeft = 180;
         
         // Seleccionar un desafío aleatorio
         this.selectRandomChallenge();
         
-        // Vincular eventos
+        // Vincular eventos de mouse específicos para este juego
         this.bindEvents();
+        console.log("Eventos de mouse vinculados en Paint Game");
     }
     
     /**
-     * Salir del juego
+     * Exit method for PaintGame
      */
     exit() {
         console.log("Saliendo del minijuego Paint Game");
         
-        // Desvincular eventos para evitar fugas de memoria
+        // Desvincular eventos de mouse al salir
         this.unbindEvents();
+        console.log("Eventos de mouse desvinculados en Paint Game");
+    }
+    
+    /**
+     * Setup prompts and challenges for painting
+     */
+    setupPrompt() {
+        this.challenges = [
+            "¡Dibuja un croissant!",
+            "¡Pinta un personaje de Migalandia!",
+            "¡Diseña tu propio postre!",
+            "¡Crea un mundo de fantasía!"
+        ];
+        
+        this.currentChallenge = this.challenges[Math.floor(Math.random() * this.challenges.length)];
+    }
+    
+
+    
+    /**
+     * Limpiar el canvas
+     */
+    clearCanvas() {
+        this.ctx.fillStyle = "#ffffff";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
     /**

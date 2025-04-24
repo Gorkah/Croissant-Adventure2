@@ -280,20 +280,43 @@
                 
                 gameInfoElement.style.display = 'block';
                 
+                // Ver si el juego está cargado correctamente
+                console.log("Iniciando juego:", gameParam);
+                console.log("¿Existe clase para este juego?", typeof window[gameParam.charAt(0).toUpperCase() + gameParam.slice(1) + "Minigame"]);
+                
                 // Inicializar el juego
-                window.addEventListener('load', () => {
-                    const gameInstance = new Game();
-                    gameInstance.start();
+                console.log("Creando nueva instancia de juego para:", gameParam);
+                const gameInstance = new Game();
+                
+                // Inicia el juego y espera a que cargue correctamente
+                gameInstance.start();
+                
+                // Definir una función que intente cambiar a la escena varias veces hasta tener éxito
+                const maxAttempts = 5;
+                let attempts = 0;
+                
+                const tryToSwitchScene = () => {
+                    attempts++;
+                    console.log(`Intento ${attempts}/${maxAttempts} de cambiar a escena: ${gameParam}`);
+                    console.log("Escenas disponibles:", Object.keys(gameInstance.scenes));
                     
-                    // Cambiar directamente a la escena del juego seleccionado
-                    setTimeout(() => {
-                        if (gameInstance.scenes[gameParam]) {
-                            gameInstance.switchScene(gameParam);
+                    if (gameInstance.scenes[gameParam]) {
+                        console.log("¡Éxito! Cambiando a escena:", gameParam);
+                        gameInstance.switchScene(gameParam);
+                        return true;
+                    } else {
+                        console.warn(`Aún no se encuentra la escena: ${gameParam}`);
+                        if (attempts < maxAttempts) {
+                            setTimeout(tryToSwitchScene, 500);
                         } else {
-                            console.error(`No se encontró la escena para el juego: ${gameParam}`);
+                            console.error(`No se pudo cargar la escena después de ${maxAttempts} intentos`);
+                            return false;
                         }
-                    }, 500);
-                });
+                    }
+                };
+                
+                // Iniciar el primer intento después de un segundo
+                setTimeout(tryToSwitchScene, 1000);
 
                 // Para asegurar que la información del juego desaparezca después de unos segundos
                 setTimeout(() => {

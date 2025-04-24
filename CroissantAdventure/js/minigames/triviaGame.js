@@ -117,8 +117,10 @@ class TriviaGameMinigame extends Minigame {
         // Seleccionar primera pregunta
         this.setCurrentQuestion();
         
-        // Vincular eventos de mouse
-        this.bindMouseEvents();
+        // Vincular eventos de mouse directamente al método handleMouseClick
+        this.handleMouseClick = this.handleMouseClick.bind(this);
+        this.game.canvas.addEventListener('mousedown', this.handleMouseClick);
+        console.log("Eventos de mouse vinculados en Trivia Game");
     }
     
     /**
@@ -127,8 +129,9 @@ class TriviaGameMinigame extends Minigame {
     exit() {
         console.log("Saliendo del minijuego Trivia");
         
-        // Desvincular eventos
-        this.unbindMouseEvents();
+        // Desvincular eventos de mouse
+        this.game.canvas.removeEventListener('mousedown', this.handleMouseClick);
+        console.log("Eventos de mouse desvinculados en Trivia Game");
     }
     
     /**
@@ -568,28 +571,7 @@ class TriviaGameMinigame extends Minigame {
         return isOver;
     }
     
-    /**
-     * Vincular eventos de mouse
-     */
-    bindMouseEvents() {
-        // Enlazar el método para mantener el contexto correcto
-        this.handleMouseClick = this.handleMouseClick.bind(this);
-        
-        // Añadir el event listener al canvas del juego
-        this.game.canvas.addEventListener('mousedown', this.handleMouseClick);
-        
-        console.log("Eventos de mouse vinculados en Trivia");
-    }
-    
-    /**
-     * Desvincular eventos de mouse
-     */
-    unbindMouseEvents() {
-        // Eliminar el event listener
-        this.game.canvas.removeEventListener('mousedown', this.handleMouseClick);
-        
-        console.log("Eventos de mouse desvinculados en Trivia");
-    }
+
     
     /**
      * Manejador de evento de clic del mouse
