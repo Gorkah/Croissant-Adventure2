@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Croissant Adventure - El Mundo de Migalandia</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ai-chat.css">
     <style>
         body {
             font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
@@ -91,6 +92,19 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
+        /* Variables de CSS para configuración global */
+        :root {
+            --header-height: 60px;
+            --chat-width-desktop: 400px;
+            --chat-height-tablet: 350px;
+            --chat-height-mobile: 300px;
+            --primary-color: #ff9900;
+            --secondary-color: #e68a00;
+            --bg-color: #ffe9c7;
+            --text-color: #5c4a38;
+        }
+
+        /* Estilos para tablets (pantallas medianas) */
         @media (max-width: 1200px) {
             .container {
                 flex-direction: column;
@@ -99,44 +113,94 @@
             }
             
             #chat-container {
-                flex: 0 0 400px;
+                flex: 0 0 var(--chat-height-tablet);
                 width: 100%;
                 border-right: none;
-                border-bottom: 3px solid #ff9900;
+                border-bottom: 3px solid var(--primary-color);
             }
             
             #game-container {
-                height: calc(100vh - 460px);
+                height: calc(100vh - var(--header-height) - var(--chat-height-tablet));
                 min-height: 400px;
-            }
-            
-            #game-canvas {
-                width: 100%;
-                height: auto;
             }
         }
         
-        @media (max-width: 600px) {
+        /* Estilos para móviles (pantallas pequeñas) */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
             #header h1 {
                 font-size: 1.5rem;
+                padding: 8px 0;
             }
             
             #chat-container {
-                flex: 0 0 350px;
+                flex: 0 0 var(--chat-height-mobile);
             }
             
             #game-container {
-                height: calc(100vh - 410px);
-                min-height: 350px;
+                height: calc(100vh - var(--header-height) - var(--chat-height-mobile));
+                min-height: 300px;
             }
             
             .back-button {
                 font-size: 0.8rem;
                 padding: 6px 12px;
+                top: 5px;
+                left: 5px;
+            }
+            
+            #game-info {
+                padding: 8px;
+                font-size: 0.9rem;
             }
             
             #game-info h3 {
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+            }
+            
+            /* Ajustes para orientación horizontal en móviles */
+            @media (orientation: landscape) {
+                .container {
+                    flex-direction: row;
+                    height: calc(100vh - var(--header-height));
+                }
+                
+                #chat-container {
+                    flex: 0 0 40%;
+                    height: 100%;
+                    border-bottom: none;
+                    border-right: 3px solid var(--primary-color);
+                }
+                
+                #game-container {
+                    flex: 0 0 60%;
+                    height: 100%;
+                }
+            }
+        }
+        
+        /* Estilos para móviles muy pequeños */
+        @media (max-width: 480px) {
+            #header h1 {
                 font-size: 1.2rem;
+            }
+            
+            #chat-container {
+                flex: 0 0 250px;
+            }
+            
+            #game-container {
+                height: calc(100vh - var(--header-height) - 250px);
+                min-height: 250px;
+            }
+            
+            .back-button {
+                padding: 4px 10px;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -149,7 +213,7 @@
     <div class="container">
         <!-- Columna izquierda - Chatbot -->
         <div id="chat-container">
-            <iframe id="chat-frame" src="https://bots.easy-peasy.ai/bot/9070d911-01ca-4d29-a339-f98a6e589b43?mode=iframe" width="100%" height="100%" allowfullscreen></iframe>
+            <!-- El contenido será generado dinámicamente por ChatInterface -->
         </div>
         
         <!-- Columna derecha - Juego -->
@@ -162,6 +226,10 @@
         </div>
     </div>
 
+    <!-- IA Storyteller -->
+    <script src="js/ai/storytellerAI.js"></script>
+    <script src="js/ai/chatInterface.js"></script>
+    
     <!-- Core Game Engine -->
     <script src="js/game.js"></script>
     
@@ -187,10 +255,18 @@
     <script src="js/minigames/towerDefense.js"></script>
     <script src="js/minigames/paintGame.js"></script>
     <script src="js/minigames/triviaGame.js"></script>
+    <script src="js/minigames/adminPanel.js"></script>
     
     <!-- Initialize Game -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar la interfaz de chat con IA
+            const chatInterface = new ChatInterface();
+            chatInterface.initialize().catch(error => {
+                console.error('Error al inicializar la interfaz de chat:', error);
+                document.getElementById('ai-status').textContent = 'Error al inicializar. Intenta recargar la página.';
+            });
+            
             // Obtener el parámetro 'game' de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const gameParam = urlParams.get('game');
@@ -264,6 +340,11 @@
                     name: "Trivia de Pastelería",
                     icon: "🥨",
                     description: "Pon a prueba tus conocimientos sobre croissants y pasteles."
+                },
+                adminPanel: {
+                    name: "Panel de Administración",
+                    icon: "🔧",
+                    description: "Panel administrativo con tablero de planificación interactivo."
                 },
 
             };

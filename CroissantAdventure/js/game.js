@@ -45,19 +45,38 @@ class Game {
     setupInputs() {
         // Keyboard
         window.addEventListener('keydown', (e) => {
-            console.log('Key pressed:', e.key);
-            this.keys[e.key.toLowerCase()] = true;
-            // Prevent default browser behavior for arrow keys and WASD
-            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'e'].includes(e.key.toLowerCase())) {
-                e.preventDefault();
+            // Verificar si el foco está en un elemento de entrada de texto
+            const isInputFocused = document.activeElement && 
+                (document.activeElement.tagName === 'INPUT' || 
+                 document.activeElement.tagName === 'TEXTAREA' || 
+                 document.activeElement.isContentEditable);
+                 
+            console.log('Key pressed:', e.key, 'Input focused:', isInputFocused);
+            
+            // Solo capturar teclas si no hay un elemento de entrada con foco
+            if (!isInputFocused) {
+                this.keys[e.key.toLowerCase()] = true;
+                // Prevent default browser behavior for arrow keys and WASD
+                if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'e'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
             }
         });
         
         window.addEventListener('keyup', (e) => {
+            // Verificar si el foco está en un elemento de entrada de texto
+            const isInputFocused = document.activeElement && 
+                (document.activeElement.tagName === 'INPUT' || 
+                 document.activeElement.tagName === 'TEXTAREA' || 
+                 document.activeElement.isContentEditable);
+                 
             this.keys[e.key.toLowerCase()] = false;
-            // Prevent default browser behavior for arrow keys and WASD
-            if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'e'].includes(e.key.toLowerCase())) {
-                e.preventDefault();
+            
+            // Solo prevenir comportamiento predeterminado si no hay un elemento de entrada con foco
+            if (!isInputFocused) {
+                if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'e'].includes(e.key.toLowerCase())) {
+                    e.preventDefault();
+                }
             }
         });
         
@@ -291,6 +310,18 @@ class Game {
                 }
             } catch (e) {
                 console.error('Error registering TriviaGameMinigame:', e);
+            }
+            
+            // Registrar Admin Panel minigame
+            try {
+                if (typeof AdminPanel !== 'undefined') {
+                    this.registerScene('adminPanel', new AdminPanel(this));
+                    console.log('AdminPanel registered');
+                } else {
+                    console.error('AdminPanel class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering AdminPanel:', e);
             }
             
             // Start with main menu
