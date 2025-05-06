@@ -82,12 +82,25 @@ class Game {
         
         // Mouse
         this.canvas.addEventListener('mousemove', (e) => {
+            // Calcular coordenadas precisas considerando el escalado del canvas
             const rect = this.canvas.getBoundingClientRect();
-            this.mouseX = e.clientX - rect.left;
-            this.mouseY = e.clientY - rect.top;
+            const scaleX = this.canvas.width / rect.width;    // Factor de escala en X
+            const scaleY = this.canvas.height / rect.height;  // Factor de escala en Y
+            
+            // Coordenadas ajustadas por el escalado
+            this.mouseX = (e.clientX - rect.left) * scaleX;
+            this.mouseY = (e.clientY - rect.top) * scaleY;
         });
         
         this.canvas.addEventListener('mousedown', (e) => {
+            // Recalcular en caso de que mousemove no se haya activado
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            this.mouseX = (e.clientX - rect.left) * scaleX;
+            this.mouseY = (e.clientY - rect.top) * scaleY;
+            
             console.log('Mouse clicked at:', this.mouseX, this.mouseY);
             this.mouseDown = true;
         });
