@@ -1,6 +1,6 @@
 /**
- * StorytellerAI - Un sistema para contar historias y dirigir a los usuarios a diferentes juegos
- * Esta implementación utiliza reglas preestablecidas y respuestas predefinidas para simular una IA
+ * StorytellerAI - Sistema narrativo simple pero efectivo para Croissant Adventure
+ * Proporciona una experiencia conversacional coherente con enfoque en las aventuras
  */
 class StorytellerAI {
     constructor() {
@@ -8,14 +8,18 @@ class StorytellerAI {
         this.messages = [];
         this.gameOptions = {};
         this.isFetchingResponse = false;
-        this.loadingTime = 2000; // Tiempo simulado de carga en ms
-        this.conversationContext = {
-            lastTopics: [],
-            userInterests: new Set(),
-            conversationState: 'greeting',  // greeting, exploring, recommending, storytelling
+        this.loadingTime = 1500; // Tiempo simulado de carga
+        
+        // Sistema de memoria para mantener contexto de conversación
+        this.memory = {
+            lastUserMessage: "",
+            lastBotMessage: "",
             mentionedGames: new Set(),
-            userMood: 'neutral'
-        }
+            userPreferences: new Set(),
+            negativePreferences: new Set(), // Lo que al usuario no le gusta
+            conversationCount: 0,
+            lastSuggestedGames: []      
+        };
         
         // Mapeo de palabras clave a juegos
         this.gameKeywords = {
@@ -116,58 +120,55 @@ class StorytellerAI {
     }
     
     /**
-     * Carga respuestas predefinidas para diferentes temas y contextos conversacionales
+     * Carga respuestas predefinidas con mayor precisión contextual
      */
     loadResponses() {
-        // Respuestas contextuales para diferentes situaciones de la conversación
         this.responses = {
-            // Saludos y bienvenidas
-            welcome: [
-                "¡Hola aventurero! Bienvenido a Migalandia, un reino donde los croissants hablan y las aventuras esperan. ¿Qué tipo de historia te gustaría vivir hoy?",
-                "¡Qué alegría verte por aquí! Migalandia está llena de magia, secretos y tesoros por descubrir. ¿Qué te gustaría explorar primero?",
-                "¡Saludos, viajero! Como Narrador de Migalandia, puedo guiarte a través de numerosas aventuras. ¿Buscas acción, misterio, desafíos de ingenio o simplemente diversión?"
+            // Bienvenida inicial
+            intro: [
+                "¡Bienvenido a Croissant Adventure! Soy el Narrador de Migalandia, un reino mágico lleno de aventuras y misterios. ¿Qué tipo de historia te gustaría explorar hoy? Puedes pedirme una aventura con monedas brillantes, un desafío de estrategia, un laberinto misterioso, o cualquier otra cosa que te intrigue. ¡Cuéntame qué buscas y te guiaré!"
             ],
             
-            // Respuestas para cuando no se detecta un tema específico
-            unknown: [
-                "Hmm, esa es una idea interesante. En Migalandia tenemos de todo: desde tesoros brillantes hasta laberintos misteriosos. ¿Te gustaría que te cuente más sobre alguna aventura específica?",
-                "¡Vaya, qué creatividad! Déjame pensar... Podría mostrarte el Valle Dorado con sus monedas mágicas, o quizás prefieras el desafío del Bosque Enredado con sus caminos confusos. ¿Qué te llama más la atención?",
-                "Interesante pregunta. Migalandia es un reino vasto con muchas historias por contar. ¿Te interesaría una aventura de acción, una historia de misterio o quizás un desafío de estrategia?"
-            ],
-            
-            // Respuestas para saludos simples o conversación casual
+            // Saludos básicos
             greeting: [
-                "¡Hola! ¿Cómo estás hoy? Puedo ver que el sol brilla en Migalandia. ¿Qué tipo de aventura busca tu corazón en este hermoso día?",
-                "¡Saludos! Espero que estés teniendo un día maravilloso. Todas las criaturas de Migalandia están ansiosas por conocer qué aventura elegirás hoy.",
-                "¡Hola! Me alegra mucho conversar contigo. ¿Qué te trae hoy por el mágico reino de Migalandia?"
+                "¡Hola aventurero! Encantado de verte en las tierras de Migalandia. Tengo muchas historias que podrían interesarte, ¿qué tipo de aventura buscas hoy?",
+                "¡Un saludo desde la Torre del Narrador! ¿Qué tipo de misión te gustaría emprender en Migalandia?",
+                "¡Bienvenido de nuevo! Las páginas de mis libros están listas para mostrar nuevas aventuras. ¿Qué historia te gustaría vivir hoy?"
             ],
             
-            // Respuestas para cuando el usuario muestra entusiasmo
-            excitement: [
-                "¡Veo que tienes mucho entusiasmo! Esa energía te será muy útil en las aventuras de Migalandia. ¿Te gustaría probar algo lleno de acción como los Burbujeadores del Cielo Azucarado?",
-                "¡Tu emoción es contagiosa! Con ese espíritu, seguramente disfrutarías saltando entre las Islas Flotantes de Bizcocho o defendiendo el Castillo de Azúcar.",
-                "¡Me encanta tu energía! Creo que disfrutarías mucho de una aventura llena de ritmo como la Orquesta Dulce de Migalandia, donde cada nota musical cobra vida."
+            // Respuestas a expresiones negativas
+            negative: [
+                "Veo que esa aventura no ha captado tu interés. No te preocupes, el reino de Migalandia tiene muchas otras historias que podrían emocionarte más. ¿Buscas acción, estrategia o tal vez un reto de ingenio?",
+                "Comprendo que eso no te entusiasma. Déjame mostrarte algo completamente diferente. ¿Quizás prefieras una aventura con más acción o un desafío estratégico?",
+                "Entiendo perfectamente, no todos los caminos son para todos los aventureros. Permíteme sugerirte algunas opciones completamente distintas que podrían despertar tu interés."
             ],
             
-            // Respuestas para preguntas sobre el universo de Migalandia
-            lore: [
-                "Migalandia surgió hace milenios cuando un panadero mágico horneó el primer croissant con harina encantada bajo la luz de la luna llena. Desde entonces, sus migas crearon valles, ríos y bosques llenos de magia y aventuras.",
-                "En el corazón de Migalandia se encuentra la Gran Pastelería, donde el Maestro Horneador crea constantemente nuevos rincones para este mundo mágico. Cada lugar tiene su propia historia y secretos por descubrir.",
-                "Las leyendas cuentan que Migalandia está conectada con nuestro mundo a través de los sueños y la imaginación. Cada vez que alguien disfruta de un delicioso croissant, se abre brevemente un portal entre los dos mundos."
+            // Respuestas para emociones positivas
+            positive: [
+                "¡Me alegra que te guste! Puedo mostrarte más aventuras similares si quieres seguir por ese camino, o podemos explorar algo totalmente nuevo.",
+                "¡Excelente elección! Ese es uno de los destinos favoritos en Migalandia. ¿Te gustaría saber más sobre esta aventura o prefieres embarcarte en ella directamente?",
+                "¡Tu entusiasmo hace que las páginas del libro brillen! Tengo muchas más historias que seguramente disfrutarás si te gustó esa."
             ],
             
-            // Respuestas para dar continuidad a la conversación
-            continuation: [
-                "Cuéntame más sobre lo que te interesa. ¿Hay algún tipo de aventura que te llame especialmente la atención?",
-                "¿Qué otros aspectos de Migalandia te gustaría explorar? Hay tantas historias por descubrir...",
-                "Me intriga tu forma de pensar. ¿Qué otra cosa te gustaría saber sobre las maravillas de Migalandia?"
+            // Respuestas para preguntas o confusión
+            question: [
+                "En Migalandia, cada rincón alberga una historia única. ¿Qué te gustaría saber específicamente sobre nuestro mundo mágico o sus aventuras?",
+                "Como Narrador, puedo revelarte los secretos de Migalandia y guiarte a través de sus tierras. ¿Qué misterios te intrigan más?",
+                "Las preguntas son el inicio de toda gran aventura. ¿Qué dudas tienes sobre el reino de Migalandia o sus desafíos?"
             ],
             
-            // Respuestas para reconocimiento de patrones de búsqueda
-            search_pattern: [
-                "Parece que estás buscando algo específico. En Migalandia tenemos aventuras para todos los gustos. ¿Puedo ayudarte a encontrar exactamente lo que buscas?",
-                "Veo que tienes una idea clara de lo que quieres. Déjame ayudarte a encontrar la aventura perfecta para ti en los vastos reinos de Migalandia.",
-                "Tu búsqueda me da pistas sobre tus intereses. Permíteme guiarte hacia las aventuras de Migalandia que más podrían fascinarte."
+            // Sugerencias específicas
+            suggestion: [
+                "Basado en lo que me cuentas, creo que estas aventuras podrían ser perfectas para ti:",
+                "He buscado en mi libro de historias y encontré estas misiones que parecen ideales para tu espíritu aventurero:",
+                "Explorando el mapa de Migalandia, estos son los destinos que más podrían interesarte:"
+            ],
+            
+            // Cuando no hay indicaciones claras
+            default: [
+                "Migalandia tiene tantas historias por contar que a veces es difícil decidir. ¿Prefieres acción, estrategia, misterio o creatividad?",
+                "Como Narrador, puedo guiarte a numerosos reinos mágicos dentro de Migalandia. ¿Qué tipo de aventura atraería más a tu espíritu?",
+                "Las páginas de mi libro mágico contienen infinitas posibilidades. Dime qué buscas y te mostraré el camino hacia la aventura perfecta."
             ]
         };
     }
@@ -242,70 +243,76 @@ class StorytellerAI {
         }
         
         if (this.isFetchingResponse) {
-            return "Espera un momento, estoy tejiendo las palabras para mi respuesta...";
+            return "Estoy preparando mi respuesta, dame un momento...";
         }
         
         try {
             this.isFetchingResponse = true;
             
+            // Guardar el mensaje anterior para contexto
+            this.memory.lastUserMessage = userInput;
+            this.memory.conversationCount++;
+            
             // Añadir mensaje del usuario
             this.addMessage('user', userInput);
             
-            // Analizar el contenido del mensaje
-            this.analyzeUserMessage(userInput);
+            // Analizar sentimiento y contexto del mensaje
+            const messageContext = this.analyzeMessage(userInput);
             
-            // Identificar juegos relevantes basados en palabras clave
-            const detectedGames = this.detectGames(userInput);
+            // Identificar juegos relevantes o excluir juegos no deseados
+            let suggestedGames = [];
             
-            // Actualizar juegos mencionados en el contexto de la conversación
-            detectedGames.forEach(game => {
-                this.conversationContext.mentionedGames.add(game);
-            });
+            // Generar sugerencias basándonos en el análisis
+            if (messageContext.sentiment === 'negative') {
+                // Si al usuario no le gusta lo sugerido anteriormente, ofrecer algo diferente
+                // Evitar sugerir los mismos juegos de antes
+                suggestedGames = this.getSuggestedGames(3, this.memory.lastSuggestedGames);
+                
+                // Actualizar juegos que no le gustan al usuario
+                this.memory.lastSuggestedGames.forEach(game => {
+                    this.memory.negativePreferences.add(game);
+                });
+            } else if (messageContext.detectedGames.length > 0) {
+                // Si detectó juegos específicos
+                suggestedGames = messageContext.detectedGames;
+                
+                // Guardar preferencias
+                suggestedGames.forEach(game => {
+                    this.memory.userPreferences.add(game);
+                });
+            } else {
+                // Sugerir juegos basándonos en contexto o al azar
+                suggestedGames = this.getSuggestedGames(3);
+            }
             
-            // Si se detectan juegos, se añaden opciones de juego
-            if (detectedGames.length > 0) {
+            // Actualizar memoria
+            this.memory.lastSuggestedGames = suggestedGames;
+            
+            // Preparar opciones para mostrar
+            if (suggestedGames.length > 0) {
                 this.gameOptions = {};
-                detectedGames.forEach(game => {
+                suggestedGames.forEach(game => {
                     this.gameOptions[game] = this.gameStories[game];
                 });
-                
-                // Si se detectan juegos específicos, cambiamos el estado de la conversación
-                this.conversationContext.conversationState = 'recommending';
             }
             
-            // Simular tiempo de "pensamiento"
-            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-            
-            // Generar respuesta contextual basada en el análisis del mensaje
+            // Construir respuesta apropiada
             const responseIndex = this.addMessage('assistant', '...');
-            let responseText = this.generateContextualResponse(userInput, detectedGames);
+            const responseText = this.buildResponse(messageContext, suggestedGames);
             
-            // Simular respuesta por partes (efecto de escritura)
-            const chunks = this.chunkText(responseText, 10 + Math.floor(Math.random() * 20));
-            
-            for (const chunk of chunks) {
-                await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
-                this.messages[responseIndex].content += chunk;
-                this.renderMessages();
-            }
+            // Efecto de escritura gradual (simulación de tipeo)
+            await this.simulateTyping(responseIndex, responseText);
             
             // Finalizar respuesta
             this.messages[responseIndex].content = responseText;
             this.renderMessages();
             
-            // Sugerir juegos si se detectaron
-            if (detectedGames.length > 0) {
-                this.displayGameOptions(detectedGames);
-            }
+            // Guardar la respuesta para contexto futuro
+            this.memory.lastBotMessage = responseText;
             
-            // Guardar el tema actual para dar continuidad a la conversación
-            if (detectedGames.length > 0) {
-                this.conversationContext.lastTopics = [...detectedGames];
-            }
-            
-            // Cambiar el estado de la conversación si es necesario
-            if (this.messages.length > 3 && this.conversationContext.conversationState === 'greeting') {
-                this.conversationContext.conversationState = 'exploring';
+            // Mostrar opciones de juego como botones
+            if (suggestedGames.length > 0) {
+                this.displayGameOptions(suggestedGames);
             }
             
             this.isFetchingResponse = false;
@@ -315,8 +322,8 @@ class StorytellerAI {
             console.error("Error al procesar mensaje:", error);
             this.isFetchingResponse = false;
             
-            // Mensaje de error en caso de fallo que mantenga el tono narrativo
-            const errorMessage = "Oh, parece que las páginas de mi libro de historias se han mezclado por un momento. ¿Podríamos empezar de nuevo con una nueva aventura? Tengo historias sobre valles dorados, bosques mágicos y muchas otras maravillas de Migalandia para compartir contigo.";
+            // Mensaje de error amigable
+            const errorMessage = "Parece que mi libro de historias está un poco desordenado. ¿Podríamos intentar otra vez? Tengo muchas aventuras emocionantes para compartir contigo.";
             this.messages[this.messages.length - 1].content = errorMessage;
             this.renderMessages();
             
@@ -325,128 +332,168 @@ class StorytellerAI {
     }
     
     /**
-     * Analiza el mensaje del usuario para entender su contexto e intención
+     * Simula el efecto de escritura gradual
      */
-    analyzeUserMessage(userInput) {
-        const lowerInput = userInput.toLowerCase();
-        
-        // Detectar saludos
-        const greetings = ['hola', 'saludos', 'buenos días', 'buenas tardes', 'buenas noches', 'qué tal', 'cómo estás', 'hey'];
-        if (greetings.some(greeting => lowerInput.includes(greeting))) {
-            this.conversationContext.conversationState = 'greeting';
+    async simulateTyping(messageIndex, text) {
+        const chunks = this.chunkText(text, 15);
+        for (const chunk of chunks) {
+            await new Promise(resolve => setTimeout(resolve, 30 + Math.random() * 70));
+            this.messages[messageIndex].content += chunk;
+            this.renderMessages();
         }
-        
-        // Detectar preguntas sobre el mundo
-        const loreQuestions = ['qué es migalandia', 'cuéntame sobre', 'historia de', 'origen', 'qué hay en', 'qué puedo hacer', 'qué juegos hay'];
-        if (loreQuestions.some(question => lowerInput.includes(question))) {
-            this.conversationContext.conversationState = 'storytelling';
-        }
-        
-        // Detectar entusiasmo
-        const enthusiasmMarkers = ['me encanta', 'genial', 'increíble', 'fantástico', 'asombroso', 'interesante', 'me gusta', '!', '!!'];
-        if (enthusiasmMarkers.some(marker => lowerInput.includes(marker))) {
-            this.conversationContext.userMood = 'excited';
-        }
-        
-        // Detectar confusión
-        const confusionMarkers = ['no entiendo', 'qué significa', 'cómo funciona', 'no sé', 'confuso', 'confundido', 'confundida'];
-        if (confusionMarkers.some(marker => lowerInput.includes(marker))) {
-            this.conversationContext.userMood = 'confused';
-        }
-        
-        // Detectar intereses del usuario y agregarlos al conjunto
-        const interestKeywords = ['me gusta', 'me interesa', 'quiero', 'preferiría', 'busco', 'me gustaría'];
-        interestKeywords.forEach(keyword => {
-            if (lowerInput.includes(keyword)) {
-                // Extraer lo que viene después de la palabra clave (simplificado)
-                const startIndex = lowerInput.indexOf(keyword) + keyword.length;
-                const interestPhrase = lowerInput.substring(startIndex).trim();
-                if (interestPhrase) {
-                    this.conversationContext.userInterests.add(interestPhrase);
-                }
-            }
-        });
     }
     
     /**
-     * Genera una respuesta contextual basada en el mensaje del usuario y el estado de la conversación
+     * Analiza el mensaje del usuario para determinar contexto y sentimiento
      */
-    generateContextualResponse(userInput, detectedGames) {
-        // Establecer el tipo de respuesta basado en el estado de la conversación
-        let responseType = 'unknown';
+    analyzeMessage(userInput) {
+        const lowerInput = userInput.toLowerCase();
         
-        // Seleccionar tipo de respuesta según el contexto
-        if (this.conversationContext.conversationState === 'greeting') {
-            responseType = 'greeting';
-        } else if (this.conversationContext.conversationState === 'storytelling') {
-            responseType = 'lore';
-        } else if (this.conversationContext.conversationState === 'recommending') {
-            // Ya se maneja con respuestas específicas de juegos
-        } else if (this.conversationContext.userMood === 'excited') {
-            responseType = 'excitement';
-        } else if (this.conversationContext.userMood === 'confused') {
-            // Dar una respuesta más explicativa
-            responseType = 'lore';
+        // Objeto de resultado del análisis
+        const result = {
+            isGreeting: false,
+            isQuestion: false,
+            sentiment: 'neutral', // positive, negative, neutral
+            detectedGames: [],
+            keywords: []
+        };
+        
+        // Detectar saludos
+        const greetings = ['hola', 'saludos', 'buenos días', 'buenas tardes', 'buenas noches', 'qué tal', 'cómo estás', 'hey'];
+        result.isGreeting = greetings.some(g => lowerInput.includes(g));
+        
+        // Detectar preguntas
+        result.isQuestion = lowerInput.includes('?') || 
+                          ['qué', 'cómo', 'cuándo', 'cuál', 'dónde', 'por qué', 'qué es', 'cuántos'].some(q => lowerInput.includes(q));
+        
+        // Detectar sentimiento
+        const negativeTerms = ['no me gusta', 'aburrido', 'aburre', 'aburrida', 'malo', 'mala', 'no quiero', 'no sirve', 'no es bueno', 'odio', 'detesto', 'fastidioso'];
+        
+        const positiveTerms = ['me gusta', 'bueno', 'buena', 'excelente', 'genial', 'divertido', 'interesante', 'fantástico', 'increíble', 'amo', 'encanta', 'maravilloso'];
+        
+        if (negativeTerms.some(term => lowerInput.includes(term))) {
+            result.sentiment = 'negative';
+        } else if (positiveTerms.some(term => lowerInput.includes(term))) {
+            result.sentiment = 'positive';
         }
         
-        // Si se han detectado juegos, generar respuesta personalizada
-        if (detectedGames.length > 0) {
-            const gameResponses = detectedGames.map(gameId => {
-                return this.gameStories[gameId];
-            });
-            
-            // Crear introducción contextual
-            let intro = this.getRandomResponse(responseType);
-            
-            // Añadir referencias a los juegos detectados
-            const gameNames = detectedGames.map(gameId => this.getGameNameFromId(gameId)).join(", ");
-            const response = `${intro} Veo que te interesa ${gameNames}. \n\n${gameResponses.join(" \n\n")}\n\nPuedes hacer clic en las palabras resaltadas para iniciar la aventura, o preguntarme sobre otro tipo de historias.`;
-            
-            return response;
-        } 
-        // Si no se detectaron juegos específicos
-        else {
-            // Personalizar según temas previos o intereses detectados
-            let customResponse = "";
-            
-            // Si hay temas previos, hacer referencia a ellos
-            if (this.conversationContext.lastTopics.length > 0) {
-                const lastGameId = this.conversationContext.lastTopics[0];
-                const lastGameName = this.getGameNameFromId(lastGameId);
-                customResponse = `Antes hablábamos sobre ${lastGameName}. `;
+        // Detectar juegos mencionados
+        result.detectedGames = this.detectGames(userInput);
+        
+        // Extraer palabras clave para futuro análisis
+        const significantWords = lowerInput.split(/\s+/).filter(word => 
+            word.length > 3 && 
+            !['como', 'para', 'este', 'esta', 'estos', 'estas', 'pero', 'porque', 'aunque'].includes(word)
+        );
+        
+        result.keywords = significantWords;
+        
+        return result;
+    }
+    
+    /**
+     * Construye una respuesta contextual basada en el análisis del mensaje
+     */
+    buildResponse(messageContext, suggestedGames) {
+        let responseType = 'default';
+        let intro = '';
+        
+        // Determinar el tipo de respuesta según el contexto
+        if (messageContext.isGreeting) {
+            responseType = 'greeting';
+        } else if (messageContext.isQuestion) {
+            responseType = 'question';
+        } else if (messageContext.sentiment === 'positive') {
+            responseType = 'positive';
+        } else if (messageContext.sentiment === 'negative') {
+            responseType = 'negative';
+        } else if (this.memory.conversationCount <= 1) {
+            responseType = 'intro';  // Primera interacción
+        }
+        
+        // Obtener una introducción apropiada
+        intro = this.getRandomResponse(responseType);
+        
+        // Preparar descripciones de juegos sugeridos
+        const gameDescriptions = suggestedGames.map(gameId => {
+            // Marcar juegos que coinciden con los intereses detectados
+            return `${this.getGameNameFromId(gameId)}: ${this.gameStories[gameId]}`;
+        }).join("\n\n");
+        
+        // Construir respuesta final
+        let response = '';
+        
+        if (messageContext.sentiment === 'negative') {
+            // Respuesta para sentimiento negativo
+            response = `${intro}\n\n${gameDescriptions}`;
+        } else if (suggestedGames.length > 0) {
+            // Respuesta con juegos sugeridos
+            if (messageContext.detectedGames.length > 0) {
+                // Si mencionó juegos específicos
+                const gamesText = messageContext.detectedGames.length === 1 ? 
+                    this.getGameNameFromId(messageContext.detectedGames[0]) : 
+                    'estas aventuras';
+                    
+                response = `${intro} ${gamesText}\n\n${gameDescriptions}`;
+            } else {
+                // Sugerencias generales
+                const suggestionIntro = this.getRandomResponse('suggestion');
+                response = `${intro}\n\n${suggestionIntro}\n\n${gameDescriptions}`;
             }
-            
-            // Elegir una respuesta contextual
-            const contextualResponse = this.getRandomResponse(responseType);
-            
-            // Seleccionar 2-3 juegos aleatorios para sugerir, pero evitando repeticiones
-            const allGames = Object.keys(this.gameStories);
-            const suggestedGames = [];
-            const mentionedGamesArray = Array.from(this.conversationContext.mentionedGames);
-            
-            // Priorizar juegos que aún no se han mencionado
-            const unmentionedGames = allGames.filter(game => !mentionedGamesArray.includes(game));
-            const gamesToChooseFrom = unmentionedGames.length > 0 ? unmentionedGames : allGames;
-            
-            while (suggestedGames.length < 3 && gamesToChooseFrom.length > suggestedGames.length) {
-                const randomGame = gamesToChooseFrom[Math.floor(Math.random() * gamesToChooseFrom.length)];
-                if (!suggestedGames.includes(randomGame)) {
-                    suggestedGames.push(randomGame);
+        } else {
+            // Respuesta genérica sin sugerencias
+            response = intro;
+        }
+        
+        return response;
+    }
+    
+    /**
+     * Obtiene juegos sugeridos basándonos en preferencias del usuario y contexto
+     */
+    getSuggestedGames(count = 3, gamesToExclude = []) {
+        const allGames = Object.keys(this.gameStories);
+        const result = [];
+        
+        // Convertir a arrays para manipulación más fácil
+        const userPreferencesArray = Array.from(this.memory.userPreferences);
+        const excludedGamesArray = Array.from(this.memory.negativePreferences).concat(gamesToExclude);
+        
+        // 1. Primero intentar con juegos que le gustan al usuario
+        if (userPreferencesArray.length > 0 && result.length < count) {
+            for (const game of userPreferencesArray) {
+                if (!excludedGamesArray.includes(game) && !result.includes(game)) {
+                    result.push(game);
+                    if (result.length >= count) break;
                 }
             }
-            
-            const gameDescriptions = suggestedGames.map(gameId => {
-                return `${this.getGameNameFromId(gameId)}: ${this.gameStories[gameId]}`;
-            }).join("\n\n");
-            
-            // Generar respuesta final con continuidad conversacional
-            let continuationPrompt = "";
-            if (this.messages.length > 3) {
-                continuationPrompt = "\n\n" + this.getRandomResponse('continuation');
-            }
-            
-            return `${customResponse}${contextualResponse}\n\nAquí tienes algunas aventuras que podrían interesarte:\n\n${gameDescriptions}${continuationPrompt}`;
         }
+        
+        // 2. Completar con juegos aleatorios que no hayan sido excluidos
+        if (result.length < count) {
+            // Filtrar juegos ya incluidos o excluidos
+            const availableGames = allGames.filter(game => 
+                !result.includes(game) && 
+                !excludedGamesArray.includes(game));
+                
+            // Si no quedan juegos disponibles, usar todos (ignorando exclusiones)
+            const gamesToChooseFrom = availableGames.length > 0 ? 
+                availableGames : 
+                allGames.filter(game => !result.includes(game));
+            
+            // Seleccionar aleatoriamente
+            while (result.length < count && gamesToChooseFrom.length > 0) {
+                const randomIndex = Math.floor(Math.random() * gamesToChooseFrom.length);
+                const selectedGame = gamesToChooseFrom[randomIndex];
+                
+                result.push(selectedGame);
+                
+                // Eliminar el juego seleccionado para evitar duplicados
+                gamesToChooseFrom.splice(randomIndex, 1);
+            }
+        }
+        
+        return result;
     }
     
     /**
