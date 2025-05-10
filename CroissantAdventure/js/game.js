@@ -310,6 +310,30 @@ class Game {
                 console.error('Error registering TowerDefenseMinigame:', e);
             }
             
+            // Registro de Pescador Pastelero
+            try {
+                if (typeof FishingMinigame !== 'undefined') {
+                    this.registerScene('fishing', new FishingMinigame(this));
+                    console.log('FishingMinigame registered');
+                } else {
+                    console.error('FishingMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering FishingMinigame:', e);
+            }
+            
+            // Registro de Surfista Glaseado
+            try {
+                if (typeof SurfingMinigame !== 'undefined') {
+                    this.registerScene('surfing', new SurfingMinigame(this));
+                    console.log('SurfingMinigame registered');
+                } else {
+                    console.error('SurfingMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering SurfingMinigame:', e);
+            }
+            
             // Registrar Paint Game minigame
             try {
                 if (typeof PaintGameMinigame !== 'undefined') {

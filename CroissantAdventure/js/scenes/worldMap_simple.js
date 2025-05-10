@@ -17,7 +17,8 @@ class WorldMapScene extends Scene {
                 y: 100,
                 width: 300,
                 height: 200,
-                bgType: "gold"
+                bgType: "gold",
+                description: "Un valle bañado por el sol y repleto de tesoros brillantes"
             },
             {
                 name: "Bosque Enredado",
@@ -27,7 +28,8 @@ class WorldMapScene extends Scene {
                 y: 350,
                 width: 300,
                 height: 250,
-                bgType: "forest"
+                bgType: "forest",
+                description: "Un misterioso bosque donde es fácil perderse entre los árboles"
             },
             {
                 name: "Cielo Azucarado",
@@ -37,7 +39,8 @@ class WorldMapScene extends Scene {
                 y: 150,
                 width: 300,
                 height: 300,
-                bgType: "sky"
+                bgType: "sky",
+                description: "Nubes de algodón de azúcar flotan en un cielo infinito"
             },
             {
                 name: "Reino Cuadriculado",
@@ -47,7 +50,8 @@ class WorldMapScene extends Scene {
                 y: 450,
                 width: 400,
                 height: 250,
-                bgType: "kingdom"
+                bgType: "kingdom",
+                description: "Un reino donde todo está perfectamente ordenado"
             },
             {
                 name: "Villa de los Recuerdos",
@@ -57,7 +61,19 @@ class WorldMapScene extends Scene {
                 y: 100,
                 width: 350,
                 height: 300,
-                bgType: "village"
+                bgType: "village",
+                description: "Un acogedor pueblo donde habitan aventuras inolvidables"
+            },
+            {
+                name: "Playa Caramelizada",
+                color: "#88ddee",
+                borderColor: "#00aacc",
+                x: 750,
+                y: 450,
+                width: 350,
+                height: 200,
+                bgType: "beach",
+                description: "Una playa de azúcar con un mar de caramelo líquido"
             },
         ];
         
@@ -313,6 +329,38 @@ class WorldMapScene extends Scene {
                 icon: '📚',
                 region: 4,
                 description: 'Vive una aventura narrativa interactiva'
+            },
+            
+            // Playa Caramelizada
+            {
+                x: 800,
+                y: 500,
+                width: 75,
+                height: 75,
+                name: 'Fishing',
+                displayName: 'Pescador Pastelero',
+                scene: 'fishing',
+                color: '#00ccff',
+                borderColor: '#0099cc',
+                points: 60,
+                icon: '🎣',
+                region: 5,
+                description: 'Captura deliciosos dulces en el mar de caramelo'
+            },
+            {
+                x: 900,
+                y: 550,
+                width: 75,
+                height: 75,
+                name: 'Surfing',
+                displayName: 'Surfista Glaseado',
+                scene: 'surfing',
+                color: '#66eeff',
+                borderColor: '#00bbcc',
+                points: 45,
+                icon: '🏄',
+                region: 5,
+                description: 'Deslízate sobre las olas de caramelo líquido'
             }
         ];
         
@@ -326,6 +374,7 @@ class WorldMapScene extends Scene {
         // Decorative elements - más decoraciones temáticas
         this.decorations = [];
         this.generateDecorations();
+        this.generateGoldCoins();
         
         // Efectos visuales
         this.particles = [];
@@ -489,8 +538,12 @@ class WorldMapScene extends Scene {
         this.checkCoinCollection();
         
         // Check for minigame zones
+        let interactingWithZone = false;
+        let closestZone = null;
+        let closestDistance = Infinity;
+
         for (const zone of this.minigameZones) {
-            // Check if player center is inside zone
+            // Check if player center is inside or near zone
             const playerCenterX = this.player.x + this.player.width / 2;
             const playerCenterY = this.player.y + this.player.height / 2;
             
@@ -501,13 +554,34 @@ class WorldMapScene extends Scene {
             const dy = playerCenterY - zoneCenterY;
             const distance = Math.sqrt(dx*dx + dy*dy);
             
+            // Track the closest zone for interaction
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestZone = zone;
+            }
+            
+            // Check for direct collision with any zone
             if (distance < zone.width / 2) {
                 // Player is in a minigame zone - enter the minigame
                 console.log(`Entering minigame: ${zone.name}`);
                 this.game.addPoints(zone.points, 'minigame');
                 this.game.switchScene(zone.scene);
+                interactingWithZone = true;
                 break;
             }
+        }
+        
+        // Show visual feedback when near a zone but not directly on it
+        if (!interactingWithZone && closestZone && closestDistance < closestZone.width * 1.5) {
+            // Close to a zone but not inside - show visual prompt
+            this.interactionPrompt = {
+                text: `¡Acércate para jugar ${closestZone.displayName}!`,
+                x: closestZone.x + closestZone.width / 2,
+                y: closestZone.y - 15,
+                game: closestZone
+            };
+        } else {
+            this.interactionPrompt = null;
         }
     }
     
@@ -593,11 +667,10 @@ class WorldMapScene extends Scene {
      * Genera decoraciones temáticas para cada región
      */
     generateDecorations() {
-        // Árboles en el Bosque Enredado
-        const forestRegion = this.regions[1]; // Bosque Enredado
-        for (let i = 0; i < 12; i++) {
-            const x = forestRegion.x + 30 + Math.random() * (forestRegion.width - 60);
-            const y = forestRegion.y + 30 + Math.random() * (forestRegion.height - 60);
+        // Decoraciones para Valle Dorado - tema de tesoro
+        for (let i = 0; i < 15; i++) {
+            const x = this.regions[0].x + Math.random() * this.regions[0].width;
+            const y = this.regions[0].y + Math.random() * this.regions[0].height;
             
             let valid = true;
             for (const zone of this.minigameZones) {
@@ -610,34 +683,24 @@ class WorldMapScene extends Scene {
                 }
             }
             
-            // Verificar que no esté demasiado cerca de otras decoraciones
-            for (const existingDec of this.decorations) {
-                const dx = x - existingDec.x;
-                const dy = y - existingDec.y;
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < 50) {
-                    valid = false;
-                    break;
-                }
-            }
-            
             if (valid) {
+                const type = Math.random() < 0.7 ? 'coin' : 'gem';
                 this.decorations.push({
                     x: x,
                     y: y,
-                    type: 'tree',
-                    size: 0.8 + Math.random() * 0.5,
+                    type: type,
+                    size: 0.5 + Math.random() * 0.5,
+                    animOffset: Math.random() * Math.PI * 2,
                     variant: Math.floor(Math.random() * 3),
-                    animOffset: Math.random() * Math.PI * 2
+                    region: 0
                 });
             }
         }
         
-        // Nubes en el Cielo Azucarado
-        const skyRegion = this.regions[2]; // Cielo Azucarado
-        for (let i = 0; i < 8; i++) {
-            const x = skyRegion.x + 30 + Math.random() * (skyRegion.width - 60);
-            const y = skyRegion.y + 30 + Math.random() * (skyRegion.height - 60);
+        // Decoraciones para Bosque Enredado - tema de naturaleza
+        for (let i = 0; i < 20; i++) {
+            const x = this.regions[1].x + Math.random() * this.regions[1].width;
+            const y = this.regions[1].y + Math.random() * this.regions[1].height;
             
             let valid = true;
             for (const zone of this.minigameZones) {
@@ -650,87 +713,210 @@ class WorldMapScene extends Scene {
                 }
             }
             
-            // Verificar que no esté demasiado cerca de otras decoraciones
-            for (const existingDec of this.decorations) {
-                const dx = x - existingDec.x;
-                const dy = y - existingDec.y;
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < 50) {
-                    valid = false;
-                    break;
-                }
-            }
-            
             if (valid) {
+                const types = ['tree', 'bush', 'mushroom'];
+                const type = types[Math.floor(Math.random() * types.length)];
                 this.decorations.push({
                     x: x,
                     y: y,
-                    type: 'cloud',
-                    size: 0.7 + Math.random() * 0.7,
-                    speed: 0.5 + Math.random() * 1.5,
-                    direction: Math.random() > 0.5 ? 1 : -1,
-                    animOffset: Math.random() * Math.PI * 2
-                });
-            }
-        }
-        
-        // Decoraciones para el Reino Cuadriculado
-        const kingdomRegion = this.regions[3]; // Reino Cuadriculado
-        for (let i = 0; i < 8; i++) {
-            const x = kingdomRegion.x + 30 + Math.random() * (kingdomRegion.width - 60);
-            const y = kingdomRegion.y + 30 + Math.random() * (kingdomRegion.height - 60);
-            
-            let valid = true;
-            for (const zone of this.minigameZones) {
-                const dx = x - (zone.x + zone.width/2);
-                const dy = y - (zone.y + zone.height/2);
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < zone.width + 20) {
-                    valid = false;
-                    break;
-                }
-            }
-            
-            // Verificar que no esté demasiado cerca de otras decoraciones
-            for (const existingDec of this.decorations) {
-                const dx = x - existingDec.x;
-                const dy = y - existingDec.y;
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < 50) {
-                    valid = false;
-                    break;
-                }
-            }
-            
-            if (valid) {
-                const types = ['tower', 'flag', 'lamp'];
-                this.decorations.push({
-                    x: x,
-                    y: y,
-                    type: types[Math.floor(Math.random() * types.length)],
-                    size: 0.7 + Math.random() * 0.4,
+                    type: type,
+                    size: 0.5 + Math.random() * 0.7,
+                    animOffset: Math.random() * Math.PI * 2,
                     variant: Math.floor(Math.random() * 3),
-                    animOffset: Math.random() * Math.PI * 2
+                    region: 1
                 });
             }
         }
         
-        // Decoraciones para la Villa de los Recuerdos
-        const villageRegion = this.regions[4]; // Villa de los Recuerdos
+        // Decoraciones para Cielo Azucarado - tema aéreo
+        for (let i = 0; i < 15; i++) {
+            const x = this.regions[2].x + Math.random() * this.regions[2].width;
+            const y = this.regions[2].y + Math.random() * this.regions[2].height;
+            
+            let valid = true;
+            for (const zone of this.minigameZones) {
+                const dx = x - (zone.x + zone.width/2);
+                const dy = y - (zone.y + zone.height/2);
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < zone.width + 20) {
+                    valid = false;
+                    break;
+                }
+            }
+            
+            if (valid) {
+                const types = ['cloud', 'star', 'balloon'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                this.decorations.push({
+                    x: x,
+                    y: y,
+                    type: type,
+                    size: 0.3 + Math.random() * 0.8,
+                    animOffset: Math.random() * Math.PI * 2,
+                    variant: Math.floor(Math.random() * 3),
+                    region: 2
+                });
+            }
+        }
+        
+        // Decoraciones para Reino Cuadriculado - tema medieval
+        for (let i = 0; i < 15; i++) {
+            const x = this.regions[3].x + Math.random() * this.regions[3].width;
+            const y = this.regions[3].y + Math.random() * this.regions[3].height;
+            
+            let valid = true;
+            for (const zone of this.minigameZones) {
+                const dx = x - (zone.x + zone.width/2);
+                const dy = y - (zone.y + zone.height/2);
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < zone.width + 20) {
+                    valid = false;
+                    break;
+                }
+            }
+            
+            if (valid) {
+                const types = ['tower', 'flag', 'knight'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                this.decorations.push({
+                    x: x,
+                    y: y,
+                    type: type,
+                    size: 0.4 + Math.random() * 0.5,
+                    animOffset: Math.random() * Math.PI * 2,
+                    variant: Math.floor(Math.random() * 3),
+                    region: 3
+                });
+            }
+        }
+        
+        // Decoraciones para Villa de los Recuerdos - tema de pueblo
+        for (let i = 0; i < 18; i++) {
+            const x = this.regions[4].x + Math.random() * this.regions[4].width;
+            const y = this.regions[4].y + Math.random() * this.regions[4].height;
+            
+            let valid = true;
+            for (const zone of this.minigameZones) {
+                const dx = x - (zone.x + zone.width/2);
+                const dy = y - (zone.y + zone.height/2);
+                const distance = Math.sqrt(dx*dx + dy*dy);
+                if (distance < zone.width + 20) {
+                    valid = false;
+                    break;
+                }
+            }
+            
+            if (valid) {
+                const types = ['house', 'book', 'gem', 'fountain'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                this.decorations.push({
+                    x: x,
+                    y: y,
+                    type: type,
+                    size: 0.4 + Math.random() * 0.6,
+                    animOffset: Math.random() * Math.PI * 2,
+                    variant: Math.floor(Math.random() * 3),
+                    region: 4
+                });
+            }
+        }
+        
+        // Playa Caramelizada - decoraciones marítimas y caramelos
+        const beachRegion = this.regions[5]; // Playa Caramelizada
+        for (let i = 0; i < 25; i++) { // Aumentado para más densidad
+            const x = beachRegion.x + 20 + Math.random() * (beachRegion.width - 40);
+            const y = beachRegion.y + 20 + Math.random() * (beachRegion.height - 40);
+            
+            let valid = true;
+            // Verificar que no esté demasiado cerca de zonas de juego
+            for (const zone of this.minigameZones) {
+                if (zone.region === 5) {
+                    const dx = x - (zone.x + zone.width/2);
+                    const dy = y - (zone.y + zone.height/2);
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    if (distance < zone.width + 20) {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (valid) {
+                // Tipos ampliados con nuevos elementos temáticos
+                const types = ['wave', 'palm', 'shell', 'sandcastle', 'candy_rock', 'sugar_bush', 'caramel_puddle', 'umbrella'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                // Tamaños más variados
+                const sizeRange = type === 'palm' || type === 'umbrella' ? 0.5 + Math.random() * 0.6 : 0.3 + Math.random() * 0.5;
+                this.decorations.push({
+                    x: x,
+                    y: y,
+                    type: type,
+                    size: sizeRange,
+                    animOffset: Math.random() * Math.PI * 2,
+                    variant: Math.floor(Math.random() * 3),
+                    region: 5,
+                    // Color personalizado para elementos de caramelo
+                    color: type.includes('candy') || type.includes('sugar') || type.includes('caramel') ? 
+                           ['#ff9966', '#ffcc66', '#ff66aa', '#ffaacc'][Math.floor(Math.random() * 4)] : null
+                });
+            }
+        }
+        
+        // Añadir algunas burbujas flotantes en la playa
         for (let i = 0; i < 10; i++) {
-            const x = villageRegion.x + 30 + Math.random() * (villageRegion.width - 60);
-            const y = villageRegion.y + 30 + Math.random() * (villageRegion.height - 60);
+            const x = beachRegion.x + 20 + Math.random() * (beachRegion.width - 40);
+            const y = beachRegion.y + 10 + Math.random() * 50; // Cerca de la parte superior
+            
+            this.decorations.push({
+                x: x,
+                y: y,
+                type: 'bubble',
+                size: 0.2 + Math.random() * 0.3,
+                animOffset: Math.random() * Math.PI * 2,
+                variant: Math.floor(Math.random() * 3),
+                region: 5,
+                color: ['#ffffff', '#aaeeff', '#ffddee'][Math.floor(Math.random() * 3)]
+            });
+        }
+        
+        // Decoraciones adicionales en todo el mapa
+        for (let i = 0; i < 30; i++) {
+            const x = Math.random() * this.game.width;
+            const y = Math.random() * this.game.height;
             
             let valid = true;
-            for (const zone of this.minigameZones) {
-                const dx = x - (zone.x + zone.width/2);
-                const dy = y - (zone.y + zone.height/2);
+            // Verificar que no esté demasiado cerca de otras decoraciones
+            for (const existingDec of this.decorations) {
+                const dx = x - existingDec.x;
+                const dy = y - existingDec.y;
                 const distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance < zone.width + 20) {
+                if (distance < 50) {
                     valid = false;
                     break;
                 }
             }
+            
+            if (valid) {
+                const types = ['rock', 'bush', 'gem', 'flower'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                this.decorations.push({
+                    x: x,
+                    y: y,
+                    type: type,
+                    size: 0.3 + Math.random() * 0.4,
+                    animOffset: Math.random() * Math.PI * 2,
+                    variant: Math.floor(Math.random() * 3),
+                    region: -1 // Decoraciones generales
+                });
+            }
+        }
+        
+        // Casas y elementos de decoración para las zonas habitadas
+        for (let i = 0; i < 15; i++) {
+            const x = Math.random() * this.game.width;
+            const y = Math.random() * this.game.height;
+            
+            let valid = true;
             
             // Verificar que no esté demasiado cerca de otras decoraciones
             for (const existingDec of this.decorations) {
@@ -755,7 +941,10 @@ class WorldMapScene extends Scene {
                 });
             }
         }
-        
+    }
+    
+    // Método adicional para generar monedas doradas en el Valle Dorado
+    generateGoldCoins() {
         // Monedas brillantes para el Valle Dorado
         const goldRegion = this.regions[0]; // Valle Dorado
         for (let i = 0; i < 6; i++) {
@@ -1199,27 +1388,287 @@ class WorldMapScene extends Scene {
                     break;
                 case 'book':
                     // Libro
-                    ctx.fillStyle = '#ddaa88';
-                    ctx.fillRect(x - 10 * size, y - 7 * size, 20 * size, 14 * size);
+                    ctx.fillStyle = '#bb8855';
+                    ctx.fillRect(x - 8 * size, y - 12 * size, 16 * size, 3 * size);
+                    ctx.fillRect(x - 8 * size, y - 9 * size, 16 * size, 18 * size);
                     
-                    // Páginas
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(x - 9 * size, y - 6 * size, 18 * size, 12 * size);
+                    // Detalle de páginas
+                    ctx.fillStyle = '#ffffcc';
+                    ctx.fillRect(x - 7 * size, y - 8 * size, 14 * size, 16 * size);
                     
                     // Líneas de texto
-                    ctx.strokeStyle = '#555555';
-                    ctx.lineWidth = 0.5;
-                    for (let i = 0; i < 4; i++) {
-                        ctx.beginPath();
-                        ctx.moveTo(x - 7 * size, y - 4 * size + i * 4 * size);
-                        ctx.lineTo(x + 7 * size, y - 4 * size + i * 4 * size);
-                        ctx.stroke();
+                    ctx.strokeStyle = '#aa6633';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.moveTo(x - 5 * size, y - 5 * size + i * 3 * size);
+                        ctx.lineTo(x + 5 * size, y - 5 * size + i * 3 * size);
                     }
+                    ctx.stroke();
+                    break;
+                case 'wave':
+                    // Ola de caramelo
+                    const waveColor = '#66ddff';
+                    const waveVariant = decoration.variant || 0;
+                    const wavePhase = now * 2 + decoration.animOffset;
+                    const waveAmplitude = 5 + Math.sin(wavePhase) * 2;
+                    
+                    ctx.fillStyle = waveColor;
+                    ctx.beginPath();
+                    ctx.moveTo(x - 20 * size, y + 5 * size);
+                    
+                    // Crear curva ondulada
+                    for (let i = 0; i <= 40; i++) {
+                        const xPos = x - 20 * size + i * size;
+                        const yPos = y + Math.sin(i * 0.5 + wavePhase) * waveAmplitude * size;
+                        ctx.lineTo(xPos, yPos);
+                    }
+                    
+                    ctx.lineTo(x + 20 * size, y + 10 * size);
+                    ctx.lineTo(x - 20 * size, y + 10 * size);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Espuma
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const xPos = x - 15 * size + i * 8 * size;
+                        const yPos = y - 2 * size + Math.sin(i * 2 + wavePhase) * 3 * size;
+                        ctx.arc(xPos, yPos, 3 * size, 0, Math.PI * 2);
+                    }
+                    ctx.fill();
+                    break;
+                
+                case 'palm':
+                    // Tronco de la palmera
+                    ctx.fillStyle = '#aa7744';
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + 15 * size);
+                    ctx.lineTo(x - 5 * size, y + 15 * size);
+                    ctx.lineTo(x - 3 * size, y - 25 * size);
+                    ctx.lineTo(x + 3 * size, y - 25 * size);
+                    ctx.lineTo(x + 5 * size, y + 15 * size);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Hojas de la palmera
+                    ctx.fillStyle = '#66bb66';
+                    for (let i = 0; i < 5; i++) {
+                        const angle = (i / 5) * Math.PI * 2 + now * 0.5 + decoration.animOffset;
+                        ctx.beginPath();
+                        ctx.moveTo(x, y - 25 * size);
+                        ctx.quadraticCurveTo(
+                            x + Math.cos(angle) * 15 * size,
+                            y - 25 * size + Math.sin(angle) * 15 * size,
+                            x + Math.cos(angle) * 30 * size,
+                            y - 25 * size + Math.sin(angle) * 10 * size
+                        );
+                        ctx.quadraticCurveTo(
+                            x + Math.cos(angle) * 20 * size,
+                            y - 25 * size + Math.sin(angle) * 20 * size,
+                            x, y - 25 * size
+                        );
+                        ctx.fill();
+                    }
+                    break;
+                    
+                case 'shell':
+                    // Concha marina
+                    const shellColor = decoration.variant % 2 === 0 ? '#ff9999' : '#ffcc99';
+                    
+                    // Base de la concha
+                    ctx.fillStyle = shellColor;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Espiral de la concha
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2 * size;
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        const radiusFactor = 1 - i * 0.2;
+                        ctx.arc(
+                            x, y,
+                            8 * size * radiusFactor,
+                            0, Math.PI * 1.5
+                        );
+                    }
+                    ctx.stroke();
+                    break;
+                    
+                case 'sandcastle':
+                    // Base del castillo
+                    ctx.fillStyle = '#e6cc99';
+                    ctx.beginPath();
+                    ctx.moveTo(x - 15 * size, y + 10 * size);
+                    ctx.lineTo(x + 15 * size, y + 10 * size);
+                    ctx.lineTo(x + 12 * size, y - 5 * size);
+                    ctx.lineTo(x - 12 * size, y - 5 * size);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Torres del castillo
+                    for (let i = -1; i <= 1; i++) {
+                        const towerX = x + i * 10 * size;
+                        ctx.fillStyle = '#e6cc99';
+                        ctx.beginPath();
+                        ctx.rect(towerX - 3 * size, y - 15 * size, 6 * size, 10 * size);
+                        ctx.fill();
+                        
+                        // Techo de la torre
+                        ctx.fillStyle = '#ff9966';
+                        ctx.beginPath();
+                        ctx.moveTo(towerX - 4 * size, y - 15 * size);
+                        ctx.lineTo(towerX, y - 22 * size);
+                        ctx.lineTo(towerX + 4 * size, y - 15 * size);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    break;
+                    
+                case 'umbrella':
+                    // Palo de la sombrilla
+                    ctx.fillStyle = '#aa7744';
+                    ctx.fillRect(x, y, 2 * size, 30 * size);
+                    
+                    // Tela de la sombrilla - varios colores según la variante
+                    {
+                        const umbrellaColors = ['#ff66aa', '#66ccff', '#ffcc66'];
+                        ctx.fillStyle = umbrellaColors[decoration.variant];
+                    
+                    // Forma de la sombrilla
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 25 * size, y + 5 * size);
+                    ctx.quadraticCurveTo(
+                        x, 
+                        y - 5 * size, 
+                        x + 25 * size, 
+                        y + 5 * size
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Líneas decorativas
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1 * size;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 15 * size, y + 3 * size);
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + 15 * size, y + 3 * size);
+                    ctx.stroke();
+                    }
+                    break;
+                
+                case 'candy_rock':
+                    // Roca de caramelo con colores brillantes
+                    ctx.fillStyle = decoration.color || '#ff9966';
+                    
+                    // Forma principal de la roca
+                    ctx.beginPath();
+                    ctx.moveTo(x - 15 * size, y + 10 * size);
+                    ctx.lineTo(x - 5 * size, y - 10 * size);
+                    ctx.lineTo(x + 15 * size, y - 5 * size);
+                    ctx.lineTo(x + 10 * size, y + 15 * size);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Detalles brillantes
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 0.5;
+                    ctx.beginPath();
+                    ctx.arc(x + 5 * size, y - 2 * size, 3 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                    break;
+                    
+                case 'sugar_bush':
+                    // Arbusto de azúcar
+                    {
+                        const sugarColor = decoration.color || '#ffaacc';
+                        
+                        // Base del arbusto
+                        ctx.fillStyle = '#dd8899';
+                        ctx.fillRect(x - 2 * size, y + 5 * size, 4 * size, 10 * size);
+                    
+                    // Forma del arbusto (más redondeada, como algodón de azúcar)
+                    ctx.fillStyle = sugarColor;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 12 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.arc(x - 8 * size, y - 5 * size, 7 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.arc(x + 8 * size, y - 3 * size, 8 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Detalles - cristales de azúcar
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 0.7;
+                    for (let i = 0; i < 5; i++) {
+                        const px = x + (Math.random() - 0.5) * 20 * size;
+                        const py = y + (Math.random() - 0.5) * 15 * size;
+                        ctx.beginPath();
+                        ctx.arc(px, py, 1 * size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.globalAlpha = 1.0;
+                    }
+                    break;
+                    
+                case 'caramel_puddle':
+                    // Charco de caramelo líquido
+                    {
+                        const puddleColor = decoration.color || '#ffcc66';
+                        
+                        // Forma del charco
+                        ctx.fillStyle = puddleColor;
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, 15 * size, 10 * size, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Efecto brillante
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 0.3;
+                    ctx.beginPath();
+                    ctx.ellipse(x - 3 * size, y - 2 * size, 5 * size, 3 * size, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                    }
+                    break;
+                    
+                case 'bubble':
+                    // Burbujas flotantes con efecto de transparencia
+                    ctx.fillStyle = decoration.color || '#aaeeff';
+                    ctx.globalAlpha = 0.6;
+                    
+                    // Forma principal de la burbuja
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Brillo de la burbuja
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 0.8;
+                    ctx.beginPath();
+                    ctx.arc(x - 3 * size, y - 3 * size, 3 * size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
                     break;
                 case 'lamp':
                     // Farol con efecto de luz más intenso
                     ctx.fillStyle = '#555555';
                     ctx.fillRect(x - 2 * size, y - 20 * size, 4 * size, 25 * size);
+                    
+                    // Base del farol
+                    ctx.fillStyle = '#333333';
+                    ctx.fillRect(x - 5 * size, y + 5 * size, 10 * size, 3 * size);
                     
                     // Luz
                     ctx.fillStyle = '#ffcc66';
@@ -1517,6 +1966,52 @@ class WorldMapScene extends Scene {
             ctx.beginPath();
             ctx.arc(miniPlayerX + this.player.width * scaleX / 2, 
                     miniPlayerY + this.player.height * scaleY / 2, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Mostrar prompt de interacción si estamos cerca de una zona de minijuego
+        if (this.interactionPrompt) {
+            const now = Date.now() / 1000;
+            const pulseSize = 1 + 0.2 * Math.sin(now * 5);
+            
+            // Dibujar fondo con efecto pulsante
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            const promptWidth = ctx.measureText(this.interactionPrompt.text).width + 40;
+            ctx.fillRect(
+                this.interactionPrompt.x - promptWidth/2,
+                this.interactionPrompt.y - 30,
+                promptWidth,
+                30
+            );
+            
+            // Dibujar borde
+            ctx.strokeStyle = this.interactionPrompt.game.borderColor;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                this.interactionPrompt.x - promptWidth/2,
+                this.interactionPrompt.y - 30,
+                promptWidth,
+                30
+            );
+            
+            // Dibujar texto
+            ctx.font = '14px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+                this.interactionPrompt.text,
+                this.interactionPrompt.x,
+                this.interactionPrompt.y - 15
+            );
+            
+            // Dibujar flecha indicadora con animación
+            ctx.fillStyle = this.interactionPrompt.game.color;
+            ctx.beginPath();
+            ctx.moveTo(this.interactionPrompt.x, this.interactionPrompt.y - 5);
+            ctx.lineTo(this.interactionPrompt.x - 10 * pulseSize, this.interactionPrompt.y + 5 * pulseSize);
+            ctx.lineTo(this.interactionPrompt.x + 10 * pulseSize, this.interactionPrompt.y + 5 * pulseSize);
+            ctx.closePath();
             ctx.fill();
         }
         
