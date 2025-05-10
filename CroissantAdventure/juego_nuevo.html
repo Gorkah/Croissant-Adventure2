@@ -16,12 +16,55 @@
             overflow-x: hidden;
         }
         
+        .logout-button {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 12px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        
+        .logout-button:hover {
+            background-color: #ff3300;
+            transform: scale(1.05);
+        }
+        
         #header {
             background-color: #ff9900;
             color: white;
             text-align: center;
             padding: 10px 0;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background-color: white;
+            padding: 2px;
+            object-fit: contain;
         }
         
         .container {
@@ -207,7 +250,14 @@
 </head>
 <body>
     <div id="header">
-        <h1>Croissant Adventure</h1>
+        <div class="header-content">
+            <h1>Croissant Adventure</h1>
+            <div class="player-info">
+                <img class="player-character-img header-avatar" src="croiso.png" alt="Personaje">
+                <span class="player-character-name">Croiso</span>
+                <button id="logout-btn" class="logout-button">Cerrar sesión</button>
+            </div>
+        </div>
     </div>
 
     <div class="container">
@@ -229,6 +279,72 @@
     <!-- IA Storyteller -->
     <script src="js/ai/storytellerAI.js"></script>
     <script src="js/ai/chatInterface.js"></script>
+    
+    <!-- Sistema de gestión de personajes -->
+    <script>
+        // Objeto global para gestionar el personaje del jugador
+        window.playerCharacter = {
+            // Por defecto es croiso
+            character: 'croiso',
+            
+            // Inicializar el personaje según lo seleccionado en el login
+            initialize: function() {
+                // Obtener el personaje de los parámetros URL o localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const paramCharacter = urlParams.get('character');
+                const storedCharacter = localStorage.getItem('selectedCharacter');
+                
+                // Priorizar el parámetro URL, luego localStorage, sino usar el valor por defecto
+                if (paramCharacter) {
+                    this.character = paramCharacter;
+                } else if (storedCharacter) {
+                    this.character = storedCharacter;
+                }
+                
+                console.log('Personaje inicializado:', this.character);
+                
+                // Aplicar el personaje a los elementos de la interfaz
+                this.applyCharacterToUI();
+                
+                return this.character;
+            },
+            
+            // Aplicar el personaje a los elementos de la interfaz
+            applyCharacterToUI: function() {
+                // Cambiar referencias visuales según el personaje
+                document.querySelectorAll('.player-character-img').forEach(element => {
+                    element.src = this.character + '.png';
+                });
+                
+                // Cambiar referencias de texto según el personaje
+                const characterDisplayName = this.character === 'croiso' ? 'Croiso' : 'Croisa';
+                document.querySelectorAll('.player-character-name').forEach(element => {
+                    element.textContent = characterDisplayName;
+                });
+                
+                // Aplicar estilos dinámicos para los mensajes del usuario (con la imagen del personaje)
+                const styleElement = document.createElement('style');
+                styleElement.textContent = `
+                    .message.user::after {
+                        background-image: url('${this.character}.png');
+                    }
+                `;
+                document.head.appendChild(styleElement);
+                
+                console.log('Personaje aplicado a la interfaz:', characterDisplayName);
+            },
+            
+            // Obtener la imagen del personaje
+            getImage: function() {
+                return this.character + '.png';
+            },
+            
+            // Obtener el nombre de visualización del personaje
+            getDisplayName: function() {
+                return this.character === 'croiso' ? 'Croiso' : 'Croisa';
+            }
+        };
+    </script>
     
     <!-- Core Game Engine -->
     <script src="js/game.js"></script>
@@ -260,6 +376,19 @@
     <!-- Initialize Game -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar el sistema de personajes
+            window.playerCharacter.initialize();
+            
+            // Configurar el botón de logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                // Limpiar datos de sesión
+                localStorage.removeItem('username');
+                // No eliminamos selectedCharacter para mantener la preferencia del usuario
+                
+                // Redirigir al menú principal
+                window.location.href = 'index.html';
+            });
+            
             // Inicializar la interfaz de chat con IA
             const chatInterface = new ChatInterface();
             chatInterface.initialize().catch(error => {

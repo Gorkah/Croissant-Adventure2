@@ -1,6 +1,6 @@
 /**
- * StorytellerAI - Sistema narrativo simple pero efectivo para Croissant Adventure
- * Proporciona una experiencia conversacional coherente con enfoque en las aventuras
+ * StorytellerAI - Sistema narrativo personalizado con Trash y Croiso para Croissant Adventure
+ * Proporciona una experiencia conversacional a través de los personajes del juego
  */
 class StorytellerAI {
     constructor() {
@@ -9,6 +9,9 @@ class StorytellerAI {
         this.gameOptions = {};
         this.isFetchingResponse = false;
         this.loadingTime = 1500; // Tiempo simulado de carga
+        
+        // Obtener el nombre del personaje seleccionado por el usuario
+        this.playerCharacter = window.playerCharacter || { getDisplayName: () => 'Croiso' };
         
         // Sistema de memoria para mantener contexto de conversación
         this.memory = {
@@ -82,8 +85,11 @@ class StorytellerAI {
             'adminPanel': 'Los planos del Reino de Migalandia se encuentran en el Panel de Administración. Explora los diseños y contribuye a la expansión del mundo mágico.'
         };
         
-        // Historia de introducción
-        this.introStory = "¡Bienvenido a Croissant Adventure! Soy el Narrador de Migalandia, un reino mágico lleno de aventuras y misterios. ¿Qué tipo de historia te gustaría explorar hoy? Puedes pedirme una aventura con monedas brillantes, un desafío de estrategia, un laberinto misterioso, o cualquier otra cosa que te intrigue. ¡Cuéntame qué buscas y te guiaré!";
+        // Obtener el nombre del personaje para la historia de introducción
+        const playerName = this.playerCharacter.getDisplayName();
+        
+        // Historia de introducción con Trash y el personaje seleccionado
+        this.introStory = `¡Hola ${playerName}! Soy Trash, tu guía en Migalandia, un reino mágico lleno de aventuras y misterios. ¿Qué tipo de historia te gustaría explorar hoy? Puedes pedirme una aventura con monedas brillantes, un desafío de estrategia, un laberinto misterioso, o cualquier otra cosa que te intrigue. ¡Cuéntame qué buscas y te guiaré!`;
     }
     
     /**
@@ -123,17 +129,20 @@ class StorytellerAI {
      * Carga respuestas predefinidas con mayor precisión contextual
      */
     loadResponses() {
+        // Obtener el nombre del personaje para personalizar las respuestas
+        const playerName = this.playerCharacter.getDisplayName();
+        
         this.responses = {
-            // Bienvenida inicial
+            // Bienvenida inicial desde Trash al personaje seleccionado
             intro: [
-                "¡Bienvenido a Croissant Adventure! Soy el Narrador de Migalandia, un reino mágico lleno de aventuras y misterios. ¿Qué tipo de historia te gustaría explorar hoy? Puedes pedirme una aventura con monedas brillantes, un desafío de estrategia, un laberinto misterioso, o cualquier otra cosa que te intrigue. ¡Cuéntame qué buscas y te guiaré!"
+                `¡Hola ${playerName}! Soy Trash, tu guía en Migalandia, un reino mágico lleno de aventuras y misterios. ¿Qué tipo de historia te gustaría explorar hoy? Puedes pedirme una aventura con monedas brillantes, un desafío de estrategia, un laberinto misterioso, o cualquier otra cosa que te intrigue. ¡Cuéntame qué buscas y te guiaré!`
             ],
             
-            // Saludos básicos
+            // Saludos básicos de Trash al personaje seleccionado
             greeting: [
-                "¡Hola aventurero! Encantado de verte en las tierras de Migalandia. Tengo muchas historias que podrían interesarte, ¿qué tipo de aventura buscas hoy?",
-                "¡Un saludo desde la Torre del Narrador! ¿Qué tipo de misión te gustaría emprender en Migalandia?",
-                "¡Bienvenido de nuevo! Las páginas de mis libros están listas para mostrar nuevas aventuras. ¿Qué historia te gustaría vivir hoy?"
+                `¡Hola ${playerName}! Encantado de verte de nuevo en las tierras de Migalandia. Tengo muchas historias que podrían interesarte, ¿qué tipo de aventura buscas hoy?`,
+                `¡Un saludo desde la Torre del Narrador, amigo ${playerName}! ¿Qué tipo de misión te gustaría emprender en Migalandia?`,
+                `¡Bienvenido de nuevo, ${playerName}! Las páginas de mis libros están listas para mostrar nuevas aventuras. ¿Qué historia te gustaría vivir hoy?`
             ],
             
             // Respuestas a expresiones negativas
@@ -164,11 +173,11 @@ class StorytellerAI {
                 "Explorando el mapa de Migalandia, estos son los destinos que más podrían interesarte:"
             ],
             
-            // Cuando no hay indicaciones claras
+            // Cuando no hay indicaciones claras - Trash al personaje seleccionado
             default: [
-                "Migalandia tiene tantas historias por contar que a veces es difícil decidir. ¿Prefieres acción, estrategia, misterio o creatividad?",
-                "Como Narrador, puedo guiarte a numerosos reinos mágicos dentro de Migalandia. ¿Qué tipo de aventura atraería más a tu espíritu?",
-                "Las páginas de mi libro mágico contienen infinitas posibilidades. Dime qué buscas y te mostraré el camino hacia la aventura perfecta."
+                `Migalandia tiene tantas historias por contar que a veces es difícil decidir, ${playerName}. ¿Prefieres acción, estrategia, misterio o creatividad?`,
+                `Como tu amigo Trash, puedo guiarte a numerosos reinos mágicos dentro de Migalandia. ¿Qué tipo de aventura atraería más a tu espíritu, ${playerName}?`,
+                `Las páginas de mi libro mágico contienen infinitas posibilidades, querido ${playerName}. Dime qué buscas y te mostraré el camino hacia la aventura perfecta.`
             ]
         };
     }

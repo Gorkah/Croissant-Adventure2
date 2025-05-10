@@ -66,19 +66,79 @@
             position: relative;
         }
         
+        .character-selection {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .character-option {
+            display: inline-block;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .character-option.selected {
+            transform: scale(1.1);
+        }
+        
+        .character-option.selected::after {
+            content: '✓';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--success-color);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .character-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .character-option:hover .character-img {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+        
+        .character-name {
+            margin-top: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
         .croissant {
             width: 200px;
             height: 200px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M128,256 C96,160 128,96 192,64 C256,32 384,32 448,96 C320,96 256,96 192,160 C128,224 192,288 256,288 C320,288 384,224 448,160 C384,320 256,352 128,256 Z" fill="%23f9c74f" stroke="%23e09f3e" stroke-width="16"/><circle cx="176" cy="160" r="16" fill="%23e09f3e"/><circle cx="240" cy="128" r="16" fill="%23e09f3e"/></svg>');
+            background-image: url('croiso.png');
             background-repeat: no-repeat;
             background-size: contain;
+            background-position: center;
             margin-bottom: 20px;
             animation: bounce 2s ease-in-out infinite;
         }
         
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(0deg); }
+            75% { transform: translateY(-10px) rotate(5deg); }
         }
         
         .login-form {
@@ -236,6 +296,20 @@
         <div class="login-image">
             <div class="croissant"></div>
             <h1>Croissant Adventure</h1>
+            
+            <div class="character-selection">
+                <h3>Elige tu personaje</h3>
+                <div class="character-options">
+                    <div class="character-option selected" data-character="croiso">
+                        <div class="character-img" style="background-image: url('croiso.png');"></div>
+                        <div class="character-name">Croiso</div>
+                    </div>
+                    <div class="character-option" data-character="croisa">
+                        <div class="character-img" style="background-image: url('croisa.png');"></div>
+                        <div class="character-name">Croisa</div>
+                    </div>
+                </div>
+            </div>
             <h2>¡Un mundo de diversión te espera!</h2>
             <div class="clouds">
                 <div class="cloud cloud-1"></div>
@@ -270,6 +344,26 @@
             const loginButton = document.getElementById('login-button');
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
+            const characterOptions = document.querySelectorAll('.character-option');
+            let selectedCharacter = 'croiso'; // Por defecto es Croiso
+            
+            // Manejo de selección de personaje
+            characterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Quitar clase selected de todas las opciones
+                    characterOptions.forEach(op => op.classList.remove('selected'));
+                    
+                    // Añadir clase selected a la opción clicada
+                    this.classList.add('selected');
+                    
+                    // Guardar el personaje seleccionado
+                    selectedCharacter = this.getAttribute('data-character');
+                    console.log('Personaje seleccionado:', selectedCharacter);
+                    
+                    // Actualizar la imagen principal con el personaje seleccionado
+                    document.querySelector('.croissant').style.backgroundImage = `url('${selectedCharacter}.png')`;
+                });
+            });
             const errorMessage = document.getElementById('error-message');
             
             // Credenciales correctas
@@ -299,26 +393,37 @@
             });
             
             // Función de login
-            loginButton.addEventListener('click', function() {
-                const username = usernameInput.value.trim().toLowerCase();
-                const password = passwordInput.value;
+            loginButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
                 
                 if (username === correctUsername && password === correctPassword) {
+                    // Guardar el personaje seleccionado en localStorage
+                    localStorage.setItem('selectedCharacter', selectedCharacter);
+                    localStorage.setItem('playerName', username);
+                    
                     // Iniciar sesión exitoso - Animación de transición
                     loginButton.innerHTML = '¡Aquí vamos! 🚀';
                     loginButton.style.backgroundColor = 'var(--success-color)';
                     
-                    // Guardar el estado de inicio de sesión
-                    localStorage.setItem('isLoggedIn', 'true');
-                    
-                    // Redirigir al juego después de una breve animación
+                    // Iniciar sesión correctamente y pasar el personaje como parámetro
                     setTimeout(function() {
-                        window.location.href = 'juego_nuevo.html';
+                        window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
                     }, 1000);
                 } else {
-                    // Mostrar error y agitar los campos
+                    // Mostrar error
+                    errorMessage.textContent = '¡Nombre de usuario o contraseña incorrectos!';
                     errorMessage.style.display = 'block';
                     
+                    // Animar el mensaje de error
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => {
+                        errorMessage.classList.remove('shake');
+                    }, 500);
+                    
+                    // Agitar los campos
                     const inputs = [usernameInput, passwordInput];
                     inputs.forEach(input => {
                         input.style.borderColor = 'var(--accent-color)';

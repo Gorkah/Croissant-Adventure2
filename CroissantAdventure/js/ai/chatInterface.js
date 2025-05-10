@@ -43,20 +43,28 @@ class ChatInterface {
             return;
         }
         
-        // Limpiar contenido anterior (iframe de Easy Peasy)
+        // Limpiar contenido anterior
         chatContainer.innerHTML = '';
         
-        // Crear estructura del chat
+        // Obtener información del personaje seleccionado por el usuario
+        const playerChar = window.playerCharacter || { getDisplayName: () => 'Croiso', getImage: () => 'croiso.png', character: 'croiso' };
+        const characterName = playerChar.getDisplayName();
+        const characterImage = playerChar.getImage();
+        
+        // Crear estructura del chat con Trash y el personaje del jugador
         const chatHTML = `
             <div class="ai-chat-container">
                 <div class="ai-chat-header">
-                    <h2>Narrador de Migalandia</h2>
+                    <div class="chat-characters">
+                        <img src="trash.png" alt="Trash" class="character-avatar trash-avatar">
+                        <h2>Conversación con <span class="player-character-name">${characterName}</span></h2>
+                    </div>
                     <div id="ai-status" class="ai-status">Inicializando...</div>
                 </div>
                 <div id="chat-messages"></div>
                 <div id="game-options"></div>
                 <div class="ai-chat-input">
-                    <input type="text" id="user-input" placeholder="Cuéntame qué aventura buscas..." autocomplete="off">
+                    <input type="text" id="user-input" placeholder="Habla con ${characterName}..." autocomplete="off">
                     <button id="send-button" disabled>Enviar</button>
                 </div>
             </div>
@@ -125,7 +133,8 @@ class ChatInterface {
         this.userInput.value = '';
         this.sendButton.disabled = true;
         
-        // Enviar mensaje a la IA
+        // Añadir el avatar de Trash en el mensaje de respuesta
+        // Enviar mensaje a la IA de Croiso
         try {
             await this.storyteller.processUserMessage(userMessage);
         } catch (error) {

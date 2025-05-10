@@ -1404,18 +1404,26 @@ class WorldMapScene extends Scene {
         );
         ctx.fill();
         
-        // Dibujar el jugador
-        if (this.game.croissantImage && this.game.croissantImage.complete && this.game.croissantImage.naturalHeight !== 0) {
-            // Usar imagen del croissant
+        // Determinar qué imagen usar según el personaje seleccionado
+        let playerImage;
+        
+        if (window.playerCharacter && window.playerCharacter.character === 'croisa') {
+            playerImage = this.game.croisaImage;
+        } else {
+            playerImage = this.game.croisoImage;
+        }
+        
+        // Dibujar la imagen del personaje seleccionado
+        if (playerImage && playerImage.complete && playerImage.naturalHeight !== 0) {
             ctx.drawImage(
-                this.game.croissantImage,
+                playerImage,
                 this.player.x,
                 this.player.y,
                 this.player.width,
                 this.player.height
             );
         } else {
-            // Dibujar un croissant más bonito como respaldo
+            // Dibujar un croissant genérico como respaldo
             const playerCenterX = this.player.x + this.player.width/2;
             const playerCenterY = this.player.y + this.player.height/2;
             

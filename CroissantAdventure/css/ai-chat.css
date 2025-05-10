@@ -18,6 +18,23 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.chat-characters {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.character-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: contain;
+    background-color: white;
+    padding: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 .ai-chat-header h2 {
     margin: 0;
     font-size: 1.4rem;
@@ -54,6 +71,23 @@
     background-color: #ffcc66;
     color: #5c4a38;
     border-bottom-left-radius: 5px;
+    position: relative;
+    padding-left: 45px;
+}
+
+.message.assistant::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 35px;
+    background-image: url('../trash.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-left: 5px;
 }
 
 .message.user {
@@ -61,6 +95,22 @@
     background-color: #ff9900;
     color: white;
     border-bottom-right-radius: 5px;
+    position: relative;
+    padding-right: 45px;
+}
+
+.message.user::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 35px;
+    height: 35px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 5px;
 }
 
 .game-keyword {

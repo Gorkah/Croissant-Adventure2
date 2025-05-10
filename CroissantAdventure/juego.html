@@ -170,11 +170,78 @@
     <script src="js/minigames/rhythm.js"></script>
     <script src="js/minigames/towerDefense.js"></script>
     
-    <!-- Script del Chatbot con interceptor -->
-    <script src="https://bots.easy-peasy.ai/chat.min.js" data-chat-url="https://bots.easy-peasy.ai/bot/9070d911-01ca-4d29-a339-f98a6e589b43" data-btn-position="bottom-right" data-widget-btn-color="#6366f1" defer></script>
+    <!-- Estilos del chat personalizado -->
+    <link rel="stylesheet" href="css/ai-chat.css">
     
-    <!-- Script para detectar menciones de juegos en los mensajes del chatbot -->
+    <!-- Scripts del chat personalizado -->
+    <script src="js/ai/storytellerAI.js"></script>
+    <script src="js/ai/chatInterface.js"></script>
+    
+    <!-- Contenedor del chat -->
+    <div id="chat-container" class="custom-chat-container"></div>
+    
+    <!-- Sistema de gestión de personajes -->
     <script>
+        // Objeto global para gestionar el personaje del jugador
+        window.playerCharacter = {
+            // Por defecto es croiso
+            character: 'croiso',
+            
+            // Inicializar el personaje según lo seleccionado en el login
+            initialize: function() {
+                // Obtener el personaje de los parámetros URL o localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const paramCharacter = urlParams.get('character');
+                const storedCharacter = localStorage.getItem('selectedCharacter');
+                
+                // Priorizar el parámetro URL, luego localStorage, sino usar el valor por defecto
+                if (paramCharacter) {
+                    this.character = paramCharacter;
+                } else if (storedCharacter) {
+                    this.character = storedCharacter;
+                }
+                
+                console.log('Personaje inicializado:', this.character);
+                
+                // Aplicar el personaje a los elementos de la interfaz
+                this.applyCharacterToUI();
+                
+                return this.character;
+            },
+            
+            // Aplicar el personaje a los elementos de la interfaz
+            applyCharacterToUI: function() {
+                // Cambiar referencias visuales según el personaje
+                document.querySelectorAll('.player-character-img').forEach(element => {
+                    element.src = this.character + '.png';
+                });
+                
+                // Cambiar referencias de texto según el personaje
+                const characterDisplayName = this.character === 'croiso' ? 'Croiso' : 'Croisa';
+                document.querySelectorAll('.player-character-name').forEach(element => {
+                    element.textContent = characterDisplayName;
+                });
+                
+                console.log('Personaje aplicado a la interfaz:', characterDisplayName);
+            },
+            
+            // Obtener la imagen del personaje
+            getImage: function() {
+                return this.character + '.png';
+            },
+            
+            // Obtener el nombre de visualización del personaje
+            getDisplayName: function() {
+                return this.character === 'croiso' ? 'Croiso' : 'Croisa';
+            }
+        };
+    </script>
+    
+    <!-- Script para inicializar el chat y detectar menciones de juegos en los mensajes -->
+    <script>
+        // Variables globales
+        let chatInterface = null;
+        
         // Función para procesar menciones de juegos en un mensaje
         function processGameMentions(messageElement) {
             const messageText = messageElement.textContent;
@@ -256,68 +323,173 @@
             }
         }
 
-        // Configuración del interceptor de mensajes
-        function setupChatInterceptor() {
-            console.log("Configurando interceptor de chat...");
+        // Inicializar el chat personalizado con Trash y el personaje seleccionado
+        function initializeCustomChat() {
+            console.log("Inicializando chat personalizado con el personaje seleccionado...");
             
-            // Función que busca mensajes de chat cada 500ms
-            function checkForMessages() {
-                // Buscar todos los contenedores de mensajes del chatbot
-                const chatMessages = document.querySelectorAll('.easy-peasy-ai-chat div[class*="message"], .easy-peasy-ai-chat-message-content');
-                
-                chatMessages.forEach(message => {
-                    // Verificar si este mensaje ya ha sido procesado
-                    if (!message.dataset.processed) {
-                        console.log("Nuevo mensaje detectado:", message.textContent);
-                        processGameMentions(message);
-                        message.dataset.processed = 'true';
-                    }
-                });
+            // Crear instancia del chat si no existe aún
+            if (!chatInterface) {
+                chatInterface = new ChatInterface();
             }
             
-            // Iniciar verificación periódica
-            setInterval(checkForMessages, 500);
+            // Inicializar la interfaz
+            chatInterface.initialize().then(() => {
+                console.log("Chat personalizado inicializado correctamente");
+                
+                // Configurar detección de menciones de juegos
+                setupGameMentionsDetection();
+                
+                // Aplicar el personaje seleccionado a los mensajes del chat
+                applyPlayerCharacterToChat();
+            }).catch(error => {
+                console.error("Error al inicializar el chat personalizado:", error);
+            });
+        }
+        
+        // Función para aplicar el personaje seleccionado a los mensajes del chat
+        function applyPlayerCharacterToChat() {
+            // Aplicar estilos dinámicos para los mensajes del usuario (con la imagen del personaje seleccionado)
+            const characterImage = window.playerCharacter.getImage();
+            const styleElement = document.createElement('style');
+            styleElement.textContent = `
+                .message.user::after {
+                    background-image: url('${characterImage}');
+                }
+            `;
+            document.head.appendChild(styleElement);
             
-            // Configurar un MutationObserver como respaldo
-            const observer = new MutationObserver(function(mutations) {
+            // Configurar un observador para aplicar el estilo a los nuevos mensajes
+            const chatObserver = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                        // Si se detecta un nuevo nodo, verificar mensajes
-                        checkForMessages();
+                        // Actualizar referencias al personaje en el texto (si es necesario)
+                        const characterName = window.playerCharacter.getDisplayName();
+                        document.querySelectorAll('.player-character-name').forEach(element => {
+                            element.textContent = characterName;
+                        });
                     }
                 });
             });
-
-            // Comenzar a observar cambios en el cuerpo del documento
-            observer.observe(document.body, { childList: true, subtree: true });
+            
+            // Observar cambios en el contenedor de mensajes
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                chatObserver.observe(chatMessages, { childList: true, subtree: true });
+            }
         }
-
-        // Iniciar el interceptor cuando la página esté cargada
+        
+        // Configurar detección de menciones de juegos en el chat personalizado
+        function setupGameMentionsDetection() {
+            // Obtener el contenedor de mensajes
+            const chatMessages = document.getElementById('chat-messages');
+            
+            if (!chatMessages) {
+                console.error("No se encontró el contenedor de mensajes del chat");
+                return;
+            }
+            
+            // Usar MutationObserver para detectar nuevos mensajes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        // Procesar únicamente los nuevos mensajes de la IA
+                        mutation.addedNodes.forEach(node => {
+                            if (node.classList && node.classList.contains('message') && 
+                                node.classList.contains('assistant') && 
+                                !node.dataset.processed) {
+                                
+                                console.log("Nuevo mensaje del asistente detectado:", node.textContent);
+                                processGameMentions(node);
+                                node.dataset.processed = 'true';
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Comenzar a observar cambios en el contenedor de mensajes
+            observer.observe(chatMessages, { childList: true, subtree: true });
+        }
+        
+        // Inicializar el chat cuando la página esté cargada
         window.addEventListener('load', function() {
-            // Esperar a que el chat se cargue
-            console.log("Página cargada. Esperando al chat...");
-            setTimeout(setupChatInterceptor, 2000);
+            console.log("Página cargada. Inicializando chat personalizado...");
+            setTimeout(initializeCustomChat, 1000);
         });
         
-        // Hacer una segunda comprobación después de un tiempo
-        setTimeout(function() {
-            console.log("Segunda comprobación de chat...");
-            setupChatInterceptor();
-        }, 5000);
+        // Crear un botón flotante para abrir el chat
+        function createChatButton() {
+            const button = document.createElement('button');
+            button.id = 'chat-toggle-button';
+            button.className = 'chat-toggle-button';
+            button.innerHTML = '💬';
+            button.title = 'Hablar con Trash';
+            
+            // Estilos para el botón
+            button.style.position = 'fixed';
+            button.style.bottom = '20px';
+            button.style.right = '20px';
+            button.style.width = '60px';
+            button.style.height = '60px';
+            button.style.borderRadius = '50%';
+            button.style.backgroundColor = '#ff9900';
+            button.style.color = 'white';
+            button.style.border = 'none';
+            button.style.fontSize = '24px';
+            button.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+            button.style.cursor = 'pointer';
+            button.style.zIndex = '1000';
+            button.style.transition = 'all 0.3s ease';
+            
+            // Comportamiento de hover
+            button.onmouseover = function() {
+                this.style.transform = 'scale(1.1)';
+            };
+            button.onmouseout = function() {
+                this.style.transform = 'scale(1)';
+            };
+            
+            // Agregar al cuerpo del documento
+            document.body.appendChild(button);
+            
+            // Mostrar/ocultar el chat al hacer clic en el botón
+            button.addEventListener('click', function() {
+                const chatContainer = document.getElementById('chat-container');
+                if (chatContainer.style.display === 'none' || !chatContainer.style.display) {
+                    chatContainer.style.display = 'block';
+                    // Inicializar el chat si aún no se ha hecho
+                    if (!chatInterface || !chatInterface.initialized) {
+                        initializeCustomChat();
+                    }
+                } else {
+                    chatContainer.style.display = 'none';
+                }
+            });
+            
+            // Estilos para el contenedor del chat
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.style.position = 'fixed';
+            chatContainer.style.bottom = '90px';
+            chatContainer.style.right = '20px';
+            chatContainer.style.width = '350px';
+            chatContainer.style.height = '500px';
+            chatContainer.style.zIndex = '999';
+            chatContainer.style.display = 'none';
+            chatContainer.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.3)';
+            chatContainer.style.borderRadius = '10px';
+            chatContainer.style.overflow = 'hidden';
+        }
         
-        // Comprobar el botón del chat para detectar cuando se abre
-        document.addEventListener('click', function(e) {
-            // Si se hace clic en el botón del chat, establecer el interceptor
-            if (e.target.matches('.easy-peasy-ai-chat-button, .easy-peasy-ai-chat-button *')) {
-                console.log("Clic en botón de chat detectado");
-                setTimeout(setupChatInterceptor, 1000);
-            }
-        }, true);
+        // Crear el botón de chat cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', createChatButton);
     </script>
     
     <!-- Initialize Game -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar el sistema de personajes
+            window.playerCharacter.initialize();
+            
             // Obtener el parámetro 'game' de la URL
             const urlParams = new URLSearchParams(window.location.search);
             const gameParam = urlParams.get('game');

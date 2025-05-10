@@ -119,12 +119,21 @@ class Game {
             console.log(`Loading asset: ${name}`, obj ? 'loaded' : 'failed');
         };
 
-        // Load croissant character with better appearance
-        this.croissantImage = new Image();
-        this.croissantImage.onload = () => logAsset('Croissant', true);
-        this.croissantImage.onerror = () => logAsset('Croissant', false);
-        // Better croissant shape with SVG
-        this.croissantImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><path d="M10,25 C8,20 10,15 15,10 C20,5 30,5 35,10 C25,10 20,10 15,15 C10,20 15,25 20,25 C25,25 30,20 35,15 C30,25 20,30 10,25 Z" fill="%23e6b266" stroke="%23966f33" stroke-width="1.5"/><circle cx="13" cy="15" r="1" fill="%23966f33"/><circle cx="18" cy="13" r="1" fill="%23966f33"/></svg>';
+        // Cargar imágenes de personajes (Croiso y Croisa)
+        // Croiso (personaje masculino)
+        this.croisoImage = new Image();
+        this.croisoImage.onload = () => logAsset('Croiso', true);
+        this.croisoImage.onerror = () => logAsset('Croiso', false);
+        this.croisoImage.src = 'croiso.png';
+        
+        // Croisa (personaje femenino)
+        this.croisaImage = new Image();
+        this.croisaImage.onload = () => logAsset('Croisa', true);
+        this.croisaImage.onerror = () => logAsset('Croisa', false);
+        this.croisaImage.src = 'croisa.png';
+        
+        // Mantener compatibilidad con código existente
+        this.croissantImage = this.croisoImage;
         
         // Load basic tileset with better graphics
         this.tilesetImage = new Image();
