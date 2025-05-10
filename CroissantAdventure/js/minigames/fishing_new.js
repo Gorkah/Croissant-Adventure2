@@ -169,10 +169,10 @@ class FishingMinigame extends Minigame {
             }
         } else if (this.player.casting) {
             // Soltar botón mientras pescamos
-            if (this.player.line.hooked) {
+            if (this.player.line.hooked && this.player.line.hookedCandy) {
                 // Si tenemos algo en el anzuelo, recogemos puntos
                 this.score += this.player.line.hookedCandy.value;
-                delete this.player.line.hookedCandy;
+                this.player.line.hookedCandy = null; // Usar null en lugar de delete para evitar errores
             }
             
             // Retraer la línea

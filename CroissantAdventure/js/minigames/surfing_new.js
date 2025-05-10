@@ -13,7 +13,7 @@ class SurfingMinigame extends Minigame {
     reset() {
         // Configuración del juego
         this.distance = 0; // distancia recorrida
-        this.distanceGoal = 2000; // distancia objetivo
+        this.distanceGoal = 5000; // distancia objetivo aumentada para que dure más
         this.gameActive = true;
         this.gameOver = false;
         this.score = 0;
@@ -29,19 +29,20 @@ class SurfingMinigame extends Minigame {
             y: this.game.height / 2,
             width: 50,
             height: 50,
-            speed: 250,
+            speed: 200, // Velocidad reducida para mayor control
             jumping: false,
             yVelocity: 0,
-            gravity: 800,
-            jumpForce: -400
+            gravity: 500, // Gravedad reducida para que no caiga tan rápido
+            jumpForce: -300, // Fuerza de salto reducida para que no vuele tanto
+            maxHeight: 150 // Límite máximo de altura para evitar volar demasiado alto
         };
         
         // Propiedades de la ola
         this.wave = {
             height: this.game.height / 2 + 50,
-            amplitude: 20,
-            frequency: 0.02,
-            speed: 100
+            amplitude: 15, // Amplitud reducida para olas más suaves
+            frequency: 0.015, // Frecuencia reducida para olas más largas
+            speed: 80 // Velocidad reducida para que el juego no sea tan rápido
         };
         
         // Obstáculos
@@ -81,7 +82,7 @@ class SurfingMinigame extends Minigame {
         
         // Crear nuevos obstáculos distribuidos en la distancia
         const numberOfObstacles = 25;
-        const spacing = this.distanceGoal / numberOfObstacles;
+        const spacing = 600 + Math.random() * 400; // Espaciado mucho mayor entre obstáculos
         
         for (let i = 0; i < numberOfObstacles; i++) {
             const obstacleType = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
@@ -176,7 +177,12 @@ class SurfingMinigame extends Minigame {
         }
         
         // Salto
-        if (this.game.isKeyPressed('space') && !this.player.jumping) {
+        if ((this.game.isKeyPressed('space') || 
+            this.game.isKeyPressed('ArrowUp') || 
+            this.game.isKeyPressed('w')) && 
+            !this.player.jumping && 
+            this.player.y >= this.getWaveHeightAt(this.player.x) - 20) {
+            // Iniciar salto
             this.player.jumping = true;
             this.player.yVelocity = this.player.jumpForce;
             
@@ -194,22 +200,31 @@ class SurfingMinigame extends Minigame {
             }
         }
         
-        // Aplicar gravedad si está saltando
+        // Lógica de salto y caída
+        // Siempre aplicar gravedad al jugador (esté o no saltando)
+        const waveHeight = this.getWaveHeightAt(this.player.x);
+        const waveHeightTarget = waveHeight - this.player.height/2;
+        
         if (this.player.jumping) {
+            // Cuando está saltando, aplicar gravedad típica
             this.player.yVelocity += this.player.gravity * deltaTime;
             this.player.y += this.player.yVelocity * deltaTime;
             
-            // Obtener altura de la ola en la posición del jugador
-            const waveHeight = this.getWaveHeightAt(this.player.x);
+            // Limitar la altura máxima del salto
+            const minY = waveHeight - this.player.maxHeight;
+            if (this.player.y < minY) {
+                this.player.y = minY;
+                this.player.yVelocity = 0;
+            }
             
-            // Verificar si ha aterrizado en la ola
-            if (this.player.y + this.player.height/2 >= waveHeight) {
-                this.player.y = waveHeight - this.player.height/2;
+            // Comprobar si ha aterrizado en la ola
+            if (this.player.y >= waveHeightTarget) {
+                this.player.y = waveHeightTarget;
                 this.player.jumping = false;
                 this.player.yVelocity = 0;
                 
                 // Crear efecto de salpicadura al aterrizar
-                for (let i = 0; i < 15; i++) {
+                for (let i = 0; i < 10; i++) {
                     this.particles.push({
                         x: this.player.x,
                         y: waveHeight,
@@ -222,11 +237,26 @@ class SurfingMinigame extends Minigame {
                 }
             }
         } else {
-            // Si no está saltando, aplicar movimiento vertical con límites
-            this.player.y = Math.max(
-                this.player.height,
-                Math.min(this.player.y + dy, this.getWaveHeightAt(this.player.x) - this.player.height/2)
-            );
+            // Si no está saltando, aplicar una física más suave pero realista para seguir las olas
+            // Calcular la diferencia entre la posición actual y la posición ideal sobre la ola
+            const diff = waveHeightTarget - this.player.y;
+            
+            // Aplicar una fuerza proporcional a la distancia al objetivo (como un resorte)
+            this.player.yVelocity += diff * 5 * deltaTime; // Fuerza de atracción a la ola
+            
+            // Aplicar resistencia/amortiguación para evitar que rebote perpetuamente
+            this.player.yVelocity *= 0.9;
+            
+            // Aplicar control manual (movimiento arriba/abajo controlado por el jugador)
+            this.player.yVelocity += dy * 3;
+            
+            // Actualizar posición
+            this.player.y += this.player.yVelocity * deltaTime;
+            
+            // Limitar movimiento vertical
+            const minY = waveHeight - this.player.height*2;
+            const maxY = waveHeight;
+            this.player.y = Math.max(minY, Math.min(this.player.y, maxY));
         }
         
         // Actualizar posición de los obstáculos
