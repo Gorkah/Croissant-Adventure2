@@ -230,7 +230,7 @@ class ParentalControl {
         
         // Botón de verificación
         const verifyButton = document.createElement('button');
-        verifyButton.textContent = 'He completado la tarea';
+        verifyButton.textContent = '¡Tarea completada!';
         verifyButton.style.backgroundColor = '#ffd166';
         verifyButton.style.border = 'none';
         verifyButton.style.padding = '10px 20px';
