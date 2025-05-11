@@ -266,14 +266,113 @@
             100% { transform: translateX(300%); }
         }
         
+        /* Estilos para Control Parental */
+        .parental-controls {
+            background-color: rgba(255, 250, 240, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px dashed var(--secondary-color);
+        }
+
+        .parental-controls h3 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .toggle-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .toggle-label {
+            margin-bottom: 0 !important;
+        }
+
+        /* Switch para el toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success-color);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
+            outline: none;
+        }
+        
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
                 max-width: 400px;
             }
             
-            .login-image {
-                padding: 20px;
+            .login-image, .login-form {
+                width: 100%;
             }
             
             .croissant {
@@ -330,6 +429,28 @@
                 <label for="password">Contraseña secreta:</label>
                 <input type="password" id="password" placeholder="Tu contraseña mágica...">
             </div>
+
+            <!-- Controles de Control Parental -->
+            <div class="parental-controls">
+                <h3>Control Parental</h3>
+                <div class="input-group">
+                    <label for="play-time">Tiempo de juego (minutos):</label>
+                    <input type="number" id="play-time" placeholder="30" min="1" max="120" value="30">
+                </div>
+                
+                <div class="input-group">
+                    <label for="task-description">Tarea a realizar:</label>
+                    <textarea id="task-description" placeholder="Ejemplo: Leer 10 páginas de un libro" rows="2"></textarea>
+                </div>
+
+                <div class="toggle-control">
+                    <label for="parental-control-toggle" class="toggle-label">Activar control parental</label>
+                    <label class="switch">
+                        <input type="checkbox" id="parental-control-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
             
             <button id="login-button">¡Comenzar Aventura!</button>
             
@@ -345,6 +466,9 @@
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
             const characterOptions = document.querySelectorAll('.character-option');
+            const parentalControlToggle = document.getElementById('parental-control-toggle');
+            const playTimeInput = document.getElementById('play-time');
+            const taskDescriptionInput = document.getElementById('task-description');
             let selectedCharacter = 'croiso'; // Por defecto es Croiso
             
             // Manejo de selección de personaje
@@ -365,6 +489,34 @@
                 });
             });
             const errorMessage = document.getElementById('error-message');
+            
+            // Control parental - Toggle
+            parentalControlToggle.addEventListener('change', function() {
+                const parentalControls = document.querySelectorAll('.parental-controls input, .parental-controls textarea');
+                
+                // Habilitar/deshabilitar inputs excepto el toggle mismo
+                parentalControls.forEach(control => {
+                    if (control !== parentalControlToggle) {
+                        control.disabled = !this.checked;
+                    }
+                });
+                
+                // Efecto visual
+                if (this.checked) {
+                    document.querySelector('.parental-controls').style.opacity = '1';
+                    playTimeInput.focus();
+                } else {
+                    document.querySelector('.parental-controls').style.opacity = '0.7';
+                }
+            });
+            
+            // Inicializar estado de los controles parentales
+            document.querySelectorAll('.parental-controls input, .parental-controls textarea').forEach(control => {
+                if (control !== parentalControlToggle) {
+                    control.disabled = !parentalControlToggle.checked;
+                }
+            });
+            document.querySelector('.parental-controls').style.opacity = parentalControlToggle.checked ? '1' : '0.7';
             
             // Credenciales correctas
             const correctUsername = 'admin';
@@ -403,6 +555,30 @@
                     // Guardar el personaje seleccionado en localStorage
                     localStorage.setItem('selectedCharacter', selectedCharacter);
                     localStorage.setItem('playerName', username);
+                    
+                    // Guardar configuración de control parental si está activado
+                    if (parentalControlToggle.checked) {
+                        const playTime = parseInt(playTimeInput.value) || 30; // Valor por defecto: 30 minutos
+                        const taskDescription = taskDescriptionInput.value.trim() || 'Completar una actividad educativa';
+                        
+                        // Guardar configuración en localStorage
+                        localStorage.setItem('parentalControlEnabled', 'true');
+                        localStorage.setItem('playTimeLimit', playTime.toString());
+                        localStorage.setItem('taskDescription', taskDescription);
+                        
+                        // Configurar tiempo inicial (en milisegundos)
+                        const currentTime = new Date().getTime();
+                        const endTime = currentTime + (playTime * 60 * 1000);
+                        localStorage.setItem('playTimeEnd', endTime.toString());
+                        console.log(`Control parental activado: ${playTime} minutos, hasta ${new Date(endTime).toLocaleTimeString()}`);
+                    } else {
+                        // Desactivar control parental
+                        localStorage.removeItem('parentalControlEnabled');
+                        localStorage.removeItem('playTimeLimit');
+                        localStorage.removeItem('taskDescription');
+                        localStorage.removeItem('playTimeEnd');
+                        console.log('Control parental desactivado');
+                    }
                     
                     // Iniciar sesión exitoso - Animación de transición
                     loginButton.innerHTML = '¡Aquí vamos! 🚀';
