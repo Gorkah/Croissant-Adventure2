@@ -1,6 +1,7 @@
 /**
  * StorytellerAI - Sistema narrativo personalizado con Trash y Croiso para Croissant Adventure
  * Proporciona una experiencia conversacional a través de los personajes del juego
+ * Con integración de la API de Hugging Face
  */
 class StorytellerAI {
     constructor() {
@@ -9,6 +10,15 @@ class StorytellerAI {
         this.gameOptions = {};
         this.isFetchingResponse = false;
         this.loadingTime = 1500; // Tiempo simulado de carga
+        
+        // Configuración para la API de Hugging Face
+        this.useHuggingFace = true; // Controla si se usa HF o el sistema local
+        this.huggingFaceToken = "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"; // Token para la API
+        
+        // Usando un modelo directamente accesible a través de la API estándar
+        this.huggingFaceModel = "mistralai/Mixtral-8x7B-Instruct-v0.1"; // Modelo potente multilingüe
+        this.huggingFaceAPIEndpoint = "https://api-inference.huggingface.co/models/"; // Base endpoint
+        this.tokenError = false; // Para rastrear si hay problemas con el token
         
         // Obtener el nombre del personaje seleccionado por el usuario
         this.playerCharacter = window.playerCharacter || { getDisplayName: () => 'Croiso' };
@@ -21,7 +31,8 @@ class StorytellerAI {
             userPreferences: new Set(),
             negativePreferences: new Set(), // Lo que al usuario no le gusta
             conversationCount: 0,
-            lastSuggestedGames: []      
+            lastSuggestedGames: [],
+            huggingFaceHistory: [] // Historial para la API de Hugging Face
         };
         
         // Mapeo de palabras clave a juegos
@@ -244,6 +255,7 @@ class StorytellerAI {
     
     /**
      * Procesa un mensaje del usuario y genera una respuesta contextualmente apropiada
+     * Primero intenta usar Hugging Face, y si falla, usa el sistema local
      */
     async processUserMessage(userInput) {
         if (!this.initialized) {
@@ -305,9 +317,49 @@ class StorytellerAI {
                 });
             }
             
-            // Construir respuesta apropiada
-            const responseIndex = this.addMessage('assistant', '...');
-            const responseText = this.buildResponse(messageContext, suggestedGames);
+            // Construir respuesta apropiada - índice del mensaje en proceso
+            const responseIndex = this.addMessage('assistant', 'Pensando...');
+            
+            // Intentar obtener respuesta de la API de Hugging Face o usar el sistema local
+            let responseText = '';
+            let usingHuggingFace = false;
+            
+            // Reactivamos Hugging Face con el nuevo modelo GPT-2
+            this.useHuggingFace = true;
+            
+            if (this.useHuggingFace && !this.tokenError) {
+                try {
+                    // Formatear contexto para la API
+                    const gameNames = suggestedGames.map(gameId => this.getGameNameFromId(gameId));
+                    const gameDescriptions = suggestedGames.map(gameId => this.gameStories[gameId]);
+                    
+                    // Obtener respuesta de Hugging Face API con un timeout para evitar bloqueos
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error("Timeout esperando respuesta de Hugging Face")), 5000);
+                    });
+                    
+                    responseText = await Promise.race([
+                        this.getHuggingFaceResponse(userInput, gameNames, gameDescriptions),
+                        timeoutPromise
+                    ]);
+                    
+                    console.log("Respuesta obtenida de Hugging Face");
+                    usingHuggingFace = true;
+                } catch (huggingFaceError) {
+                    console.error("Error con Hugging Face API, usando sistema local:", huggingFaceError);
+                    // Si hay un error de token, lo marcamos para no volver a intentar
+                    if (huggingFaceError.message.includes('401') || huggingFaceError.message.includes('403')) {
+                        this.tokenError = true;
+                        console.log("Se desactivaron futuras llamadas a Hugging Face por error de autenticación");
+                    }
+                    
+                    // Si falla, usar el sistema local
+                    responseText = this.buildResponse(messageContext, suggestedGames);
+                }
+            } else {
+                // Usar el sistema local directamente
+                responseText = this.buildResponse(messageContext, suggestedGames);
+            }
             
             // Efecto de escritura gradual (simulación de tipeo)
             await this.simulateTyping(responseIndex, responseText);
@@ -338,6 +390,217 @@ class StorytellerAI {
             
             return errorMessage;
         }
+    }
+
+    /**
+     * Obtiene una respuesta de la API de Hugging Face
+     * @param {string} userInput - Mensaje del usuario
+     * @param {Array} gameNames - Nombres de los juegos a recomendar
+     * @param {Array} gameDescriptions - Descripciones de los juegos
+     * @returns {Promise<string>} - Respuesta generada por la API
+     */
+    async getHuggingFaceResponse(userInput, gameNames, gameDescriptions) {
+        // Si ya tuvimos un error con el token, saltamos directamente al sistema local
+        if (this.tokenError) {
+            console.log("Usando sistema local debido a error previo con token");
+            throw new Error("Token error detected previously");
+        }
+
+        // Actualizar el historial con el mensaje del usuario
+        this.memory.huggingFaceHistory.push({
+            role: "user",
+            content: userInput
+        });
+
+        // Preparar el contexto para el modelo
+        const playerName = this.playerCharacter.getDisplayName();
+        
+        // Preparar formato para el modelo Mixtral-8x7B-Instruct-v0.1
+        // Este modelo requiere un formato de texto específico
+        
+        // Construir el contexto para el prompt
+        const systemInstruction = `Eres Trash, un narrador mágico en el mundo de Migalandia en el juego Croissant Adventure. 
+Tu misión es contar historias cautivadoras en español y recomendar juegos a ${playerName}.
+Sé amigable, mágico e imaginativo. Usa un lenguaje colorido y apropiado para un mundo de fantasía.`;
+        
+        // Información sobre los juegos disponibles
+        const gamesInfo = `Estos son los juegos disponibles que puedes recomendar según el contexto:
+${gameNames.map((name, i) => `- ${name}: ${gameDescriptions[i]}`).join('\n')}`;
+        
+        // Obtener historial reciente limitado
+        const recentHistory = this.memory.huggingFaceHistory.slice(-4);
+        const historyText = recentHistory.map(msg => 
+            `${msg.role === 'user' ? playerName : 'Trash'}: ${msg.content}`
+        ).join('\n\n');
+        
+        // Formato de prompt para Mixtral-8x7B-Instruct-v0.1
+        // Usa el formato <s>[INST] instrucción [/INST] respuesta </s>
+        const prompt = `<s>[INST] ${systemInstruction}\n\n${gamesInfo}\n\nHistorial de conversación:\n${historyText}\n\n${playerName}: ${userInput}\n\nResponde SIEMPRE en ESPAÑOL como si fueras Trash, el narrador mágico. [/INST]`;
+        
+        try {
+            console.log("Enviando solicitud a Hugging Face para el modelo: " + this.huggingFaceModel);
+            
+            // Construir la URL completa
+            const fullEndpoint = `${this.huggingFaceAPIEndpoint}${this.huggingFaceModel}`;
+            console.log("URL de la API: " + fullEndpoint);
+            console.log("Enviando formato de texto, no de chat");
+            
+            // Llamar a la API con el formato correcto para Mixtral
+            const response = await fetch(fullEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.huggingFaceToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    inputs: prompt,  // Ahora enviamos un string, no un array
+                    parameters: {
+                        max_new_tokens: 250,
+                        return_full_text: false,
+                        temperature: 0.75,
+                        top_p: 0.9,
+                        do_sample: true
+                    }
+                })
+            });
+            
+            console.log("Respuesta recibida con status: " + response.status);
+            
+            if (response.status === 401 || response.status === 403) {
+                console.error("Error de autenticación con la API de Hugging Face");
+                this.tokenError = true; // Marcar que hay un problema con el token para no intentar más llamadas
+                throw new Error(`Error de autenticación: ${response.status}`);
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Error de API detallado:", errorText);
+                throw new Error(`Error de API: ${response.status} - ${errorText}`);
+            }
+
+            // Obtener los datos de respuesta
+            let data;
+            const responseText = await response.text();
+            try {
+                data = JSON.parse(responseText);
+                console.log("Datos recibidos de Hugging Face:", data);
+            } catch (jsonError) {
+                console.error("Error al parsear la respuesta JSON:", jsonError);
+                console.log("Respuesta en texto plano:", responseText);
+                data = { generated_text: responseText };
+            }
+            
+            // Extraer el texto generado (el modelo Qwen tiene un formato específico)
+            let generatedText = '';
+            
+            // Extraer según diferentes formatos posibles de respuesta
+            if (data && data.generated_text) {
+                // Formato estándar
+                generatedText = data.generated_text;
+            } else if (Array.isArray(data) && data[0] && data[0].generated_text) {
+                // Formato array
+                generatedText = data[0].generated_text;
+            } else if (data && data.choices && data.choices[0] && data.choices[0].message) {
+                // Formato tipo OpenAI que algunos modelos usan
+                generatedText = data.choices[0].message.content;
+            } else if (data && data.content) {
+                // Formato simple con content
+                generatedText = data.content;
+            } else if (data && data.message && data.message.content) {
+                // Formato tipo chat
+                generatedText = data.message.content;
+            } else if (typeof data === 'string') {
+                // Respuesta directa como string
+                generatedText = data;
+            } else {
+                // Si no podemos extraer el texto de una forma específica
+                generatedText = JSON.stringify(data);
+            }
+
+            console.log("Texto generado final:", generatedText);
+
+            // Limpiar y formatear la respuesta
+            let cleanResponse = this.cleanHuggingFaceResponse(generatedText);
+            
+            // Guardar en el historial
+            this.memory.huggingFaceHistory.push({
+                role: "assistant",
+                content: cleanResponse
+            });
+
+            return cleanResponse;
+
+        } catch (error) {
+            console.error("Error al llamar a la API de Hugging Face:", error);
+            throw error; // Permitir que el fallback se active
+        }
+    }
+
+    /**
+     * Limpia y formatea la respuesta de la API para mostrarla
+     * @param {string} response - Respuesta de la API
+     * @returns {string} - Respuesta limpia
+     */
+    cleanHuggingFaceResponse(response) {
+        // Si la respuesta está en formato JSON (como string), intentar extraer el texto
+        let cleaned = response;
+        
+        try {
+            // Comprobar si la respuesta es un JSON en formato string
+            if (cleaned.startsWith('{') || cleaned.startsWith('[')) {
+                const jsonData = JSON.parse(cleaned);
+                if (jsonData.message && jsonData.message.content) {
+                    cleaned = jsonData.message.content;
+                } else if (jsonData.generated_text) {
+                    cleaned = jsonData.generated_text;
+                } else if (jsonData.choices && jsonData.choices[0] && jsonData.choices[0].message) {
+                    cleaned = jsonData.choices[0].message.content;
+                }
+            }
+        } catch (e) {
+            // Si hay error al parsear, seguimos con el texto original
+            console.log("No se pudo parsear la respuesta como JSON");
+        }
+        
+        // Eliminar marcadores de rol o formato extraño
+        cleaned = cleaned.replace(/^(assistant|AI|bot|trash|narrador trash|narrador):\s*/i, '');
+        
+        // Cortar la respuesta si continúa con un diálogo
+        const dialogueCutoff = cleaned.indexOf('\n' + this.playerCharacter.getDisplayName() + ':');
+        if (dialogueCutoff > 0) {
+            cleaned = cleaned.substring(0, dialogueCutoff);
+        }
+        
+        // También cortar si hay otros marcadores de inicio de un nuevo turno
+        const userMarkers = ['\nUser:', '\nUsuario:', '\nPlayer:', '\nJugador:'];
+        for (const marker of userMarkers) {
+            const markerIndex = cleaned.indexOf(marker);
+            if (markerIndex > 0) {
+                cleaned = cleaned.substring(0, markerIndex);
+            }
+        }
+        
+        // Detectar si la respuesta está en inglés
+        const englishWords = ['the', 'and', 'is', 'in', 'of', 'to', 'a', 'for', 'with', 'that', 'this', 'it', 'you', 'are', 'your', 'I', 'would', 'like', 'can', 'will'];
+        const words = cleaned.toLowerCase().split(/\s+/);
+        const englishWordCount = words.filter(word => englishWords.includes(word)).length;
+        
+        if (englishWordCount > words.length * 0.3 && words.length > 5) {
+            console.log("Respuesta detectada en inglés, usando respuesta en español");
+            return this.getRandomResponse('default');
+        }
+        
+        // Si la respuesta está vacía o es inválida, proporcionar un mensaje predeterminado
+        if (!cleaned || cleaned.trim() === '') {
+            return "¡Vaya! Parece que me quedé sin palabras por un momento. ¿En qué tipo de aventura estábamos?";
+        }
+        
+        // Verificar que la respuesta es lo suficientemente larga y coherente
+        if (cleaned.length < 15) {
+            return this.getRandomResponse('default');
+        }
+        
+        return cleaned;
     }
     
     /**
