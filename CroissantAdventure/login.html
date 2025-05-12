@@ -264,7 +264,7 @@
         </div>
     </div>
     <script>
-        document.getElementById('login-button').addEventListener('click', async function () {
+        document.getElementById('login-button').addEventListener('click', function () {
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
             const errorMessage = document.getElementById('error-message');
@@ -275,30 +275,22 @@
                 return;
             }
 
-            if (username === 'manage' && password === 'manage') {
-                // Redirigir a la interfaz de gestión
-                window.location.href = 'manage.html';
-                return;
-            }
-
             if (username === 'admin' && password === 'admin') {
-                // Redirigir al juego
                 window.location.href = 'juego_nuevo.html';
                 return;
             }
 
-            try {
-                const userData = await getUserData(); // Obtener datos de usuarios desde GitHub
-                if (userData[username] && userData[username].password === password) {
-                    alert('¡Inicio de sesión exitoso!');
-                    window.location.href = 'game.html'; // Redirigir al juego
-                } else {
-                    errorMessage.textContent = 'Usuario o contraseña incorrectos.';
-                    errorMessage.style.display = 'block';
-                }
-            } catch (err) {
-                console.error(err);
-                errorMessage.textContent = 'Error al conectar con el repositorio.';
+            if (username === 'manage' && password === 'manage') {
+                window.location.href = 'manage.html';
+                return;
+            }
+
+            // Validar credenciales contra los datos almacenados (si aplica)
+            const userData = JSON.parse(localStorage.getItem('userData')) || {};
+            if (userData[username] && userData[username].password === password) {
+                window.location.href = 'juego_nuevo.html';
+            } else {
+                errorMessage.textContent = 'Usuario o contraseña incorrectos.';
                 errorMessage.style.display = 'block';
             }
         });

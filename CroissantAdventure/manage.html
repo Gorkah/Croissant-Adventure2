@@ -82,51 +82,39 @@
             <!-- Los datos de los usuarios se cargarán aquí -->
         </tbody>
     </table>
-    <script src="githubApi.js"></script>
     <script>
-        async function loadUsers() {
-            try {
-                const users = await getUserData();
-                const tableBody = document.getElementById('user-table-body');
+        function loadUsers() {
+            const userData = JSON.parse(localStorage.getItem('userData')) || {};
+            const tableBody = document.getElementById('user-table-body');
 
-                Object.keys(users).forEach(username => {
-                    const user = users[username];
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${username}</td>
-                        <td>${user.email || 'No especificado'}</td>
-                        <td>${user.password}</td>
-                        <td>${user.age}</td>
-                        <td>${user.coins}</td>
-                        <td>${user.minigamesPlayed}</td>
-                        <td>
-                            <button class="delete-button" data-username="${username}">🗑️</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+            Object.keys(userData).forEach(username => {
+                const user = userData[username];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${username}</td>
+                    <td>${user.email || 'No especificado'}</td>
+                    <td>${user.password}</td>
+                    <td>${user.age}</td>
+                    <td>${user.coins}</td>
+                    <td>${user.minigamesPlayed}</td>
+                    <td>
+                        <button class="delete-button" data-username="${username}">🗑️</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
 
-                document.querySelectorAll('.delete-button').forEach(button => {
-                    button.addEventListener('click', async function () {
-                        const username = this.getAttribute('data-username');
-                        if (confirm(`¿Estás seguro de que deseas eliminar al usuario "${username}"?`)) {
-                            try {
-                                const users = await getUserData();
-                                delete users[username];
-                                await updateUserData(users);
-                                alert(`Usuario "${username}" eliminado con éxito.`);
-                                this.closest('tr').remove();
-                            } catch (err) {
-                                console.error(err);
-                                alert('Error al eliminar el usuario.');
-                            }
-                        }
-                    });
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    const username = this.getAttribute('data-username');
+                    if (confirm(`¿Estás seguro de que deseas eliminar al usuario "${username}"?`)) {
+                        delete userData[username];
+                        localStorage.setItem('userData', JSON.stringify(userData));
+                        alert(`Usuario "${username}" eliminado con éxito.`);
+                        this.closest('tr').remove();
+                    }
                 });
-            } catch (err) {
-                console.error(err);
-                alert('Error al cargar los usuarios.');
-            }
+            });
         }
 
         document.addEventListener('DOMContentLoaded', loadUsers);
