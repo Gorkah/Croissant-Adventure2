@@ -51,7 +51,7 @@ Disfruta de una amplia variedad de mini-juegos:
 
 1. Simplemente clona el repositorio:
    ```
-   git clone https://github.com/YOUR-USERNAME/CroissantAdventure.git
+   git clone https://github.com/gorkah/CroissantAdventure.git
    ```
 
 2. Abre el archivo `index.html` en tu navegador web preferido
