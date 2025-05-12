@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - Croissant Adventure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff9900;
+            --secondary-color: #ffd166;
+            --accent-color: #ef476f;
+            --background-color: #fffaf0;
+            --success-color: #06d6a0;
+            --text-color: #5c4a38;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Baloo 2', cursive;
+            background-color: var(--background-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 217, 102, 0.3) 0%, transparent 20%),
+                radial-gradient(circle at 90% 30%, rgba(255, 153, 0, 0.3) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(239, 71, 111, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 80% 80%, rgba(6, 214, 160, 0.3) 0%, transparent 20%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-color);
+            overflow: hidden;
+        }
+        
+        .login-container {
+            width: 90%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px var(--shadow-color);
+            overflow: hidden;
+            display: flex;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .login-image {
+            flex: 1;
+            background-color: var(--secondary-color);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .croissant {
+            width: 200px;
+            height: 200px;
+            background-image: url('croiso.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(0deg); }
+            75% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .login-form {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 3px solid var(--secondary-color);
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Baloo 2', cursive;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 10px var(--secondary-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+        
+        button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 20px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        
+        .clouds {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .cloud {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .cloud-1 {
+            width: 100px;
+            height: 60px;
+            top: 20px;
+            left: 20px;
+            animation: driftCloud 30s linear infinite;
+        }
+        
+        .cloud-2 {
+            width: 70px;
+            height: 40px;
+            top: 60px;
+            right: 30px;
+            animation: driftCloud 25s linear infinite 5s;
+        }
+        
+        .cloud-3 {
+            width: 120px;
+            height: 70px;
+            bottom: 30px;
+            left: 50px;
+            animation: driftCloud 35s linear infinite 10s;
+        }
+        
+        @keyframes driftCloud {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .login-image, .login-form {
+                width: 100%;
+            }
+            
+            .croissant {
+                width: 150px;
+                height: 150px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-image">
+            <div class="croissant"></div>
+            <h1>Croissant Adventure</h1>
+            <h2>¡Regístrate para comenzar tu aventura!</h2>
+            <div class="clouds">
+                <div class="cloud cloud-1"></div>
+                <div class="cloud cloud-2"></div>
+                <div class="cloud cloud-3"></div>
+            </div>
+        </div>
+        <div class="login-form">
+            <h2>Registrarse</h2>
+            <div class="input-group">
+                <label for="username">Nombre de aventurero:</label>
+                <input type="text" id="username" placeholder="Escribe tu nombre aquí..." autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label for="age">Edad:</label>
+                <input type="number" id="age" placeholder="Escribe tu edad aquí..." min="1">
+            </div>
+            <div class="input-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" placeholder="Tu correo electrónico...">
+            </div>
+            <div class="input-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" placeholder="Tu contraseña mágica..." disabled>
+            </div>
+            <button id="register-button">¡Registrarse!</button>
+            <div id="error-message" class="error-message">
+                ¡Ups! Algo salió mal. ¡Inténtalo de nuevo!
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerButton = document.getElementById('register-button');
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const ageInput = document.getElementById('age');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+
+            ageInput.addEventListener('input', function () {
+                const age = parseInt(ageInput.value, 10);
+                if (age >= 10) {
+                    passwordInput.disabled = false;
+                    errorMessage.style.display = 'none';
+                } else {
+                    passwordInput.disabled = true;
+                    errorMessage.textContent = '¡Oh no! Solo un adulto puede escribir la contraseña mágica.';
+                    errorMessage.style.display = 'block';
+                }
+            });
+
+            registerButton.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const username = usernameInput.value.trim();
+                const email = emailInput.value.trim();
+                const age = parseInt(ageInput.value, 10);
+                const password = passwordInput.value.trim();
+
+                if (username && email && !isNaN(age) && password) {
+                    if (age < 10) {
+                        alert('¡Oh no! Necesitas la ayuda de un adulto para registrarte.');
+                    } else {
+                        console.log('Usuario registrado:', { username, email, age, password });
+                        alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
+                        window.location.href = 'index.html';
+                    }
+                } else {
+                    errorMessage.textContent = 'Por favor, completa todos los campos.';
+                    errorMessage.style.display = 'block';
+
+                    errorMessage.classList.add('shake');
+                    setTimeout(() => {
+                        errorMessage.classList.remove('shake');
+                    }, 500);
+                }
+            });
+
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20%, 60% { transform: translateX(-10px); }
+                    40%, 80% { transform: translateX(10px); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

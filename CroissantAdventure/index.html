@@ -14,6 +14,7 @@
             --success-color: #06d6a0;
             --text-color: #5c4a38;
             --shadow-color: rgba(0, 0, 0, 0.2);
+            --brown-band-color: #ffd166;
         }
         
         * {
@@ -32,100 +33,71 @@
                 radial-gradient(circle at 80% 80%, rgba(6, 214, 160, 0.3) 0%, transparent 20%);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start;
             color: var(--text-color);
             overflow: hidden;
         }
         
-        .login-container {
-            width: 90%;
-            max-width: 800px;
-            background-color: white;
-            border-radius: 30px;
-            box-shadow: 0 15px 30px var(--shadow-color);
-            overflow: hidden;
+        .top-buttons {
+            width: 100%;
             display: flex;
-            animation: float 6s ease-in-out infinite;
+            justify-content: flex-end;
+            padding: 20px;
+            gap: 10px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
         }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .login-image {
+
+        .main-content {
             flex: 1;
-            background-color: var(--secondary-color);
-            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+        }
+
+        .description-section {
+            position: absolute;
+            top: 0;
+            left: 20px; /* Slight separation from the left margin */
+            width: 50%; /* Extends to the center of the screen */
+            height: 100%; /* Full height of the screen */
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            position: relative;
-        }
-        
-        .character-selection {
-            margin-top: 20px;
+            justify-content: center;
+            background-color: var(--brown-band-color);
+            color: rgb(21, 21, 21);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-color);
             text-align: center;
         }
-        
-        .character-option {
-            display: inline-block;
-            margin: 0 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+
+        .description-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
         }
-        
-        .character-option.selected {
-            transform: scale(1.1);
+
+        .description-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
         }
-        
-        .character-option.selected::after {
-            content: '✓';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--success-color);
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+
+        .description-section p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 90%;
         }
-        
-        .character-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 3px 6px var(--shadow-color);
-            transition: all 0.3s ease;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
-        .character-option:hover .character-img {
-            transform: scale(1.1);
-            border-color: var(--accent-color);
-        }
-        
-        .character-name {
-            margin-top: 8px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-        
+
         .croissant {
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             background-image: url('croiso.png');
             background-repeat: no-repeat;
             background-size: contain;
@@ -140,15 +112,7 @@
             50% { transform: translateY(-20px) rotate(0deg); }
             75% { transform: translateY(-10px) rotate(5deg); }
         }
-        
-        .login-form {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
+
         h1 {
             font-size: 2.5rem;
             margin-bottom: 20px;
@@ -163,33 +127,6 @@
             color: var(--accent-color);
         }
         
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 3px solid var(--secondary-color);
-            border-radius: 15px;
-            font-size: 1rem;
-            font-family: 'Baloo 2', cursive;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 10px var(--secondary-color);
-        }
-        
         button {
             background-color: var(--primary-color);
             color: white;
@@ -201,7 +138,6 @@
             transition: all 0.3s ease;
             font-family: 'Baloo 2', cursive;
             font-weight: 600;
-            margin-top: 20px;
             box-shadow: 0 5px 15px var(--shadow-color);
         }
         
@@ -213,173 +149,97 @@
         button:active {
             transform: translateY(0);
         }
-        
-        .error-message {
-            color: var(--accent-color);
-            margin-top: 20px;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-        }
-        
-        .clouds {
+
+        .carousel-section {
             position: absolute;
+            top: 60%; /* Center vertically */
+            transform: translateY(-50%); /* Adjust for perfect centering */
+            right: 20px; /* Keep horizontal position unchanged */
+            width: 50%; /* Increase size */
+            max-width: 500px; /* Adjust maximum size */
+        }
+
+        .carousel {
             width: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-        
-        .cloud {
-            position: absolute;
-            background-color: white;
-            border-radius: 50%;
-            opacity: 0.7;
-        }
-        
-        .cloud-1 {
-            width: 100px;
-            height: 60px;
-            top: 20px;
-            left: 20px;
-            animation: driftCloud 30s linear infinite;
-        }
-        
-        .cloud-2 {
-            width: 70px;
-            height: 40px;
-            top: 60px;
-            right: 30px;
-            animation: driftCloud 25s linear infinite 5s;
-        }
-        
-        .cloud-3 {
-            width: 120px;
-            height: 70px;
-            bottom: 30px;
-            left: 50px;
-            animation: driftCloud 35s linear infinite 10s;
-        }
-        
-        @keyframes driftCloud {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(300%); }
-        }
-        
-        /* Estilos para Control Parental */
-        .parental-controls {
-            background-color: rgba(255, 250, 240, 0.5);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px dashed var(--secondary-color);
+            max-width: 500px; /* Match the new size */
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-color);
         }
 
-        .parental-controls h3 {
-            color: var(--text-color);
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .toggle-control {
+        .carousel-images {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-images img {
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .carousel-buttons {
+            display: flex;
+            justify-content: center;
             margin-top: 10px;
         }
 
-        .toggle-label {
-            margin-bottom: 0 !important;
-        }
-
-        /* Switch para el toggle */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-
-        input:checked + .slider {
-            background-color: var(--success-color);
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px var(--success-color);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
+        .carousel-button {
+            width: 10px;
+            height: 10px;
+            margin: 0 5px;
+            background-color: var(--secondary-color);
             border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-family: inherit;
-            resize: vertical;
-            transition: all 0.3s ease;
+        .carousel-button.active {
+            background-color: var(--primary-color);
         }
 
-        textarea:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
-            outline: none;
-        }
-        
         @media (max-width: 768px) {
-            .login-container {
+            .main-content {
                 flex-direction: column;
-                max-width: 400px;
+                align-items: center;
             }
-            
-            .login-image, .login-form {
-                width: 100%;
+
+            .description-section {
+                position: static;
+                width: 90%;
+                height: auto;
+                margin: 20px auto;
+                padding: 20px;
             }
-            
+
             .croissant {
                 width: 150px;
                 height: 150px;
             }
-            
+
+            .description-section h1 {
+                font-size: 2rem;
+            }
+
+            .description-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .description-section p {
+                font-size: 1rem;
+            }
+
+            .carousel-section {
+                position: static;
+                width: 90%;
+                margin: 20px auto;
+                top: auto;
+                transform: none;
+            }
+
+            .carousel {
+                max-width: 100%;
+            }
+
             h1 {
                 font-size: 2rem;
             }
@@ -391,252 +251,68 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-image">
+    <div class="top-buttons">
+        <button id="login-button">Iniciar Sesión</button>
+        <button id="register-button" onclick="window.location.href='register.html'">Registrarse</button>
+    </div>
+    <div class="main-content">
+        <div class="description-section">
             <div class="croissant"></div>
             <h1>Croissant Adventure</h1>
-            
-            <div class="character-selection">
-                <h3>Elige tu personaje</h3>
-                <div class="character-options">
-                    <div class="character-option selected" data-character="croiso">
-                        <div class="character-img" style="background-image: url('croiso.png');"></div>
-                        <div class="character-name">Croiso</div>
-                    </div>
-                    <div class="character-option" data-character="croisa">
-                        <div class="character-img" style="background-image: url('croisa.png');"></div>
-                        <div class="character-name">Croisa</div>
-                    </div>
-                </div>
-            </div>
             <h2>¡Un mundo de diversión te espera!</h2>
-            <div class="clouds">
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="cloud cloud-3"></div>
-            </div>
+            <p>
+                Croissant Adventure es un emocionante videojuego donde explorarás mundos mágicos, resolverás acertijos y vivirás aventuras inolvidables. ¡Elige tu personaje y comienza la diversión!
+            </p>
         </div>
-        
-        <div class="login-form">
-            <h2>¡Inicia sesión para jugar!</h2>
-            
-            <div class="input-group">
-                <label for="username">Nombre de aventurero:</label>
-                <input type="text" id="username" placeholder="Escribe tu nombre aquí..." autocomplete="off">
-            </div>
-            
-            <div class="input-group">
-                <label for="password">Contraseña secreta:</label>
-                <input type="password" id="password" placeholder="Tu contraseña mágica...">
-            </div>
-
-            <!-- Controles de Control Parental -->
-            <div class="parental-controls">
-                <h3>Control Parental</h3>
-                <div class="input-group">
-                    <label for="play-time">Tiempo de juego (minutos):</label>
-                    <input type="number" id="play-time" placeholder="30" min="1" max="120" value="30">
+        <div class="carousel-section">
+            <div class="carousel">
+                <div class="carousel-images">
+                    <img src="ingame1.jpg" alt="In-game 1">
+                    <img src="ingame2.jpg" alt="In-game 2">
+                    <img src="ingame3.jpg" alt="In-game 3">
                 </div>
-                
-                <div class="input-group">
-                    <label for="task-description">Tarea a realizar:</label>
-                    <textarea id="task-description" placeholder="Ejemplo: Leer 10 páginas de un libro" rows="2"></textarea>
+                <div class="carousel-buttons">
+                    <div class="carousel-button active" data-index="0"></div>
+                    <div class="carousel-button" data-index="1"></div>
+                    <div class="carousel-button" data-index="2"></div>
                 </div>
-
-                <div class="toggle-control">
-                    <label for="parental-control-toggle" class="toggle-label">Activar control parental</label>
-                    <label class="switch">
-                        <input type="checkbox" id="parental-control-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-            </div>
-            
-            <button id="login-button">¡Comenzar Aventura!</button>
-            
-            <div id="error-message" class="error-message">
-                ¡Ups! Nombre o contraseña incorrectos. ¡Inténtalo de nuevo!
             </div>
         </div>
     </div>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Bienvenido a Croissant Adventure');
+
+            // Fix "Iniciar Sesión" button functionality
             const loginButton = document.getElementById('login-button');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
-            const characterOptions = document.querySelectorAll('.character-option');
-            const parentalControlToggle = document.getElementById('parental-control-toggle');
-            const playTimeInput = document.getElementById('play-time');
-            const taskDescriptionInput = document.getElementById('task-description');
-            let selectedCharacter = 'croiso'; // Por defecto es Croiso
-            
-            // Manejo de selección de personaje
-            characterOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    // Quitar clase selected de todas las opciones
-                    characterOptions.forEach(op => op.classList.remove('selected'));
-                    
-                    // Añadir clase selected a la opción clicada
-                    this.classList.add('selected');
-                    
-                    // Guardar el personaje seleccionado
-                    selectedCharacter = this.getAttribute('data-character');
-                    console.log('Personaje seleccionado:', selectedCharacter);
-                    
-                    // Actualizar la imagen principal con el personaje seleccionado
-                    document.querySelector('.croissant').style.backgroundImage = `url('${selectedCharacter}.png')`;
-                });
+            loginButton.addEventListener('click', function() {
+                window.location.href = 'login.html';
             });
-            const errorMessage = document.getElementById('error-message');
-            
-            // Control parental - Toggle
-            parentalControlToggle.addEventListener('change', function() {
-                const parentalControls = document.querySelectorAll('.parental-controls input, .parental-controls textarea');
-                
-                // Habilitar/deshabilitar inputs excepto el toggle mismo
-                parentalControls.forEach(control => {
-                    if (control !== parentalControlToggle) {
-                        control.disabled = !this.checked;
-                    }
-                });
-                
-                // Efecto visual
-                if (this.checked) {
-                    document.querySelector('.parental-controls').style.opacity = '1';
-                    playTimeInput.focus();
-                } else {
-                    document.querySelector('.parental-controls').style.opacity = '0.7';
-                }
-            });
-            
-            // Inicializar estado de los controles parentales
-            document.querySelectorAll('.parental-controls input, .parental-controls textarea').forEach(control => {
-                if (control !== parentalControlToggle) {
-                    control.disabled = !parentalControlToggle.checked;
-                }
-            });
-            document.querySelector('.parental-controls').style.opacity = parentalControlToggle.checked ? '1' : '0.7';
-            
-            // Credenciales correctas
-            const correctUsername = 'admin';
-            const correctPassword = 'admin';
-            
-            // Efectos visuales en los campos
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.transform = 'scale(1.05)';
-                    errorMessage.style.display = 'none';
-                });
-                
-                input.addEventListener('blur', function() {
-                    this.style.transform = 'scale(1)';
-                });
-                
-                // Al presionar Enter en el campo de contraseña, intentar iniciar sesión
-                if (input.id === 'password') {
-                    input.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            loginButton.click();
-                        }
-                    });
-                }
-            });
-            
-            // Función de login
-            loginButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const username = usernameInput.value.trim();
-                const password = passwordInput.value.trim();
-                
-                if (username === correctUsername && password === correctPassword) {
-                    // Guardar el personaje seleccionado en localStorage
-                    localStorage.setItem('selectedCharacter', selectedCharacter);
-                    localStorage.setItem('playerName', username);
-                    
-                    // Guardar configuración de control parental si está activado
-                    if (parentalControlToggle.checked) {
-                        const playTime = parseInt(playTimeInput.value) || 30; // Valor por defecto: 30 minutos
-                        const taskDescription = taskDescriptionInput.value.trim() || 'Completar una actividad educativa';
-                        
-                        // Guardar configuración en localStorage
-                        localStorage.setItem('parentalControlEnabled', 'true');
-                        localStorage.setItem('playTimeLimit', playTime.toString());
-                        localStorage.setItem('taskDescription', taskDescription);
-                        
-                        // Configurar tiempo inicial (en milisegundos)
-                        const currentTime = new Date().getTime();
-                        const endTime = currentTime + (playTime * 60 * 1000);
-                        localStorage.setItem('playTimeEnd', endTime.toString());
-                        console.log(`Control parental activado: ${playTime} minutos, hasta ${new Date(endTime).toLocaleTimeString()}`);
-                    } else {
-                        // Desactivar control parental
-                        localStorage.removeItem('parentalControlEnabled');
-                        localStorage.removeItem('playTimeLimit');
-                        localStorage.removeItem('taskDescription');
-                        localStorage.removeItem('playTimeEnd');
-                        console.log('Control parental desactivado');
-                    }
-                    
-                    // Iniciar sesión exitoso - Animación de transición
-                    loginButton.innerHTML = '¡Aquí vamos! 🚀';
-                    loginButton.style.backgroundColor = 'var(--success-color)';
-                    
-                    // Iniciar sesión correctamente y pasar el personaje como parámetro
-                    setTimeout(function() {
-                        window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
-                    }, 1000);
-                } else {
-                    // Mostrar error
-                    errorMessage.textContent = '¡Nombre de usuario o contraseña incorrectos!';
-                    errorMessage.style.display = 'block';
-                    
-                    // Animar el mensaje de error
-                    errorMessage.classList.add('shake');
-                    setTimeout(() => {
-                        errorMessage.classList.remove('shake');
-                    }, 500);
-                    
-                    // Agitar los campos
-                    const inputs = [usernameInput, passwordInput];
-                    inputs.forEach(input => {
-                        input.style.borderColor = 'var(--accent-color)';
-                        input.style.animation = 'shake 0.5s ease-in-out';
-                        setTimeout(() => {
-                            input.style.animation = '';
-                        }, 500);
-                    });
-                }
-            });
-            
-            // Definir la animación de sacudida
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    20%, 60% { transform: translateX(-10px); }
-                    40%, 80% { transform: translateX(10px); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Comprobar si el usuario ya está logueado para redirigirlo automáticamente
-            if (localStorage.getItem('isLoggedIn') === 'true') {
-                window.location.href = 'juego_nuevo.html';
+
+            // Carousel functionality
+            const carouselImages = document.querySelector('.carousel-images');
+            const carouselButtons = document.querySelectorAll('.carousel-button');
+            let currentIndex = 0;
+
+            function updateCarousel(index) {
+                const offset = -index * 100;
+                carouselImages.style.transform = `translateX(${offset}%)`;
+                carouselButtons.forEach(button => button.classList.remove('active'));
+                carouselButtons[index].classList.add('active');
             }
-            
-            // Para fines de demostración, colocar sugerencias sutiles
-            // Esta parte es opcional y se puede eliminar en producción
-            const hintElement = document.createElement('div');
-            hintElement.style.position = 'fixed';
-            hintElement.style.bottom = '10px';
-            hintElement.style.right = '10px';
-            hintElement.style.fontSize = '10px';
-            hintElement.style.color = 'rgba(92, 74, 56, 0.5)';
-            hintElement.innerHTML = 'Pista: admin / admin';
-            document.body.appendChild(hintElement);
+
+            carouselButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentIndex = parseInt(this.getAttribute('data-index'));
+                    updateCarousel(currentIndex);
+                });
+            });
+
+            // Auto-slide every 5 seconds
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % carouselButtons.length;
+                updateCarousel(currentIndex);
+            }, 5000);
         });
     </script>
 </body>
