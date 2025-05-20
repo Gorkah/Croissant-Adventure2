@@ -4,10 +4,10 @@
     flex-direction: column;
     height: 100%;
     background-color: #fff8e6;
-    border-radius: 10px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    font-family: 'Arial Rounded MT Bold', Arial, sans-serif;
+    box-shadow: none;
+    font-family: 'Baloo 2', cursive;
 }
 
 .ai-chat-header {
