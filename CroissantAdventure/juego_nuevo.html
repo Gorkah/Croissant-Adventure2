@@ -102,7 +102,9 @@
         }
         
         #chat-container {
-            flex: 0 0 400px;
+            flex: 0 0 30%; /* Ancho relativo */
+            max-width: 400px; /* Límite máximo para pantallas grandes */
+            min-width: 250px; /* Límite mínimo para pantallas pequeñas */
             border-right: 2px solid #ff9900;
             height: 100%;
             background-color: #fff5e5;
