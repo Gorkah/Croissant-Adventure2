@@ -6,6 +6,15 @@
     <title>Croissant Adventure - El Mundo de Migalandia</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/ai-chat.css">
+    <!-- Script del bot externo (Easy-Peasy AI) -->
+    <script 
+        src="https://bots.easy-peasy.ai/chat.min.js" 
+        data-chat-url="https://bots.easy-peasy.ai/bot/8b081267-6cc8-43e2-a078-319a8a1bdd1e" 
+        data-btn-position="bottom-right"
+        data-widget-btn-color="#f1a203"
+        id="easy-peasy-bot"
+        defer>
+    </script>
     <style>
         body {
             font-family: 'Baloo 2', cursive;
@@ -469,6 +478,11 @@
         <!-- Columna izquierda - Chatbot -->
         <div id="chat-container">
             <!-- El contenido será generado dinámicamente por ChatInterface -->
+            <div id="bot-toggle-container" style="text-align: center; padding: 10px; background-color: #ffe9c7; border-bottom: 1px solid #ff9900;">
+                <button id="toggle-bot-button" class="bot-toggle-button" style="background-color: #ff9900; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    Cambiar a Bot Externo
+                </button>
+            </div>
         </div>
         
         <!-- Columna derecha - Juego -->
