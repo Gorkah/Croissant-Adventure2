@@ -676,12 +676,22 @@
                 } else {
                     // Validar credenciales contra los datos almacenados (si aplica)
                     const userData = JSON.parse(localStorage.getItem('userData')) || {};
-                    if (userData[username] && userData[username].password === password) {
-                        // Guardar el personaje seleccionado en localStorage
-                        localStorage.setItem('selectedCharacter', selectedCharacter);
-                        localStorage.setItem('playerName', username);
-                        
-                        window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
+                    // Verificar si son las credenciales de demo
+                if (username === 'demo' && password === 'demo') {
+                    // Guardar indicador de modo demo
+                    localStorage.setItem('demoMode', 'true');
+                    localStorage.setItem('selectedCharacter', 'croiso'); // Forzar Croiso para la demo
+                    localStorage.setItem('playerName', 'Demo');
+                    
+                    // Redirigir a la página de demostración
+                    window.location.href = 'demo.html';
+                } else if (userData[username] && userData[username].password === password) {
+                    // Inicio de sesión normal
+                    localStorage.setItem('demoMode', 'false');
+                    localStorage.setItem('selectedCharacter', selectedCharacter);
+                    localStorage.setItem('playerName', username);
+                    
+                    window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
                     } else {
                         // Mostrar error
                         errorMessage.textContent = '¡Nombre de usuario o contraseña incorrectos!';

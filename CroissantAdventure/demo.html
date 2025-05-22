@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modo Demo - Croissant Adventure</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff9900;
+      --secondary-color: #ffd166;
+      --accent-color: #ef476f;
+      --background-color: #fffaf0;
+      --success-color: #06d6a0;
+      --text-color: #5c4a38;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Baloo 2', cursive;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px var(--shadow-color);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      width: 35px;
+      height: 35px;
+      background: url('croiso.png') center/contain no-repeat;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .demo-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .demo-header h1 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .demo-header p {
+      font-size: 1.2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .demo-navigation {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .nav-dot {
+      width: 12px;
+      height: 12px;
+      background-color: var(--secondary-color);
+      border-radius: 50%;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .nav-dot.active {
+      background-color: var(--primary-color);
+      transform: scale(1.2);
+    }
+
+    .demo-slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .demo-slide.active {
+      display: flex;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .slide-content {
+      display: flex;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    .slide-image {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slide-image img {
+      max-width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px var(--shadow-color);
+    }
+
+    .slide-text {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slide-text h2 {
+      font-size: 1.8rem;
+      color: var(--accent-color);
+      margin-bottom: 15px;
+    }
+
+    .slide-text p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .guide-character {
+      position: fixed;
+      top: 40%;
+      left: 90%;
+      transform: translate(-50%, -50%);
+      width: 150px;
+      height: 150px;
+      background-image: url('croiso.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 10;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+
+    .speech-bubble {
+      position: absolute;
+      top: -120px; /* sube el globo sobre el personaje */
+      left: -260px; /* mueve el globo a la izquierda */
+      background-color: white;
+      padding: 15px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px var(--shadow-color, rgba(0, 0, 0, 0.2));
+      max-width: 250px;
+      z-index: 11;
+    }
+
+    .speech-bubble:after {
+      content: '';
+      position: absolute;
+      bottom: -15px; /* la punta queda abajo del globo */
+      right: 0px; /* ajusta la posición de la punta */
+      border-width: 15px 15px 0;
+      border-style: solid;
+      border-color: white transparent transparent transparent;
+    }
+
+
+
+    .demo-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .demo-btn {
+      padding: 12px 25px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .demo-btn:hover {
+      background-color: var(--accent-color);
+      transform: translateY(-3px);
+    }
+
+    .demo-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 15px;
+      text-align: center;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <div class="logo-img"></div>
+      <div class="logo-text">Croissant Adventure</div>
+    </div>
+    <div>
+      <span style="font-weight: bold;">MODO DEMO</span>
+    </div>
+  </header>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <h1>Demostración de Croissant Adventure</h1>
+      <p>¡Bienvenido al tour guiado de Croissant Adventure! Te mostraremos todas las funcionalidades de nuestro juego educativo interactivo.</p>
+    </div>
+
+    <div class="demo-navigation" id="nav-dots">
+      <!-- Puntos de navegación generados por JS -->
+    </div>
+
+    <div class="demo-slides" id="slides-container">
+      <!-- Slide 1: Proceso de desarrollo I -->
+      <div class="demo-slide active" data-speech="¡Hola! Soy Croiso y te mostraré cómo creamos Croissant Adventure, comenzando por nuestra fase de diseño.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <img src="desarrollo1.jpg" alt="Proceso de diseño">
+          </div>
+          <div class="slide-text">
+            <h2>Proceso de Diseño</h2>
+            <p>El desarrollo de Croissant Adventure comenzó con un cuidadoso proceso de diseño y planificación:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Bocetos iniciales de los personajes y escenarios</li>
+              <li>Definición de la experiencia de usuario y flujos de navegación</li>
+              <li>Creación de un mapa conceptual del mundo del juego</li>
+              <li>Desarrollo de objetivos pedagógicos para cada minijuego</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Proceso de desarrollo II -->
+      <div class="demo-slide" data-speech="En esta fase, nos centramos en la implementación técnica y la creación de los minijuegos educativos.">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Implementación Técnica</h2>
+            <p>Una vez definido el diseño, pasamos a la fase de implementación:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Desarrollo del motor de juego y sistema de navegación</li>
+              <li>Programación de los minijuegos educativos</li>
+              <li>Implementación de la lógica del chat inteligente</li>
+              <li>Creación del sistema de control parental</li>
+            </ul>
+            <p style="margin-top: 15px;">Utilizamos tecnologías web modernas para asegurar una experiencia fluida y accesible desde cualquier dispositivo.</p>
+          </div>
+          <div class="slide-image">
+            <img src="desarrollo2.jpg" alt="Implementación técnica">
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Proceso de desarrollo III -->
+      <div class="demo-slide" data-speech="La fase final consistió en pruebas exhaustivas con usuarios para refinar la experiencia de juego.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <img src="desarrollo3.jpg" alt="Pruebas con usuarios">
+          </div>
+          <div class="slide-text">
+            <h2>Pruebas y Refinamiento</h2>
+            <p>Antes de finalizar el producto, realizamos múltiples iteraciones de pruebas:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Sesiones de prueba con niños de diferentes edades</li>
+              <li>Retroalimentación de educadores y padres</li>
+              <li>Ajustes de usabilidad y experiencia de usuario</li>
+              <li>Optimización del rendimiento en diferentes dispositivos</li>
+            </ul>
+            <p style="margin-top: 15px;">Gracias a este proceso iterativo, pudimos crear un juego que es divertido, educativo y accesible para todos.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Introducción -->
+      <div class="demo-slide" data-speech="Y ahora, permíteme presentarte Croissant Adventure, nuestro juego educativo interactivo.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <img src="ingame1.jpg" alt="Introducción al juego">
+          </div>
+          <div class="slide-text">
+            <h2>Bienvenido a Croissant Adventure</h2>
+            <p>Croissant Adventure es un juego educativo interactivo para niños que combina diversión y aprendizaje en un mundo mágico lleno de aventuras.</p>
+            <p>En esta demostración, te guiaremos a través de las principales funcionalidades del juego:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Mapa interactivo con minijuegos</li>
+              <li>Sistemas de chat inteligente</li>
+              <li>Control parental avanzado</li>
+              <li>Minijuegos educativos temáticos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: El Mapa -->
+      <div class="demo-slide" data-speech="Este es nuestro mapa principal. ¡Aquí puedes explorar diferentes regiones y descubrir minijuegos!">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Mapa Interactivo</h2>
+            <p>El mapa es el centro de Croissant Adventure. Desde aquí, los jugadores pueden:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Explorar diferentes regiones temáticas</li>
+              <li>Descubrir minijuegos educativos</li>
+              <li>Interactuar con personajes del juego</li>
+              <li>Seguir su progreso en las diferentes áreas</li>
+            </ul>
+            <p style="margin-top: 15px;">Nuestra región más popular es "Playa Caramelizada", donde se encuentran los minijuegos "Pescador Pastelero" y "Surfista Glaseado".</p>
+          </div>
+          <div class="slide-image">
+            <img src="ingame2.jpg" alt="Mapa del juego">
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Playa Caramelizada -->
+      <div class="demo-slide" data-speech="¡Bienvenido a Playa Caramelizada! Aquí hemos mejorado la interactividad de los minijuegos con un sistema de detección de colisiones y feedback visual.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <img src="ingame3.jpg" alt="Playa Caramelizada">
+          </div>
+          <div class="slide-text">
+            <h2>Playa Caramelizada</h2>
+            <p>Una de nuestras regiones más populares con minijuegos acuáticos y diversión bajo el sol.</p>
+            <p style="margin-top: 10px;"><strong>Mejoras recientes:</strong></p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Mejor detección de colisiones para interactuar con los minijuegos</li>
+              <li>Sistema de feedback visual que muestra un prompt cuando el jugador se acerca</li>
+              <li>Corrección de errores en el código de las decoraciones</li>
+            </ul>
+            <p style="margin-top: 15px;">Estas mejoras hacen que la interacción con los minijuegos sea más intuitiva y divertida para los niños.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Pescador Pastelero -->
+      <div class="demo-slide" data-speech="¡Este es nuestro minijuego Pescador Pastelero! Los niños pueden aprender matemáticas mientras pescan pasteles deliciosos.">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Minijuego: Pescador Pastelero</h2>
+            <p>En este divertido minijuego, los niños practican:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Operaciones matemáticas básicas</li>
+              <li>Coordinación mano-ojo</li>
+              <li>Toma de decisiones rápidas</li>
+            </ul>
+            <p style="margin-top: 15px;">Los jugadores deben pescar pasteles con el valor correcto para resolver ecuaciones, combinando aprendizaje y diversión.</p>
+            <div style="margin-top: 20px;">
+              <button class="demo-btn" style="margin-right: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Probar minijuego</button>
+            </div>
+          </div>
+          <div class="slide-image">
+            <img src="minigames/fishing.jpg" alt="Minijuego Pescador Pastelero">
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 5: Surfista Glaseado -->
+      <div class="demo-slide" data-speech="¡Y aquí está nuestro minijuego Surfista Glaseado! Los niños aprenden mientras surfean sobre olas de glaseado.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <img src="minigames/surfing.jpg" alt="Minijuego Surfista Glaseado">
+          </div>
+          <div class="slide-text">
+            <h2>Minijuego: Surfista Glaseado</h2>
+            <p>En este emocionante minijuego, los niños desarrollan:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Reconocimiento de palabras y ortografía</li>
+              <li>Velocidad de reacción</li>
+              <li>Memoria visual</li>
+            </ul>
+            <p style="margin-top: 15px;">Los jugadores surfean olas de glaseado mientras recogen letras para formar palabras correctas.</p>
+            <div style="margin-top: 20px;">
+              <button class="demo-btn" style="margin-right: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Probar minijuego</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Chat Inteligente -->
+      <div class="demo-slide" data-speech="Nuestro chat inteligente ayuda a los niños con preguntas y les brinda asistencia personalizada.">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Chat Inteligente</h2>
+            <p>El chat inteligente de Croissant Adventure ofrece:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Asistencia personalizada para cada niño</li>
+              <li>Respuestas adaptadas a su edad y nivel educativo</li>
+              <li>Ayuda contextual dentro de los minijuegos</li>
+              <li>Guía amigable en todo el mundo del juego</li>
+            </ul>
+            <p style="margin-top: 15px;">El chat está diseñado para ser seguro y educativo, fomentando el aprendizaje mientras los niños juegan.</p>
+            <div style="margin-top: 20px;">
+              <div style="display: flex; align-items: center;">
+                <input type="text" placeholder="Haz una pregunta..." style="padding: 10px; border-radius: 8px; border: 2px solid var(--primary-color); width: 70%;">
+                <button class="demo-btn" style="margin-left: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Enviar</button>
+              </div>
+            </div>
+          </div>
+          <div class="slide-image">
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px var(--shadow-color);">
+              <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
+                <div style="width: 40px; height: 40px; background-image: url('croiso.png'); background-size: contain; background-repeat: no-repeat; margin-right: 10px;"></div>
+                <div style="background: #f0f0f0; padding: 10px; border-radius: 10px; max-width: 80%;">¡Hola! Soy Croiso. ¿En qué puedo ayudarte hoy?</div>
+              </div>
+              <div style="display: flex; align-items: flex-start; margin-bottom: 15px; justify-content: flex-end;">
+                <div style="background: var(--secondary-color); padding: 10px; border-radius: 10px; max-width: 80%;">¿Cómo puedo jugar al Pescador Pastelero?</div>
+                <div style="width: 40px; height: 40px; background-image: url('croisa.png'); background-size: contain; background-repeat: no-repeat; margin-left: 10px;"></div>
+              </div>
+              <div style="display: flex; align-items: flex-start;">
+                <div style="width: 40px; height: 40px; background-image: url('croiso.png'); background-size: contain; background-repeat: no-repeat; margin-right: 10px;"></div>
+                <div style="background: #f0f0f0; padding: 10px; border-radius: 10px; max-width: 80%;">¡Claro! Para jugar al Pescador Pastelero, dirígete a la Playa Caramelizada en el mapa. Cuando veas un icono de caña de pescar, haz clic en él. El objetivo es pescar los pasteles con el valor numérico correcto para resolver la ecuación que aparece en pantalla. ¡Es divertido y aprenderás matemáticas!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Control Parental -->
+      <div class="demo-slide" data-speech="El control parental permite a los padres supervisar y gestionar la experiencia de juego de sus hijos.">
+        <div class="slide-content">
+          <div class="slide-image">
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px var(--shadow-color);">
+              <h3 style="margin-bottom: 15px; color: var(--primary-color);">Panel de Control Parental</h3>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Tiempo de juego diario</label>
+                <div style="display: flex; align-items: center;">
+                  <input type="range" min="0" max="120" value="60" style="flex: 1;">
+                  <span style="margin-left: 10px;">60 minutos</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Áreas educativas prioritarias</label>
+                <div style="display: flex; gap: 10px;">
+                  <div style="padding: 8px; background: var(--secondary-color); border-radius: 5px;">Matemáticas</div>
+                  <div style="padding: 8px; background: #f0f0f0; border-radius: 5px;">Lenguaje</div>
+                  <div style="padding: 8px; background: #f0f0f0; border-radius: 5px;">Ciencias</div>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Informes de progreso</label>
+                <select style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                  <option>Diario</option>
+                  <option selected>Semanal</option>
+                  <option>Mensual</option>
+                </select>
+              </div>
+              
+              <button class="demo-btn" style="width: 100%;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Guardar configuración</button>
+            </div>
+          </div>
+          <div class="slide-text">
+            <h2>Control Parental Avanzado</h2>
+            <p>Nuestro sistema de control parental permite a los padres:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Establecer límites de tiempo de juego</li>
+              <li>Seleccionar áreas educativas prioritarias</li>
+              <li>Recibir informes de progreso periódicos</li>
+              <li>Personalizar el contenido según la edad</li>
+              <li>Monitorear la actividad del niño</li>
+            </ul>
+            <p style="margin-top: 15px;">El control parental garantiza una experiencia segura y educativa, adaptada a las necesidades específicas de cada niño.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 8: Conclusión -->
+      <div class="demo-slide" data-speech="¡Gracias por explorar Croissant Adventure! Esperamos que hayas disfrutado de esta demostración.">
+        <div class="slide-content">
+          <div class="slide-text" style="text-align: center; width: 100%;">
+            <h2>¡Gracias por explorar Croissant Adventure!</h2>
+            <p style="margin: 20px 0;">Has visto las principales características de nuestro juego educativo:</p>
+            <div style="display: flex; justify-content: space-around; margin: 30px 0;">
+              <div style="text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                  <span style="font-size: 2rem; color: white;">🗺️</span>
+                </div>
+                <p>Mapa Interactivo</p>
+              </div>
+              <div style="text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                  <span style="font-size: 2rem; color: white;">🎮</span>
+                </div>
+                <p>Minijuegos Educativos</p>
+              </div>
+              <div style="text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                  <span style="font-size: 2rem; color: white;">💬</span>
+                </div>
+                <p>Chat Inteligente</p>
+              </div>
+              <div style="text-align: center;">
+                <div style="width: 80px; height: 80px; background-color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                  <span style="font-size: 2rem; color: white;">👨‍👩‍👧‍👦</span>
+                </div>
+                <p>Control Parental</p>
+              </div>
+            </div>
+            <p style="margin: 20px 0;">¿Listo para sumergirte en esta dulce aventura?</p>
+            <div style="margin-top: 30px;">
+              <button class="demo-btn" style="margin-right: 15px;" onclick="window.location.href='register.html'">Registrarse</button>
+              <button class="demo-btn" onclick="window.location.href='index.html'">Volver al inicio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-controls">
+      <button id="prev-btn" class="demo-btn" disabled>Anterior</button>
+      <button id="next-btn" class="demo-btn">Siguiente</button>
+    </div>
+  </div>
+
+  <div class="guide-character" id="guide">
+    <div class="speech-bubble" id="speech">
+      ¡Hola! Soy Croiso y te guiaré por esta demo de Croissant Adventure. ¡Vamos a comenzar!
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>&copy; 2025 Croissant Adventure - Modo Demostración</p>
+  </footer>
+
+  <!-- Fondo animado con personajes -->
+  <script src="js/animated-background.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Variables para la navegación
+      const slides = document.querySelectorAll('.demo-slide');
+      const navDots = document.getElementById('nav-dots');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const speechBubble = document.getElementById('speech');
+      let currentSlide = 0;
+
+      // Crear puntos de navegación
+      slides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.classList.add('nav-dot');
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(index));
+        navDots.appendChild(dot);
+      });
+
+      // Actualizar navegación
+      function updateNavigation() {
+        // Actualizar botones
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === slides.length - 1;
+        
+        // Actualizar puntos
+        document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+          dot.classList.toggle('active', index === currentSlide);
+        });
+        
+        // Actualizar mensaje de Croiso
+        const currentSpeech = slides[currentSlide].getAttribute('data-speech');
+        if (currentSpeech) {
+          speechBubble.textContent = currentSpeech;
+        }
+      }
+
+      // Ir a una diapositiva específica
+      function goToSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        slides[index].classList.add('active');
+        currentSlide = index;
+        updateNavigation();
+      }
+
+      // Eventos de botones
+      prevBtn.addEventListener('click', () => {
+        if (currentSlide > 0) {
+          goToSlide(currentSlide - 1);
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentSlide < slides.length - 1) {
+          goToSlide(currentSlide + 1);
+        }
+      });
+
+      // Inicializar
+      updateNavigation();
+    });
+  </script>
+</body>
+</html>
