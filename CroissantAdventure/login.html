@@ -1,104 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Croissant Adventure</title>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #ff9900;
-            --secondary-color: #ffd166;
-            --accent-color: #ef476f;
-            --background-color: #fffaf0;
-            --success-color: #06d6a0;
-            --text-color: #5c4a38;
-            --shadow-color: rgba(0, 0, 0, 0.2);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Baloo 2', cursive;
-            background-color: var(--background-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(255, 217, 102, 0.3) 0%, transparent 20%),
-                radial-gradient(circle at 90% 30%, rgba(255, 153, 0, 0.3) 0%, transparent 30%),
-                radial-gradient(circle at 30% 70%, rgba(239, 71, 111, 0.3) 0%, transparent 25%),
-                radial-gradient(circle at 80% 80%, rgba(6, 214, 160, 0.3) 0%, transparent 20%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-color);
-            overflow: hidden;
-        }
-        
-        .login-container {
-            width: 90%;
-            max-width: 800px;
-            background-color: white;
-            border-radius: 30px;
-            box-shadow: 0 15px 30px var(--shadow-color);
-            overflow: hidden;
-            display: flex;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .login-image {
-            flex: 1;
-            background-color: var(--secondary-color);
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Croissant Adventure</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff9900;
+      --secondary-color: #ffd166;
+      --accent-color: #ef476f;
+      --background-color: #fffaf0;
+      --success-color: #06d6a0;
+      --text-color: #5c4a38;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Baloo 2', cursive;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px var(--shadow-color);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      width: 35px;
+      height: 35px;
+      background: url('croiso.png') center/contain no-repeat;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .auth-container {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 15px var(--shadow-color);
+      overflow: hidden;
+    }
+
+    .login-image {
+      flex: 1;
+      background-color: var(--secondary-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
         
         .character-selection {
-            margin-top: 20px;
-            text-align: center;
-        }
+      margin-top: 20px;
+      text-align: center;
+    }
         
-        .character-option {
-            display: inline-block;
-            margin: 0 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
+    .character-option {
+      display: inline-block;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
         
-        .character-option.selected {
-            transform: scale(1.1);
-        }
+    .character-option.selected {
+      transform: scale(1.1);
+    }
         
-        .character-option.selected::after {
-            content: '✓';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--success-color);
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
+    .character-option.selected::after {
+      content: '✓';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--success-color);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+      }
+
+      .login-image, .login-form {
+        width: 100%;
+        padding: 20px;
+      }
+    }
         
         .character-img {
             width: 80px;
@@ -148,71 +196,56 @@
             flex-direction: column;
             justify-content: center;
         }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            text-align: center;
-        }
-        
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            text-align: center;
-            color: var(--accent-color);
-        }
-        
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            font-size: 1.2rem;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 3px solid var(--secondary-color);
-            border-radius: 15px;
-            font-size: 1rem;
-            font-family: 'Baloo 2', cursive;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 10px var(--secondary-color);
-        }
-        
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Baloo 2', cursive;
-            font-weight: 600;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px var(--shadow-color);
-        }
-        
-        button:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-3px);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
+
+        .login-form h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid var(--secondary-color);
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px var(--secondary-color);
+    }
+
+    button {
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--accent-color);
+      transform: translateY(-3px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
         
         .error-message {
             color: var(--accent-color);
@@ -391,33 +424,41 @@
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-image">
-            <div class="croissant"></div>
-            <h1>Croissant Adventure</h1>
+  <header class="header">
+    <div class="logo-container">
+      <div class="logo-img"></div>
+      <div class="logo-text">Croissant Adventure</div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="login.html">Iniciar Sesión</a>
+      <a href="register.html">Registrarse</a>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="auth-container">
+      <div class="login-image">
+        <div class="croissant" style="width: 180px; height: 180px; background: url('croiso.png') center/contain no-repeat; margin-bottom: 20px; animation: bounce 2s ease-in-out infinite;"></div>
+        <h1 style="font-size: 2rem; color: var(--primary-color);">Croissant Adventure</h1>
+        <h2 style="font-size: 1.2rem; color: var(--text-color); text-align: center;">¡Aventuras llenas de diversión te esperan!</h2>
             
-            <div class="character-selection">
-                <h3>Elige tu personaje</h3>
-                <div class="character-options">
-                    <div class="character-option selected" data-character="croiso">
-                        <div class="character-img" style="background-image: url('croiso.png');"></div>
-                        <div class="character-name">Croiso</div>
-                    </div>
-                    <div class="character-option" data-character="croisa">
-                        <div class="character-img" style="background-image: url('croisa.png');"></div>
-                        <div class="character-name">Croisa</div>
-                    </div>
-                </div>
+        <div class="character-selection">
+          <h3>Elige tu personaje</h3>
+          <div class="character-options">
+            <div class="character-option" data-character="croiso">
+              <div class="character-img" style="background-image: url('croiso.png'); width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px var(--shadow-color); transition: all 0.3s ease; background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+              <div class="character-name">Croiso</div>
             </div>
-            <h2>¡Un mundo de diversión te espera!</h2>
-            <div class="clouds">
-                <div class="cloud cloud-1"></div>
-                <div class="cloud cloud-2"></div>
-                <div class="cloud cloud-3"></div>
+            <div class="character-option" data-character="croisa">
+              <div class="character-img" style="background-image: url('croisa.png'); width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px var(--shadow-color); transition: all 0.3s ease; background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+              <div class="character-name">Croisa</div>
             </div>
+          </div>
         </div>
-        <div class="login-form">
-            <h2>¡Inicia sesión para jugar!</h2>
+      </div>
+      <div class="login-form" style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center;">
+        <h2>¡Inicia sesión para jugar!</h2>
             
             <div class="input-group">
                 <label for="username">Nombre de aventurero:</label>
@@ -677,5 +718,19 @@
             document.body.appendChild(hintElement);
         });
     </script>
+        </div>
+    </div>
+    
+  <footer class="footer">
+    <span>&copy; 2025 Croissant Adventure</span>
+    <div>
+      <span style="margin-right: 15px;">Contacto</span>
+      <span style="margin-right: 15px;">Acerca de</span>
+      <span>Política de Privacidad</span>
+    </div>
+  </footer>
+
+  <!-- Fondo animado con personajes -->
+  <script src="js/animated-background.js"></script>
 </body>
 </html>

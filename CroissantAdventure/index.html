@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Bienvenido a Croissant Adventure!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #ff9900;
-            --secondary-color: #ffd166;
-            --accent-color: #ef476f;
-            --background-color: #fffaf0;
-            --success-color: #06d6a0;
-            --text-color: #5c4a38;
-            --shadow-color: rgba(0, 0, 0, 0.2);
-            --brown-band-color: #ffd166;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Bienvenido a Croissant Adventure!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff9900;
+      --secondary-color: #ffd166;
+      --accent-color: #ef476f;
+      --background-color: #fffaf0;
+      --success-color: #06d6a0;
+      --text-color: #5c4a38;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --brown-band-color: #ffd166;
+    }
         
         * {
             margin: 0;
@@ -251,33 +251,48 @@
     </style>
 </head>
 <body>
-    <div class="top-buttons">
-        <button id="login-button">Iniciar Sesión</button>
-        <button id="register-button" onclick="window.location.href='register.html'">Registrarse</button>
-    </div>
-    <div class="main-content">
-        <div class="description-section">
-            <div class="croissant"></div>
-            <h1>Croissant Adventure</h1>
-            <h2>¡Un mundo de diversión te espera!</h2>
-            <p>
-                Croissant Adventure es un emocionante videojuego donde explorarás mundos mágicos, resolverás acertijos y vivirás aventuras inolvidables. ¡Elige tu personaje y comienza la diversión!
-            </p>
+    <!-- Header -->
+    <header class="header" style="background-color: var(--primary-color); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px var(--shadow-color); width: 100%;">
+      <div class="logo-container" style="display: flex; align-items: center;">
+        <div class="logo-img" style="width: 35px; height: 35px; background: url('croiso.png') center/contain no-repeat; margin-right: 10px;"></div>
+        <div class="logo-text" style="font-size: 1.5rem; font-weight: bold;">Croissant Adventure</div>
+      </div>
+      <nav class="nav-links">
+        <a href="index.html" style="color: white; text-decoration: none; margin-left: 20px; font-weight: 600;">Inicio</a>
+        <a href="login.html" style="color: white; text-decoration: none; margin-left: 20px; font-weight: 600;">Iniciar Sesión</a>
+        <a href="register.html" style="color: white; text-decoration: none; margin-left: 20px; font-weight: 600;">Registrarse</a>
+      </nav>
+    </header>
+    
+    <div class="main-content" style="flex: 1; display: flex; padding: 30px; align-items: center; justify-content: center;">
+      <div class="content-wrapper" style="display: flex; width: 100%; max-width: 1200px; gap: 30px; align-items: center;">
+        <div class="content-left" style="flex: 1; padding: 20px;">
+          <div class="croissant" style="width: 180px; height: 180px; background-image: url('croiso.png'); background-size: contain; background-repeat: no-repeat; background-position: center; margin-bottom: 20px; animation: bounce 2s ease-in-out infinite;"></div>
+          <h1 style="font-size: 2.2rem; margin-bottom: 10px; color: var(--primary-color);">Croissant Adventure</h1>
+          <h2 style="font-size: 1.3rem; margin-bottom: 15px; color: var(--accent-color);">¡Un mundo de diversión te espera!</h2>
+          <p style="margin-bottom: 20px;">Croissant Adventure es un emocionante videojuego donde explorarás mundos mágicos, resolverás acertijos y vivirás aventuras inolvidables. ¡Elige tu personaje y comienza a divertirte!</p>
+          
+          <div style="display: flex; gap: 15px; margin-top: 20px;">
+            <button id="login-button" onclick="window.location.href='login.html'" style="min-width: 150px; padding: 12px; background-color: var(--primary-color); color: white; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">Iniciar Sesión</button>
+            <button id="register-button" onclick="window.location.href='register.html'" style="min-width: 150px; padding: 12px; background-color: var(--primary-color); color: white; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">Registrarse</button>
+          </div>
         </div>
-        <div class="carousel-section">
-            <div class="carousel">
-                <div class="carousel-images">
-                    <img src="ingame1.jpg" alt="In-game 1">
-                    <img src="ingame2.jpg" alt="In-game 2">
-                    <img src="ingame3.jpg" alt="In-game 3">
-                </div>
-                <div class="carousel-buttons">
-                    <div class="carousel-button active" data-index="0"></div>
-                    <div class="carousel-button" data-index="1"></div>
-                    <div class="carousel-button" data-index="2"></div>
-                </div>
+        
+        <div class="content-right" style="flex: 1; padding: 20px;">
+          <div class="carousel" style="width: 100%; max-width: 500px; overflow: hidden; border-radius: 15px; box-shadow: 0 5px 15px var(--shadow-color); margin: 0 auto;">
+            <div class="carousel-images" style="display: flex; transition: transform 0.5s ease-in-out;">
+              <img src="ingame1.jpg" alt="In-game 1" style="width: 100%; flex-shrink: 0;">
+              <img src="ingame2.jpg" alt="In-game 2" style="width: 100%; flex-shrink: 0;">
+              <img src="ingame3.jpg" alt="In-game 3" style="width: 100%; flex-shrink: 0;">
             </div>
+          </div>
+          <div class="carousel-buttons" style="display: flex; justify-content: center; margin-top: 15px;">
+            <div class="carousel-button active" data-index="0" style="width: 12px; height: 12px; margin: 0 5px; background-color: var(--primary-color); border-radius: 50%; cursor: pointer;"></div>
+            <div class="carousel-button" data-index="1" style="width: 12px; height: 12px; margin: 0 5px; background-color: var(--secondary-color); border-radius: 50%; cursor: pointer;"></div>
+            <div class="carousel-button" data-index="2" style="width: 12px; height: 12px; margin: 0 5px; background-color: var(--secondary-color); border-radius: 50%; cursor: pointer;"></div>
+          </div>
         </div>
+      </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -315,5 +330,64 @@
             }, 5000);
         });
     </script>
+    
+    <footer class="footer" style="background-color: var(--primary-color); color: white; padding: 15px 20px; width: 100%; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 0.9rem;">&copy; 2025 Croissant Adventure</span>
+      <div style="display: flex; gap: 20px;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <span style="font-weight: bold; font-size: 0.9rem;">Contacto</span>
+          <span style="font-size: 0.8rem;">info@croissantadventure.com</span>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <span style="font-weight: bold; font-size: 0.9rem;">Enlaces</span>
+          <div style="display: flex; gap: 10px; font-size: 0.8rem;">
+            <a href="#" style="color: white; text-decoration: none;">Acerca de</a>
+            <a href="#" style="color: white; text-decoration: none;">Política</a>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <span style="font-weight: bold; font-size: 0.9rem;">Síguenos</span>
+          <div style="display: flex; gap: 10px; font-size: 0.8rem;">
+            <a href="#" style="color: white; text-decoration: none;">Facebook</a>
+            <a href="#" style="color: white; text-decoration: none;">Twitter</a>
+            <a href="#" style="color: white; text-decoration: none;">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('.carousel-images');
+        const buttons = document.querySelectorAll('.carousel-button');
+        let currentIndex = 0;
+        
+        function updateCarousel(index) {
+          carousel.style.transform = `translateX(-${index * 100}%)`;
+          
+          buttons.forEach(button => {
+            button.style.backgroundColor = 'var(--secondary-color)';
+          });
+          
+          buttons[index].style.backgroundColor = 'var(--primary-color)';
+        }
+        
+        buttons.forEach(button => {
+          button.addEventListener('click', function() {
+            currentIndex = parseInt(this.getAttribute('data-index'));
+            updateCarousel(currentIndex);
+          });
+        });
+        
+        // Auto rotate carousel
+        setInterval(() => {
+          currentIndex = (currentIndex + 1) % 3;
+          updateCarousel(currentIndex);
+        }, 5000);
+      });
+    </script>
+    
+    <!-- Fondo animado con personajes -->
+    <script src="js/animated-background.js"></script>
 </body>
 </html>
