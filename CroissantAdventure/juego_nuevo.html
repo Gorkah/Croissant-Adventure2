@@ -291,6 +291,90 @@
                 font-size: 0.75rem;
             }
         }
+
+        /* Cabecera superior modificada */
+        .header-bar {
+            background: #ff9900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            width: 90vw;
+            max-width: 1200px;
+            margin: 24px auto 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            height: 65px;
+            overflow: visible;
+        }
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: flex-start;
+            gap: 18px;
+            position: relative;
+        }
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+            margin: 0;
+            z-index: 2;
+            margin-left: 40px;
+        }
+        .header-outfit-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 0;
+            margin-left: 250px;
+            margin-right: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            object-fit: contain;
+            z-index: 2;
+            opacity: 1;
+            position: absolute;
+            top: -40px;
+            left: 180px;
+        }
+        .header-outfit-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-left: 160px;
+            color: #fff;
+            z-index: 2;
+            text-shadow:
+                -2px -2px 0 #ef476f,
+                2px -2px 0 #ef476f,
+                -2px  2px 0 #ef476f,
+                2px  2px 0 #ef476f,
+                0px  2px 4px rgba(0,0,0,0.10);
+        }
+        .header-logout-btn {
+            background: #ef476f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 32px;
+            margin-left: 32px;
+            z-index: 2;
+        }
+        @media (max-width: 700px) {
+            .header-bar { width: 98vw; max-width: 98vw; }
+            .header-title { font-size: 1.2rem; }
+            .header-outfit-img { width: 40px; height: 40px; margin-left: 8px; }
+            .header-outfit-name { font-size: 0.9rem; margin-left: 8px; }
+            .header-logout-btn { padding: 6px 10px; font-size: 0.9rem; margin-right: 8px; margin-left: 8px; }
+        }
     </style>
     
     <!-- Estilos adicionales para la alternancia de mapa/galería -->
@@ -457,17 +541,15 @@
             }
         }
     </style>
-</head>
-<body>
-    <div id="header">
-        <div class="header-content">
-            <h1>Croissant Adventure</h1>
-            <div class="player-info">
-                <img class="player-character-img header-avatar" src="croiso.png" alt="Personaje">
-                <span class="player-character-name">Croiso</span>
-                <button id="logout-btn" class="logout-button">Cerrar sesión</button>
-            </div>
-        </div>
+    
+    <!-- Cabecera superior -->
+    <div class="header-bar">
+      <div class="header-title-container">
+        <span class="header-title">Croissant Adventure</span>
+        <img id="main-character-img" class="header-outfit-img" src="" alt="Outfit">
+        <span id="main-character-name" class="header-outfit-name"></span>
+      </div>
+      <button id="logout-btn" class="header-logout-btn">Cerrar sesión</button>
     </div>
 
     <div class="top-buttons" style="top: 70px;">
@@ -1009,6 +1091,46 @@
             window.addEventListener('resize', resizeCanvas);
             window.addEventListener('load', resizeCanvas);
         });
+    </script>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Nombres personalizados para cada outfit (igual que en login.html)
+        const outfitNames = {
+            croiso: [
+                "Croiso",
+                "Croiso Universitario",
+                "Croiso Surfista",
+                "Croiso Encantador de Serpientes",
+                "Croiso Pescador",
+                "Croiso Pianista"
+            ],
+            croisa: [
+                "Croisa Exploradora",
+                "Croisa Pastelera",
+                "Croisa Sirena",
+                "Croisa Hada",
+                "Croisa Deportista",
+                "Croisa Artista"
+            ]
+        };
+
+        // Obtener personaje y outfit seleccionados
+        const selectedCharacter = localStorage.getItem('selectedCharacter') || 'croiso';
+        const selectedOutfit = parseInt(localStorage.getItem('selectedOutfit')) || 1;
+
+        // Actualizar imagen y nombre en cabecera
+        const mainCharacterImg = document.getElementById('main-character-img');
+        const mainCharacterName = document.getElementById('main-character-name');
+        if (mainCharacterImg) {
+            mainCharacterImg.src = `${selectedCharacter}_outfit${selectedOutfit}.png`;
+            mainCharacterImg.alt = outfitNames[selectedCharacter]?.[selectedOutfit-1] || selectedCharacter;
+            mainCharacterImg.style.opacity = "1";
+        }
+        if (mainCharacterName) {
+            mainCharacterName.textContent = outfitNames[selectedCharacter]?.[selectedOutfit-1] || selectedCharacter;
+        }
+    });
     </script>
 </body>
 </html>

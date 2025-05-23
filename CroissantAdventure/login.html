@@ -456,6 +456,26 @@
             </div>
           </div>
         </div>
+        <!-- Menú de outfits con flechas infantiles y nombre personalizado por outfit -->
+        <div id="outfit-selection" style="display:none; margin-top: 30px; text-align: center;">
+            <h3>Elige tu outfit:</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+                <button id="outfit-prev" style="background: #ffe9c7; border: 4px solid #ffd166; border-radius: 50%; width: 64px; height: 64px; cursor:pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg width="38" height="38" viewBox="0 0 38 38" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="25,8 13,19 25,30" fill="none" stroke="#ff9900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <!-- Cambios aquí: sin fondo, sin borde, tamaño aumentado -->
+                <img id="outfit-viewer" src="" alt="Outfit"
+                  style="width:300px; height:300px; border-radius:0; border:none; background:transparent; box-shadow:none;">
+                <button id="outfit-next" style="background: #ffe9c7; border: 4px solid #ffd166; border-radius: 50%; width: 64px; height: 64px; cursor:pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg width="38" height="38" viewBox="0 0 38 38" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="13,8 25,19 13,30" fill="none" stroke="#ff9900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="outfit-character-name" style="margin-top:16px; color:#ef476f; font-size:1.3rem; font-weight:800; letter-spacing:1px;"></div>
+        </div>
       </div>
       <div class="login-form" style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center;">
         <h2>¡Inicia sesión para jugar!</h2>
@@ -522,6 +542,7 @@
             </div>
         </div>
     </div>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginButton = document.getElementById('login-button');
@@ -532,8 +553,35 @@
             const playTimeInput = document.getElementById('play-time');
             const childAgeInput = document.getElementById('child-age');
             const taskDescriptionInput = document.getElementById('task-description');
+            const outfitSelection = document.getElementById('outfit-selection');
+            const outfitViewer = document.getElementById('outfit-viewer');
+            const outfitPrev = document.getElementById('outfit-prev');
+            const outfitNext = document.getElementById('outfit-next');
+            const outfitCharacterName = document.getElementById('outfit-character-name');
             let selectedCharacter = 'croiso'; // Por defecto es Croiso
-            
+            let currentOutfit = 1;
+            const totalOutfits = 6;
+
+            // Nombres personalizados para cada outfit
+            const outfitNames = {
+                croiso: [
+                    "Croiso",
+                    "Croiso Universitario",
+                    "Croiso Surfista",
+                    "Croiso Encantador de Serpientes",
+                    "Croiso Pescador",
+                    "Croiso Pianista"
+                ],
+                croisa: [
+                    "Croisa Exploradora",
+                    "Croisa Pastelera",
+                    "Croisa Sirena",
+                    "Croisa Hada",
+                    "Croisa Deportista",
+                    "Croisa Artista"
+                ]
+            };
+
             // Manejo de selección de personaje
             characterOptions.forEach(option => {
                 option.addEventListener('click', function() {
@@ -549,8 +597,39 @@
                     
                     // Actualizar la imagen principal con el personaje seleccionado
                     document.querySelector('.croissant').style.backgroundImage = `url('${selectedCharacter}.png')`;
+                    
+                    // Mostrar selección de outfit
+                    showOutfitSelection(selectedCharacter);
                 });
             });
+
+            // Mostrar visor de outfits con flechas y nombre personalizado
+            function showOutfitSelection(character) {
+                outfitSelection.style.display = 'block';
+                currentOutfit = 1;
+                updateOutfitViewer(character, currentOutfit);
+            }
+
+            function updateOutfitViewer(character, outfitNum) {
+                outfitViewer.src = `${character}_outfit${outfitNum}.png`;
+                outfitViewer.alt = `Outfit ${outfitNum}`;
+                // Mostrar nombre personalizado del outfit
+                const namesArr = outfitNames[character] || [];
+                outfitCharacterName.textContent = namesArr[outfitNum - 1] || '';
+                // Guardar selección en localStorage
+                localStorage.setItem('selectedOutfit', outfitNum);
+            }
+
+            outfitPrev.addEventListener('click', function() {
+                currentOutfit = currentOutfit === 1 ? totalOutfits : currentOutfit - 1;
+                updateOutfitViewer(selectedCharacter, currentOutfit);
+            });
+
+            outfitNext.addEventListener('click', function() {
+                currentOutfit = currentOutfit === totalOutfits ? 1 : currentOutfit + 1;
+                updateOutfitViewer(selectedCharacter, currentOutfit);
+            });
+            
             const errorMessage = document.getElementById('error-message');
             
             // Control parental - Toggle
