@@ -150,8 +150,10 @@ class PaintGameMinigame extends Minigame {
      */
     handleMouseDown(e) {
         const rect = this.game.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = this.game.canvas.width / rect.width;
+        const scaleY = this.game.canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
         
         // Verificar si se hizo clic en la paleta de colores
         if (y > this.game.height - this.toolbarHeight) {
@@ -202,8 +204,10 @@ class PaintGameMinigame extends Minigame {
         if (!this.isDrawing) return;
         
         const rect = this.game.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = this.game.canvas.width / rect.width;
+        const scaleY = this.game.canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
         
         // No dibujar en la barra de herramientas
         if (y > this.game.height - this.toolbarHeight) {
@@ -371,14 +375,34 @@ class PaintGameMinigame extends Minigame {
      * @param {number} deltaTime - Tiempo desde el último frame
      */
     update(deltaTime) {
+        // Verificar salida con el botón Esc
+        if (this.game.keys['Escape']) {
+            this.game.changeState('map');
+            return;
+        }
+        
         // Actualizar el tiempo restante
         if (this.timeLeft > 0) {
             this.timeLeft -= deltaTime;
-        } else {
-            // Tiempo agotado, guardar dibujo y dar puntos
-            if (this.challengeActive && this.currentChallenge) {
-                this.game.addPoints(5, 'paintGame'); // Puntos de participación
+            if (this.timeLeft <= 0) {
+                this.timeLeft = 0;
                 this.challengeActive = false;
+            }
+        }
+        
+        // Verificar clic en botón de salida
+        if (this.game.mouseDown) {
+            const exitBtnX = 40;
+            const exitBtnY = 40;
+            const exitBtnRadius = 20;
+            
+            const dx = this.game.mouseX - exitBtnX;
+            const dy = this.game.mouseY - exitBtnY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance <= exitBtnRadius) {
+                this.game.changeState('map');
+                this.game.mouseDown = false;
             }
         }
     }
@@ -403,6 +427,9 @@ class PaintGameMinigame extends Minigame {
         
         // Dibujar información del desafío
         this.drawChallengeInfo(ctx, width, height);
+        
+        // Dibujar botón de salida
+        this.drawExitButton(ctx);
     }
     
     /**
@@ -481,6 +508,45 @@ class PaintGameMinigame extends Minigame {
         ctx.font = "14px Arial";
         ctx.textAlign = "left";
         ctx.fillText(`Tiempo: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`, 20, height - 15);
+    }
+    
+    /**
+     * Dibujar botón de salida
+     */
+    drawExitButton(ctx) {
+        const x = 40;
+        const y = 40;
+        const radius = 20;
+        
+        // Fondo del botón
+        ctx.fillStyle = "#ff5555";
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Borde del botón
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // X del botón
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x - 8, y - 8);
+        ctx.lineTo(x + 8, y + 8);
+        ctx.moveTo(x + 8, y - 8);
+        ctx.lineTo(x - 8, y + 8);
+        ctx.stroke();
+        
+        // Texto 'Salir'
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Salir", x, y + radius + 15);
     }
     
     /**

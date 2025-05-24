@@ -32,6 +32,31 @@ class Game {
             shooterHighscore: 0
         };
         
+        // Audio system
+        this.audioSystem = {
+            musicEnabled: true,
+            sfxEnabled: true,
+            backgroundMusic: null,
+            currentMusic: null,
+            volume: 0.3 // Volumen por defecto
+        };
+        
+        // Sistema de control parental
+        this.parentalControl = {
+            timeTracking: {
+                sessionStart: new Date(),
+                totalPlayTime: 0, // en minutos
+                lastSaved: new Date(),
+                sessionsPlayed: 0,
+                dailyLimitMinutes: 60 // límite diario en minutos
+            },
+            minigamesPlayed: {}, // registro de minijuegos jugados
+            lastLogin: new Date()
+        };
+        
+        // Cargar datos de control parental si existen
+        this.loadParentalControls();
+        
         // Set up inputs
         this.setupInputs();
         
@@ -80,7 +105,7 @@ class Game {
             }
         });
         
-        // Mouse
+        // Mouse events
         this.canvas.addEventListener('mousemove', (e) => {
             // Calcular coordenadas precisas considerando el escalado del canvas
             const rect = this.canvas.getBoundingClientRect();
@@ -90,10 +115,13 @@ class Game {
             // Coordenadas ajustadas por el escalado
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
+            
+            // Debug para verificar coordenadas
+            // console.log('Mouse coords:', this.mouseX, this.mouseY);
         });
         
         this.canvas.addEventListener('mousedown', (e) => {
-            // Recalcular en caso de que mousemove no se haya activado
+            // Recalcular coordenadas en caso de que mousemove no se haya activado
             const rect = this.canvas.getBoundingClientRect();
             const scaleX = this.canvas.width / rect.width;
             const scaleY = this.canvas.height / rect.height;
@@ -103,9 +131,48 @@ class Game {
             
             console.log('Mouse clicked at:', this.mouseX, this.mouseY);
             this.mouseDown = true;
+            
+            // Comprobar si se ha hecho clic en el botón de música
+            const musicBtnX = this.width - 40;
+            const musicBtnY = 20;
+            const musicBtnRadius = 15;
+            
+            const dx = this.mouseX - musicBtnX;
+            const dy = this.mouseY - musicBtnY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance <= musicBtnRadius) {
+                // Toggle de música
+                const musicEnabled = this.toggleBackgroundMusic();
+                console.log(`Música ${musicEnabled ? 'activada' : 'desactivada'}`);
+                return;
+            }
+            
+            // Pass mouse event to current scene if it has a handler
+            if (this.currentScene && this.currentScene.onMouseDown) {
+                this.currentScene.onMouseDown();
+            }
         });
         
-        this.canvas.addEventListener('mouseup', () => {
+        this.canvas.addEventListener('mouseup', (e) => {
+            // Actualizar coordenadas del ratón al soltar
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+            
+            this.mouseX = (e.clientX - rect.left) * scaleX;
+            this.mouseY = (e.clientY - rect.top) * scaleY;
+            
+            this.mouseDown = false;
+            
+            // Propagar el evento a la escena actual si existe el método
+            if (this.currentScene && typeof this.currentScene.onMouseUp === 'function') {
+                this.currentScene.onMouseUp();
+            }
+        });
+        
+        // Asegurar que mouseDown se resetea si el cursor sale del canvas
+        this.canvas.addEventListener('mouseleave', () => {
             this.mouseDown = false;
         });
     }
@@ -165,11 +232,21 @@ class Game {
      */
     switchScene(name) {
         if (this.scenes[name]) {
+            // Guardar el estado de la música actual
+            const wasPlayingMusic = this.audioSystem.backgroundMusic !== null;
+            const currentMusicPath = this.audioSystem.currentMusic;
+            
             if (this.currentScene) {
                 this.currentScene.exit();
             }
+            
             this.currentScene = this.scenes[name];
             this.currentScene.enter();
+            
+            // Si la música estaba sonando y se detuvo durante el cambio, reiniciarla
+            if (wasPlayingMusic && this.audioSystem.backgroundMusic === null && this.audioSystem.musicEnabled) {
+                this.playBackgroundMusic(currentMusicPath);
+            }
         }
     }
     
@@ -198,6 +275,209 @@ class Game {
     }
     
     /**
+     * Cargar y reproducir música de fondo
+     * @param {string} musicPath - Ruta al archivo de audio
+     * @param {boolean} loop - Si la música debe repetirse
+     */
+    playBackgroundMusic(musicPath, loop = true) {
+        // Si la música está desactivada, no hacer nada
+        if (!this.audioSystem.musicEnabled) return;
+        
+        // Si ya hay música sonando, detenerla
+        this.stopBackgroundMusic();
+        
+        // Crear nuevo elemento de audio
+        const audio = new Audio(musicPath);
+        audio.loop = loop;
+        audio.volume = this.audioSystem.volume; // Usar el volumen configurado
+        
+        // Guardar referencia a la música actual
+        this.audioSystem.backgroundMusic = audio;
+        this.audioSystem.currentMusic = musicPath;
+        
+        // Reproducir música
+        audio.play().catch(error => {
+            console.warn('Error al reproducir música de fondo:', error);
+        });
+    }
+    
+    /**
+     * Detener la música de fondo
+     */
+    stopBackgroundMusic() {
+        if (this.audioSystem.backgroundMusic) {
+            this.audioSystem.backgroundMusic.pause();
+            this.audioSystem.backgroundMusic = null;
+        }
+    }
+    
+    /**
+     * Activar/desactivar la música de fondo
+     * @returns {boolean} - Estado actual de la música (true = activada)
+     */
+    toggleBackgroundMusic() {
+        this.audioSystem.musicEnabled = !this.audioSystem.musicEnabled;
+        
+        if (this.audioSystem.musicEnabled) {
+            // Si hay una música guardada, reproducirla
+            if (this.audioSystem.currentMusic) {
+                this.playBackgroundMusic(this.audioSystem.currentMusic);
+            }
+        } else {
+            // Detener la música actual
+            this.stopBackgroundMusic();
+        }
+        
+        // Guardar preferencias de audio
+        this.saveAudioSettings();
+        
+        return this.audioSystem.musicEnabled;
+    }
+    
+    /**
+     * Establecer el volumen de la música de fondo
+     * @param {number} volume - Volumen entre 0.0 y 1.0
+     */
+    setMusicVolume(volume) {
+        // Asegurar que el volumen está entre 0 y 1
+        volume = Math.max(0, Math.min(1, volume));
+        this.audioSystem.volume = volume;
+        
+        // Aplicar a la música actual si está sonando
+        if (this.audioSystem.backgroundMusic) {
+            this.audioSystem.backgroundMusic.volume = volume;
+        }
+        
+        // Guardar preferencias de audio
+        this.saveAudioSettings();
+        
+        return volume;
+    }
+    
+    /**
+     * Guardar configuración de audio en localStorage
+     */
+    saveAudioSettings() {
+        const audioSettings = {
+            musicEnabled: this.audioSystem.musicEnabled,
+            sfxEnabled: this.audioSystem.sfxEnabled,
+            volume: this.audioSystem.volume
+        };
+        
+        localStorage.setItem('croissantAdventure_audioSettings', JSON.stringify(audioSettings));
+    }
+    
+    /**
+     * Cargar configuración de audio desde localStorage
+     */
+    loadAudioSettings() {
+        const savedSettings = localStorage.getItem('croissantAdventure_audioSettings');
+        
+        if (savedSettings) {
+            try {
+                const settings = JSON.parse(savedSettings);
+                this.audioSystem.musicEnabled = settings.musicEnabled;
+                this.audioSystem.sfxEnabled = settings.sfxEnabled;
+                this.audioSystem.volume = settings.volume;
+            } catch (error) {
+                console.warn('Error al cargar configuración de audio:', error);
+            }
+        }
+    }
+    
+    /**
+     * Guardar datos de control parental
+     */
+    saveParentalControls() {
+        // Actualizar tiempo de juego antes de guardar
+        this.updatePlayTime();
+        
+        const parentalData = {
+            timeTracking: this.parentalControl.timeTracking,
+            minigamesPlayed: this.parentalControl.minigamesPlayed,
+            lastLogin: new Date().toISOString()
+        };
+        
+        localStorage.setItem('croissantAdventure_parentalControl', JSON.stringify(parentalData));
+    }
+    
+    /**
+     * Cargar datos de control parental
+     */
+    loadParentalControls() {
+        const savedData = localStorage.getItem('croissantAdventure_parentalControl');
+        
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                
+                // Convertir strings de fecha a objetos Date
+                if (data.timeTracking) {
+                    data.timeTracking.sessionStart = new Date();
+                    data.timeTracking.lastSaved = new Date(data.timeTracking.lastSaved);
+                    this.parentalControl.timeTracking = data.timeTracking;
+                }
+                
+                if (data.minigamesPlayed) {
+                    this.parentalControl.minigamesPlayed = data.minigamesPlayed;
+                }
+                
+                this.parentalControl.lastLogin = data.lastLogin ? new Date(data.lastLogin) : new Date();
+                
+                // Iniciar nueva sesión
+                this.parentalControl.timeTracking.sessionStart = new Date();
+                this.parentalControl.timeTracking.sessionsPlayed++;
+                
+            } catch (error) {
+                console.warn('Error al cargar datos de control parental:', error);
+            }
+        }
+        
+        // Cargar también configuración de audio
+        this.loadAudioSettings();
+    }
+    
+    /**
+     * Actualizar tiempo de juego
+     */
+    updatePlayTime() {
+        const now = new Date();
+        const sessionTime = (now - this.parentalControl.timeTracking.sessionStart) / (1000 * 60); // en minutos
+        
+        this.parentalControl.timeTracking.totalPlayTime += sessionTime;
+        this.parentalControl.timeTracking.lastSaved = now;
+        this.parentalControl.timeTracking.sessionStart = now; // Reiniciar para la próxima actualización
+        
+        return {
+            sessionTime: sessionTime.toFixed(2),
+            totalPlayTime: this.parentalControl.timeTracking.totalPlayTime.toFixed(2)
+        };
+    }
+    
+    /**
+     * Registrar juego de un minijuego
+     * @param {string} minigameName - Nombre del minijuego
+     */
+    logMinigamePlayed(minigameName) {
+        if (!this.parentalControl.minigamesPlayed[minigameName]) {
+            this.parentalControl.minigamesPlayed[minigameName] = {
+                timesPlayed: 0,
+                lastPlayed: null,
+                totalTimeSpent: 0 // en minutos
+            };
+        }
+        
+        this.parentalControl.minigamesPlayed[minigameName].timesPlayed++;
+        this.parentalControl.minigamesPlayed[minigameName].lastPlayed = new Date().toISOString();
+        
+        // Actualizar estadísticas generales
+        this.achievements.minigamesPlayed++;
+        
+        // Guardar datos actualizados
+        this.saveParentalControls();
+    }
+    
+    /**
      * Start the game
      */
     start() {
@@ -206,6 +486,22 @@ class Game {
             // Register scenes
             this.registerScene('mainMenu', new MainMenuScene(this));
             console.log('MainMenuScene registered');
+            
+            // Iniciar música de fondo para todo el juego
+            try {
+                // Usamos uno de los archivos de música existentes
+                this.playBackgroundMusic('assets/audio/future-design-344320.mp3');
+                console.log('Música de fondo iniciada con éxito');
+            } catch (e) {
+                console.warn('No se pudo iniciar la música de fondo:', e);
+                // Intentar con el segundo archivo de música como respaldo
+                try {
+                    this.playBackgroundMusic('assets/audio/jungle-waves-drumampbass-electronic-inspiring-promo-345013.mp3');
+                    console.log('Música de fondo alternativa iniciada con éxito');
+                } catch (err) {
+                    console.error('No se pudo iniciar ninguna música de fondo:', err);
+                }
+            }
             
             this.registerScene('worldMap', new WorldMapScene(this));
             console.log('WorldMapScene registered');
@@ -370,6 +666,18 @@ class Game {
                 console.error('Error registering AdminPanel:', e);
             }
             
+            // Registrar StoryTeller minigame
+            try {
+                if (typeof StoryTellerMinigame !== 'undefined') {
+                    this.registerScene('storyTeller', new StoryTellerMinigame(this));
+                    console.log('StoryTellerMinigame registered');
+                } else {
+                    console.error('StoryTellerMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering StoryTellerMinigame:', e);
+            }
+            
             // Start with main menu
             console.log('Switching to main menu scene');
             this.switchScene('mainMenu');
@@ -409,15 +717,86 @@ class Game {
             this.currentScene.render(this.ctx);
         }
         
+        // Renderizar elementos de UI como la puntuación
+        this.ctx.fillStyle = '#333';
+        this.ctx.font = '16px Arial';
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText(`Puntos: ${this.playerScore}`, 10, 20);
+        
+        // Botón de música (icono de altavoz)
+        this.renderMusicButton(this.ctx);
+        
         // Continue the loop
         requestAnimationFrame(this.gameLoop.bind(this));
     }
-    
     /**
-     * Check if a key is currently pressed
-     * @param {string} key - Key to check
-     * @returns {boolean} - True if the key is pressed
+     * Renderizar el botón de música
      */
+    renderMusicButton(ctx) {
+        const x = this.width - 40;
+        const y = 20;
+        const size = 30;
+        
+        // Dibujar fondo del botón
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.arc(x, y, size/2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Dibujar icono de altavoz
+        ctx.fillStyle = '#fff';
+        
+        if (this.audioSystem.musicEnabled) {
+            // Altavoz con ondas (música activada)
+            // Dibujar base del altavoz
+            ctx.beginPath();
+            ctx.moveTo(x - 8, y - 5);
+            ctx.lineTo(x - 3, y - 5);
+            ctx.lineTo(x + 3, y - 10);
+            ctx.lineTo(x + 3, y + 10);
+            ctx.lineTo(x - 3, y + 5);
+            ctx.lineTo(x - 8, y + 5);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Dibujar ondas de sonido
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            
+            // Primera onda
+            ctx.beginPath();
+            ctx.arc(x + 2, y, 8, -Math.PI/3, Math.PI/3);
+            ctx.stroke();
+            
+            // Segunda onda
+            ctx.beginPath();
+            ctx.arc(x + 2, y, 12, -Math.PI/3, Math.PI/3);
+            ctx.stroke();
+        } else {
+            // Altavoz con cruz (música desactivada)
+            // Dibujar base del altavoz
+            ctx.beginPath();
+            ctx.moveTo(x - 8, y - 5);
+            ctx.lineTo(x - 3, y - 5);
+            ctx.lineTo(x + 3, y - 10);
+            ctx.lineTo(x + 3, y + 10);
+            ctx.lineTo(x - 3, y + 5);
+            ctx.lineTo(x - 8, y + 5);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Dibujar cruz
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x + 8, y - 8);
+            ctx.lineTo(x + 14, y - 2);
+            ctx.moveTo(x + 14, y - 8);
+            ctx.lineTo(x + 8, y - 2);
+            ctx.stroke();
+        }
+    }
+    
     isKeyPressed(key) {
         // Debugging to help diagnose key issues
         if (key === 'w' || key === 'a' || key === 's' || key === 'd' || 

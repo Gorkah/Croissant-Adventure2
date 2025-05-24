@@ -111,13 +111,19 @@ class RouletteMinigame extends Minigame {
         // Calculate which segment the wheel landed on
         const segmentAngle = Math.PI * 2 / this.segments.length;
         
-        // The pointer is at the top (PI/2), so we need to adjust the rotation
+        // La aguja está en la parte superior (PI/2), así que necesitamos ajustar la rotación
+        // El ajuste es opuesto a la rotación de la rueda, ya que la rueda gira en sentido horario
+        // pero queremos calcular qué segmento está en la parte superior
         const adjustedRotation = this.currentRotation + Math.PI / 2;
-        const normalizedRotation = adjustedRotation % (Math.PI * 2);
+        const normalizedRotation = (adjustedRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
         
-        // Determine segment index
-        const segmentIndex = Math.floor(normalizedRotation / segmentAngle);
+        // Invertimos el índice porque la rueda gira en sentido horario
+        const segmentIndex = this.segments.length - 1 - Math.floor(normalizedRotation / segmentAngle);
         this.result = this.segments[segmentIndex % this.segments.length];
+        
+        // Añadir puntos al juego principal
+        this.game.addPoints(this.result.value, 'roulette');
+        console.log(`Añadidos ${this.result.value} puntos de la ruleta. Segmento: ${this.result.label}`);
     }
     
     render(ctx) {
@@ -200,10 +206,14 @@ class RouletteMinigame extends Minigame {
             ctx.font = '24px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(`You won: ${this.result.label}!`, this.game.width / 2, this.game.height - 65);
+            ctx.fillText(`¡Has ganado: ${this.result.value} puntos!`, this.game.width / 2, this.game.height - 75);
+            
+            // Mostrar el texto del segmento y valor ganado
+            ctx.font = '20px Arial';
+            ctx.fillText(`${this.result.label}`, this.game.width / 2, this.game.height - 45);
             
             ctx.font = '16px Arial';
-            ctx.fillText('Click anywhere to spin again', this.game.width / 2, this.game.height - 40);
+            ctx.fillText('Haz clic para girar de nuevo', this.game.width / 2, this.game.height - 20);
         }
     }
 }

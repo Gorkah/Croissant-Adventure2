@@ -55,6 +55,116 @@ class RhythmMinigame extends Minigame {
         // Instructions
         this.showInstructions = true;
         this.instructionTimer = 3;
+        
+        // Audio setup
+        this.setupAudio();
+    }
+    
+    /**
+     * Configurar el sistema de audio
+     */
+    setupAudio() {
+        try {
+            // Verificar soporte de Web Audio API
+            if (!window.AudioContext && !window.webkitAudioContext) {
+                console.warn("Web Audio API no soportada en este navegador");
+                return;
+            }
+            
+            // Crear o reutilizar el contexto de audio global
+            if (!window.gameAudioContext) {
+                window.gameAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            this.audioContext = window.gameAudioContext;
+            
+            // Definir notas musicales (frecuencias en Hz)
+            this.notes_frequencies = {
+                'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23,
+                'G4': 392.00, 'A4': 440.00, 'B4': 493.88, 'C5': 523.25
+            };
+            
+            // Definir la melodía base (usando notación simple)
+            this.melody = [
+                'C4', 'E4', 'G4', 'C5', 'B4', 'G4', 'E4', 'C4',
+                'D4', 'F4', 'A4', 'D5', 'C5', 'A4', 'F4', 'D4'
+            ];
+            
+            this.currentNoteIndex = 0;
+            console.log("Sistema de audio configurado correctamente");
+        } catch (error) {
+            console.error("Error al configurar el sistema de audio:", error);
+            this.audioContext = null;
+        }
+    }
+    
+    /**
+     * Reproducir un sonido de nota musical
+     * @param {string} note - La nota a reproducir
+     * @param {number} duration - Duración en segundos
+     */
+    playNote(note, duration = 0.2) {
+        if (!this.audioContext) return;
+        
+        try {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = this.notes_frequencies[note] || 440;
+            
+            // Configurar la envolvente del sonido
+            gainNode.gain.setValueAtTime(0.001, this.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.5, this.audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + duration);
+            
+            // Conectar nodos de audio
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            // Iniciar y detener el oscilador
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + duration);
+        } catch (error) {
+            console.error("Error al reproducir nota:", error);
+        }
+    }
+    
+    /**
+     * Reproducir un efecto de sonido para acierto/fallo
+     * @param {boolean} hit - Si fue un acierto o fallo
+     */
+    playHitSound(hit) {
+        if (!this.audioContext) return;
+        
+        try {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            if (hit) {
+                // Sonido de acierto (más agudo)
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(1200, this.audioContext.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.2);
+            } else {
+                // Sonido de fallo (más grave)
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
+            }
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.start(this.audioContext.currentTime);
+            oscillator.stop(this.audioContext.currentTime + (hit ? 0.2 : 0.3));
+        } catch (error) {
+            console.error("Error al reproducir sonido de hit:", error);
+        }
     }
     
     spawnNote() {
@@ -132,6 +242,13 @@ class RhythmMinigame extends Minigame {
             this.beatTimer -= this.beatInterval;
             this.onBeat = true;
             
+            // Reproducir nota musical cuando estamos en el beat
+            if (this.audioContext && this.melody && this.melody.length > 0) {
+                const note = this.melody[this.currentNoteIndex];
+                this.playNote(note, this.beatInterval * 0.8); // Duración ligeramente menor que el intervalo
+                this.currentNoteIndex = (this.currentNoteIndex + 1) % this.melody.length;
+            }
+            
             // Increase difficulty over time
             this.difficulty = Math.min(2, 1 + (this.totalDuration - this.timeLeft) / this.totalDuration);
         } else {
@@ -170,18 +287,22 @@ class RhythmMinigame extends Minigame {
                         hitScore = 100;
                         hitText = 'Perfect!';
                         this.combo++;
+                        this.playHitSound(true); // Reproducir sonido de acierto perfecto
                     } else if (hitAccuracy > 0.7) {
                         hitScore = 75;
                         hitText = 'Great!';
                         this.combo++;
+                        this.playHitSound(true); // Reproducir sonido de acierto
                     } else if (hitAccuracy > 0.4) {
                         hitScore = 50;
                         hitText = 'Good';
                         this.combo++;
+                        this.playHitSound(true); // Reproducir sonido de acierto
                     } else {
                         hitScore = 25;
                         hitText = 'OK';
                         this.combo = 0;
+                        this.playHitSound(false); // Reproducir sonido de acierto pobre
                     }
                     
                     // Apply combo multiplier
@@ -206,6 +327,7 @@ class RhythmMinigame extends Minigame {
                 // Note missed
                 note.missed = true;
                 this.combo = 0;
+                this.playHitSound(false); // Reproducir sonido de fallo
                 
                 // Create miss effect
                 this.hitEffects.push({
