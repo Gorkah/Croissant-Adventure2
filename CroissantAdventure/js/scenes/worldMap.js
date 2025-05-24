@@ -22,36 +22,6 @@ class WorldMapScene extends Scene {
             glowDir: 1
         };
         
-        // Control parental - se puede activar/desactivar desde el Panel de Administración
-        this.parentalControlEnabled = localStorage.getItem('parentalControlEnabled') === 'true';
-        this.parentalControlPin = localStorage.getItem('parentalControlPin') || '0000';
-        
-        // Arrays para elementos visuales
-        this.particles = [];
-        this.floatingTexts = [];
-        
-        // UI
-        this.interactionPrompt = null;
-        this.tooltip = {
-            visible: false,
-            x: 0,
-            y: 0,
-            game: null
-        };
-        
-        // Minimapa
-        this.minimap = {
-            visible: true,
-            x: 10,
-            y: 10,
-            width: 150,
-            height: 150,
-            scale: 150 / 2400 // Escala basada en el ancho del mapa
-        };
-        
-        // Control de UI
-        this.showScoreUI = true;
-        
         // Cargar sprites del jugador (estilo Pokémon)
         this.playerSprites = {
             down: [],
@@ -74,14 +44,17 @@ class WorldMapScene extends Scene {
         this.camera = {
             x: 0,
             y: 0,
-            game: null
+            width: game.width,
+            height: game.height,
+            followPlayer: true
         };
         
-        // Animación de transición
-        this.transition = {
-            active: false,
-            alpha: 0,
-            targetScene: null
+        // Map properties - mundo con sistema de tiles
+        this.map = {
+            width: 2400,     // 3 regiones de ancho
+            height: 1800,    // 3 regiones de alto
+            tileSize: 32,    // Tamaño típico de tiles en Pokémon
+            currentRegion: 'plaza-central'
         };
         
         // Definir regiones del mapa con sus características específicas
@@ -702,6 +675,22 @@ class WorldMapScene extends Scene {
         // Tooltip para info de juegos
         this.tooltip = {
             visible: false,
+            x: 0,
+            y: 0,
+            game: null
+        };
+        
+        // Estado para teclas presionadas
+        this.mPressed = false;
+        this.tabPressed = false;
+    }
+    
+    // Obtiene el ID de la región adyacente en la dirección especificada
+    getAdjacentRegionId(regionId, direction) {
+        const currentRegion = this.regions.find(r => r.id === regionId);
+        if (!currentRegion) return null;
+        
+        let adjacentX = currentRegion.x;
         let adjacentY = currentRegion.y;
         
         // Tamaño estándar de las regiones
@@ -736,187 +725,122 @@ class WorldMapScene extends Scene {
     }
     
     /**
-     * Comprueba si el jugador ha recogido alguna moneda
+     * Método que se ejecuta al entrar en la escena
      */
-    checkCoinCollection() {
-        const playerCenterX = this.player.x + this.player.width/2;
-        const playerCenterY = this.player.y + this.player.height/2;
+    enter() {
+        console.log("Entrando en el mapa del mundo Pokémon");
         
-        for (let i = 0; i < this.coins.length; i++) {
-            const coin = this.coins[i];
+        // Cargar posición guardada si existe
+        const savedPosition = localStorage.getItem('playerPosition');
+        if (savedPosition) {
+            const pos = JSON.parse(savedPosition);
+            this.player.x = pos.x;
+            this.player.y = pos.y;
+            this.player.region = pos.region;
+        }
+        
+        // Reset camera position to follow player
+        this.updateCamera(true); // Inmediato para evitar transiciones extrañas
+        
+        // Iniciar la música de la región actual
+        this.playRegionMusic();
+        
+        // Comprobar si el jugador está dentro de una zona de minijuego y moverlo si es necesario
+        let isInMinigameZone = false;
+        let closestZone = null;
+        let shortestDistance = Infinity;
+        
+        // Obtener posición central del jugador
+        const playerCenterX = this.player.x + this.player.width / 2;
+        const playerCenterY = this.player.y + this.player.height / 2;
+        
+        // Comprobar si está en alguna zona de minijuego
+        for (const zone of this.minigameZones) {
+            if (zone.region !== this.player.region) continue;
             
-            // Solo comprobar monedas en la región actual y no recogidas
-            if (coin.region === this.player.region && !coin.collected) {
-                const dx = playerCenterX - coin.x;
-                const dy = playerCenterY - coin.y;
-                const distance = Math.sqrt(dx*dx + dy*dy);
-                
-                if (distance < 25) { // Radio de recogida
-                    // Marcar como recogida
-                    coin.collected = true;
-                    
-                    // Añadir puntos al jugador
-                    if (this.game.addPoints) {
-                        this.game.addPoints(coin.value, 'coin');
-                    } else {
-                        // Si no existe el método, incrementar directamente
-                        this.game.points = (this.game.points || 0) + coin.value;
-                        this.game.playerCoins = (this.game.playerCoins || 0) + 1;
-                    }
-                    
-                    // Crear efecto visual de recogida
-                    this.createCoinCollectionEffect(coin.x, coin.y, coin.color, coin.value);
-                    
-                    // Reproducir sonido (si está disponible)
-                    if (this.game.playSoundEffect) {
-                        this.game.playSoundEffect('coin');
-                    }
-                    
-                    console.log(`Moneda recogida! +${coin.value} puntos`);
-                    
-                    // Aumentar temporalmente el brillo del jugador
-                    this.player.glowSize = 1;
-                    this.player.glowDir = -1;
-                }
+            const zoneCenterX = zone.x + zone.width / 2;
+            const zoneCenterY = zone.y + zone.height / 2;
+            const dx = playerCenterX - zoneCenterX;
+            const dy = playerCenterY - zoneCenterY;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            
+            if (distance < zone.width / 2 + 20) { // Añadir 20px de buffer
+                isInMinigameZone = true;
+            }
+            
+            // Seguir la zona más cercana como referencia
+            if (distance < shortestDistance) {
+                shortestDistance = distance;
+                closestZone = zone;
             }
         }
-    }
-    
-    /**
-     * Crea efecto visual al recoger una moneda
-     */
-    createCoinCollectionEffect(x, y, color, value) {
-        // Crear partículas que salen disparadas desde el punto de recogida
-        const numParticles = 8;
         
-        for (let i = 0; i < numParticles; i++) {
-            const angle = (i / numParticles) * Math.PI * 2;
-            const speed = 2 + Math.random() * 3;
+        // Si el jugador está en una zona de minijuego, sacarlo
+        if (isInMinigameZone && closestZone) {
+            console.log("El jugador está en una zona de minijuego al regresar, reposicionando");
+            const zoneCenterX = closestZone.x + closestZone.width / 2;
+            const zoneCenterY = closestZone.y + closestZone.height / 2;
+            const dx = playerCenterX - zoneCenterX;
+            const dy = playerCenterY - zoneCenterY;
             
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1.0,  // Comienza con vida completa
-                decay: 0.02 + Math.random() * 0.02,  // Velocidad de desaparición
-                size: 3 + Math.random() * 3,
-                color: color || '#ffcc00'
-            });
-        }
-        
-        // Añadir también un número que sube mostrando el valor
-        this.floatingTexts.push({
-            x: x,
-            y: y,
-            text: '+' + value,
-            color: '#ffffff',
-            vy: -1.5,  // Velocidad hacia arriba
-            life: 1.0,
-            decay: 0.02
-        });
-    }
-    
-    /**
-     * Genera monedas de oro especiales en ciertas regiones
-     */
-    generateGoldCoins() {
-        // Regiones donde colocar monedas de oro especiales
-        const goldRegions = ['volcán-brownie', 'cueva-caramelo', 'lago-merengue'];
-        
-        for (const regionId of goldRegions) {
-            const region = this.regions.find(r => r.id === regionId);
-            if (!region) continue;
+            // Determinar dirección fuera de la zona (normalizar vector)
+            let distance = Math.sqrt(dx*dx + dy*dy);
+            if (distance === 0) distance = 1; // Evitar división por cero
             
-            // Generar entre 3-5 monedas de oro especiales por región
-            const numCoins = 3 + Math.floor(Math.random() * 3);
+            // Mover al jugador lejos de la zona en 100 píxeles
+            const moveDistance = closestZone.width / 2 + 60; // 60px de buffer
+            this.player.x = zoneCenterX + (dx / distance) * moveDistance - this.player.width / 2;
+            this.player.y = zoneCenterY + (dy / distance) * moveDistance - this.player.height / 2;
             
-            for (let i = 0; i < numCoins; i++) {
-                // Encontrar posición válida
-                let x, y, valid;
-                let attempts = 0;
-                
-                do {
-                    valid = true;
-                    attempts++;
-                    
-                    // Posición aleatoria dentro de la región
-                    x = region.x + 50 + Math.random() * (region.width - 100);
-                    y = region.y + 50 + Math.random() * (region.height - 100);
-                    
-                    // Comprobar colisión con zonas de minijuegos
-                    for (const zone of this.minigameZones) {
-                        if (zone.region === region.id) {
-                            const dx = x - (zone.x + zone.width/2);
-                            const dy = y - (zone.y + zone.height/2);
-                            const distance = Math.sqrt(dx*dx + dy*dy);
-                            
-                            if (distance < zone.width + 20) {
-                                valid = false;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Comprobar colisión con otras monedas ya colocadas
-                    for (const coin of this.coins) {
-                        const dx = x - coin.x;
-                        const dy = y - coin.y;
-                        const distance = Math.sqrt(dx*dx + dy*dy);
-                        
-                        if (distance < 40) {
-                            valid = false;
-                            break;
-                        }
-                    }
-                    
-                    // Evitar intentos infinitos
-                    if (attempts > 30) {
-                        valid = true;
-                        break;
-                    }
-                    
-                } while (!valid);
-                
-                if (attempts <= 30) {  // Solo añadir si encontramos una posición válida
-                    // Añadir moneda especial de oro
-                    this.coins.push({
-                        x: x,
-                        y: y,
-                        color: '#ffd700', // Gold
-                        outline: '#b8860b', // DarkGoldenRod
-                        value: 50, // Mayor valor que las monedas normales
-                        region: region.id,
-                        collected: false,
-                        animTimer: Math.random() * Math.PI * 2,
-                        glowSize: Math.random() * 5,
-                        glowDir: Math.random() > 0.5 ? 1 : -1,
-                        special: true // Marcar como especial para efectos visuales
-                    });
-                }
-            }
+            // Mantener al jugador dentro de los límites
+            this.player.x = Math.max(0, Math.min(this.player.x, this.map.width - this.player.width));
+            this.player.y = Math.max(0, Math.min(this.player.y, this.map.height - this.player.height));
         }
     }
     
     /**
-     * Encuentra la región adyacente en una dirección determinada
-     */   const adjacentRegion = this.regions.find(r => 
-            r.x === adjacentX && r.y === adjacentY
-        );
+     * Reproduce la música adecuada para la región actual
+     */
+    playRegionMusic() {
+        // Mapeo de regiones a música
+        const musicMap = {
+            'plaza-central': 'assets/audio/future-design-344320.mp3',
+            'playa-caramelizada': 'assets/audio/jungle-waves-drumampbass-electronic-inspiring-promo-345013.mp3',
+            // Podrías agregar más músicas para otras regiones cuando estén disponibles
+        };
         
-        if (adjacentRegion) {
-            console.log(`Región adyacente en dirección ${direction} desde ${regionId}: ${adjacentRegion.id}`);
-{{ ... }}
+        const region = this.regions.find(r => r.id === this.player.region);
+        const music = region && region.music ? region.music : musicMap[this.player.region] || musicMap['plaza-central'];
+        this.game.playBackgroundMusic(music);
+    }
+    
+    /**
+     * Método que se ejecuta al salir de la escena
+     */
+    exit() {
+        // Guardar la posición actual del jugador
+        localStorage.setItem('playerPosition', JSON.stringify({
+            x: this.player.x,
+            y: this.player.y,
             region: this.player.region
         }));
     }
     
     /**
-     * Actualiza el estado del juego en cada frame
+     * Actualiza la lógica del juego cada frame
      */
     update(deltaTime) {
-        // Actualizar la posición del jugador basado en la entrada
-        this.updatePlayerPosition(deltaTime);
+        // Manejar transiciones entre regiones
+        if (this.regionTransition.active) {
+            this.regionTransition.timer += deltaTime;
+            
+            // Calcular alpha para el efecto fade
+            if (this.regionTransition.timer < this.regionTransition.duration / 2) {
+                // Fade out
+                this.regionTransition.alpha = this.regionTransition.timer / (this.regionTransition.duration / 2);
+            } else {
+                // Fade in
+                this.regionTransition.alpha = 1 - (this.regionTransition.timer - this.regionTransition.duration / 2) / (this.regionTransition.duration / 2);
             }
             
             // Terminar transición
@@ -2194,111 +2118,220 @@ class WorldMapScene extends Scene {
      * Genera decoraciones temáticas para cada región
      */
     generateDecorations() {
-        this.decorations = [];
-        // Implementa la generación de decoraciones según la región
-        for (const region of this.regions) {
-            // Añadir decoraciones específicas para cada región
-            this.addRegionDecorations(region);
+        // Verificar que el array esté inicializado
+        if (!this.decorations) this.decorations = [];
+        if (!this.minigameZones) {
+            console.warn('No hay zonas de minijuegos definidas para posicionar decoraciones');
+            this.minigameZones = [];
         }
         
-        // Generar monedas de oro especiales (más valiosas) en algunas regiones
-        this.generateGoldCoins();
-    }
-    
-    /**
-     * Genera monedas coleccionables en el mapa
-     */
-    generateCoins(count = 20) {
-        this.coins = [];
-        
-        // Colores para diferentes tipos de monedas
-        const coinTypes = [
-            { color: '#ffcc00', outline: '#cc9900', value: 5, chance: 0.7 },  // Oro (común)
-            { color: '#cccccc', outline: '#999999', value: 10, chance: 0.2 },  // Plata (poco común)
-            { color: '#ff6666', outline: '#cc3333', value: 25, chance: 0.1 }   // Rubí (raro)
-        ];
-        
-        // Distribuir monedas en cada región
         for (const region of this.regions) {
-            // Número de monedas basado en el tamaño de la región
-            const regionCoins = Math.floor(count / this.regions.length) + 
-                               Math.floor(Math.random() * 3);
+            if (!region || !region.id) continue;
             
-            for (let i = 0; i < regionCoins; i++) {
-                // Encontrar posición no superpuesta con zonas de minijuegos
-                let x, y, valid;
-                let attempts = 0;
+            try {
+                // Número de decoraciones basado en el tamaño de la región
+                const area = region.width * region.height;
+                const numDecorations = Math.floor(area / 10000) + 5; // Ajustar según necesidad
                 
-                do {
-                    valid = true;
-                    attempts++;
-                    
+                for (let i = 0; i < numDecorations; i++) {
                     // Posición aleatoria dentro de la región
-                    x = region.x + 50 + Math.random() * (region.width - 100);
-                    y = region.y + 50 + Math.random() * (region.height - 100);
+                    const x = region.x + Math.random() * region.width;
+                    const y = region.y + Math.random() * region.height;
                     
-                    // Comprobar colisión con zonas de minijuegos
+                    // Evitar colocar decoraciones sobre minijuegos
+                    let collides = false;
                     for (const zone of this.minigameZones) {
+                        if (!zone) continue;
+                        
                         if (zone.region === region.id) {
-                            const dx = x - (zone.x + zone.width/2);
-                            const dy = y - (zone.y + zone.height/2);
-                            const distance = Math.sqrt(dx*dx + dy*dy);
-                            
-                            if (distance < zone.width + 20) {
-                                valid = false;
+                            const distX = Math.abs(x - (zone.x + zone.width/2));
+                            const distY = Math.abs(y - (zone.y + zone.height/2));
+                            if (distX < zone.width && distY < zone.height) {
+                                collides = true;
                                 break;
                             }
                         }
                     }
                     
-                    // Comprobar colisión con otras monedas ya colocadas
-                    for (const coin of this.coins) {
-                        const dx = x - coin.x;
-                        const dy = y - coin.y;
-                        const distance = Math.sqrt(dx*dx + dy*dy);
-                        
-                        if (distance < 40) {
-                            valid = false;
+                    if (collides) continue;
+                    
+                    // Tipo y color según la región
+                    let type = 'tree';
+                    let color = '#4CAF50';
+                    
+                    switch (region.id) {
+                        case 'plaza-central':
+                            type = Math.random() < 0.7 ? 'flower' : 'tree';
+                            color = ['#FF5555', '#FF9966', '#FFFF99', '#99FF99', '#9999FF'][Math.floor(Math.random() * 5)];
                             break;
-                        }
-                    }
-                    
-                    // Evitar intentos infinitos
-                    if (attempts > 50) {
-                        valid = true; // Forzar salida
-                        break;
-                    }
-                    
-                } while (!valid);
-                
-                if (attempts <= 50) {  // Solo añadir si encontramos una posición válida
-                    // Determinar tipo de moneda basado en probabilidad
-                    const rand = Math.random();
-                    let cumulative = 0;
-                    let selectedType = coinTypes[0];
-                    
-                    for (const type of coinTypes) {
-                        cumulative += type.chance;
-                        if (rand <= cumulative) {
-                            selectedType = type;
+                        case 'bosque-chocolate':
+                            type = 'tree';
+                            color = ['#8B4513', '#A0522D', '#6B8E23'][Math.floor(Math.random() * 3)];
                             break;
-                        }
+                        case 'montaña-galleta':
+                            type = 'rock';
+                            color = ['#A9A9A9', '#D3D3D3', '#CD853F'][Math.floor(Math.random() * 3)];
+                            break;
+                        case 'playa-caramelizada':
+                            type = Math.random() < 0.5 ? 'palm' : (Math.random() < 0.5 ? 'shell' : 'starfish');
+                            color = ['#FFD700', '#00CED1', '#FF6347', '#98FB98'][Math.floor(Math.random() * 4)];
+                            break;
+                        case 'ciudad-pastelera':
+                            type = Math.random() < 0.7 ? 'building' : 'lamp';
+                            color = ['#FF99CC', '#99CCFF', '#FFCC99', '#CCFFCC'][Math.floor(Math.random() * 4)];
+                            break;
+                        case 'lago-merengue':
+                            type = Math.random() < 0.5 ? 'water_lily' : 'bridge';
+                            color = ['#4682B4', '#87CEEB', '#00BFFF'][Math.floor(Math.random() * 3)];
+                            break;
+                        case 'cueva-caramelo':
+                            type = Math.random() < 0.5 ? 'crystal' : 'stalagmite';
+                            color = ['#9370DB', '#8A2BE2', '#BA55D3'][Math.floor(Math.random() * 3)];
+                            break;
+                        case 'pradera-azucarada':
+                            type = Math.random() < 0.7 ? 'flower' : 'bush';
+                            color = ['#FF9999', '#FFCC99', '#FFFF99', '#99FF99', '#9999FF'][Math.floor(Math.random() * 5)];
+                            break;
+                        case 'volcán-brownie':
+                            type = Math.random() < 0.5 ? 'lava_pool' : 'volcanic_rock';
+                            color = ['#FF4500', '#FF6347', '#8B0000'][Math.floor(Math.random() * 3)];
+                            break;
                     }
                     
-                    // Añadir moneda al mapa
-                    this.coins.push({
-                        x: x,
-                        y: y,
-                        color: selectedType.color,
-                        outline: selectedType.outline,
-                        value: selectedType.value,
+                    // Crear decoración
+                    this.decorations.push({
+                        x,
+                        y,
+                        type,
+                        color,
+                        size: 0.5 + Math.random() * 0.5, // Tamaño aleatorio
                         region: region.id,
-                        collected: false,
-                        animTimer: Math.random() * Math.PI * 2,
-                        glowSize: Math.random() * 5,
-                        glowDir: Math.random() > 0.5 ? 1 : -1
+                        animOffset: Math.random() * Math.PI * 2, // Offset para animación
+                        special: Math.random() < 0.1 // 10% de ser especial con efectos adicionales
                     });
                 }
+            } catch (error) {
+                console.error(`Error al generar decoraciones para la región ${region.id}:`, error);
+            }
+        }
+    }
+    
+    /**
+     * Genera monedas coleccionables en el mapa
+     */
+    generateCoins() {
+        // Verificar que el array esté inicializado
+        if (!this.coins) this.coins = [];
+        if (!this.minigameZones) {
+            console.warn('No hay zonas de minijuegos definidas para posicionar monedas');
+            this.minigameZones = [];
+        }
+        if (!this.decorations) {
+            console.warn('No hay decoraciones definidas para posicionar monedas');
+            this.decorations = [];
+        }
+        
+        // Para cada región, generar monedas
+        for (const region of this.regions) {
+            if (!region || !region.id) continue;
+            
+            try {
+                // Número de monedas basado en el tamaño de la región
+                const area = region.width * region.height;
+                const numCoins = Math.floor(area / 20000) + 3; // Ajustar según necesidad
+                
+                for (let i = 0; i < numCoins; i++) {
+                    // Posición aleatoria dentro de la región, evitando bordes
+                    const margin = 50;
+                    const x = region.x + margin + Math.random() * (region.width - margin * 2);
+                    const y = region.y + margin + Math.random() * (region.height - margin * 2);
+                    
+                    // Evitar colocar monedas sobre minijuegos
+                    let collides = false;
+                    for (const zone of this.minigameZones) {
+                        if (!zone) continue;
+                        
+                        if (zone.region === region.id) {
+                            const distX = Math.abs(x - (zone.x + zone.width/2));
+                            const distY = Math.abs(y - (zone.y + zone.height/2));
+                            if (distX < zone.width * 1.2 && distY < zone.height * 1.2) {
+                                collides = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // También evitar colocar sobre decoraciones
+                    for (const decoration of this.decorations) {
+                        if (!decoration) continue;
+                        
+                        if (decoration.region === region.id) {
+                            const dist = Math.sqrt(Math.pow(x - decoration.x, 2) + Math.pow(y - decoration.y, 2));
+                            if (dist < 30 * (decoration.size || 1)) {
+                                collides = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (collides) continue;
+                    
+                    // Color y valor según la región
+                    let color = '#FFD700';
+                    let value = 1;
+                    
+                    switch (region.id) {
+                        case 'plaza-central':
+                            color = '#FFD700'; // Gold
+                            value = 1;
+                            break;
+                        case 'bosque-chocolate':
+                            color = '#CD7F32'; // Bronze
+                            value = 2;
+                            break;
+                        case 'montaña-galleta':
+                            color = '#C0C0C0'; // Silver
+                            value = 3;
+                            break;
+                        case 'playa-caramelizada':
+                            color = '#00FFFF'; // Aqua
+                            value = 5;
+                            break;
+                        case 'ciudad-pastelera':
+                            color = '#4169E1'; // Royal Blue
+                            value = 3;
+                            break;
+                        case 'lago-merengue':
+                            color = '#FF00FF'; // Magenta
+                            value = 4;
+                            break;
+                        case 'cueva-caramelo':
+                            color = '#800080'; // Purple
+                            value = 7;
+                            break;
+                        case 'pradera-azucarada':
+                            color = '#32CD32'; // Lime Green
+                            value = 2;
+                            break;
+                        case 'volcán-brownie':
+                            color = '#FF4500'; // Orange Red
+                            value = 10;
+                            break;
+                    }
+                    
+                    // Crear moneda
+                    this.coins.push({
+                        x,
+                        y,
+                        color,
+                        value,
+                        collected: false,
+                        region: region.id,
+                        animTimer: Math.random() * Math.PI * 2 // Offset para animación
+                    });
+                }
+            } catch (error) {
+                console.error(`Error al generar monedas para la región ${region.id}:`, error);
             }
         }
     }
