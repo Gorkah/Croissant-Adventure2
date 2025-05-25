@@ -75,9 +75,7 @@ class Game {
                 (document.activeElement.tagName === 'INPUT' || 
                  document.activeElement.tagName === 'TEXTAREA' || 
                  document.activeElement.isContentEditable);
-                 
-            console.log('Key pressed:', e.key, 'Input focused:', isInputFocused);
-            
+                             
             // Solo capturar teclas si no hay un elemento de entrada con foco
             if (!isInputFocused) {
                 this.keys[e.key.toLowerCase()] = true;
@@ -115,9 +113,6 @@ class Game {
             // Coordenadas ajustadas por el escalado
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
-            
-            // Debug para verificar coordenadas
-            // console.log('Mouse coords:', this.mouseX, this.mouseY);
         });
         
         this.canvas.addEventListener('mousedown', (e) => {
@@ -128,19 +123,14 @@ class Game {
             
             this.mouseX = (e.clientX - rect.left) * scaleX;
             this.mouseY = (e.clientY - rect.top) * scaleY;
-            
-            console.log('Mouse clicked at:', this.mouseX, this.mouseY);
             this.mouseDown = true;
-            
             // Comprobar si se ha hecho clic en el botón de música
             const musicBtnX = this.width - 40;
             const musicBtnY = 20;
             const musicBtnRadius = 15;
-            
             const dx = this.mouseX - musicBtnX;
             const dy = this.mouseY - musicBtnY;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
             if (distance <= musicBtnRadius) {
                 // Toggle de música
                 const musicEnabled = this.toggleBackgroundMusic();
@@ -309,6 +299,22 @@ class Game {
             this.audioSystem.backgroundMusic.pause();
             this.audioSystem.backgroundMusic = null;
         }
+    }
+    
+    /**
+     * Método simplificado para reproducir música por nombre (para compatibilidad con minijuegos)
+     * @param {string} musicName - Nombre de la música a reproducir (sin extensión)
+     */
+    playMusic(musicName) {
+        const musicPath = `assets/music/${musicName}.mp3`;
+        this.playBackgroundMusic(musicPath);
+    }
+    
+    /**
+     * Detener la música actual (alias para compatibilidad)
+     */
+    stopMusic() {
+        this.stopBackgroundMusic();
     }
     
     /**
@@ -678,6 +684,18 @@ class Game {
                 console.error('Error registering CaveExplorerMinigame:', e);
             }
             
+            // Registrar Tutorial del juego
+            try {
+                if (typeof TutorialMinigame !== 'undefined') {
+                    this.registerScene('tutorial', new TutorialMinigame(this));
+                    console.log('TutorialMinigame registered');
+                } else {
+                    console.error('TutorialMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering TutorialMinigame:', e);
+            }
+            
             // Registrar Admin Panel minigame
             try {
                 if (typeof AdminPanel !== 'undefined') {
@@ -746,6 +764,25 @@ class Game {
         this.ctx.font = '16px Arial';
         this.ctx.textAlign = 'left';
         this.ctx.fillText(`Puntos: ${this.playerScore}`, 10, 20);
+
+
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(this.width - 150, 20, 130, 60);
+            
+            // Dibujar borde
+        this.ctx.strokeStyle = '#FFCC00';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(this.width - 150, 20, 130, 60);
+            
+            // Dibujar texto de puntuación
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.font = 'bold 16px Arial';
+        this.ctx.textAlign = 'right';
+        this.ctx.fillText(`Puntos: ${this.playerScore || 0}`, this.width - 30, 45);
+            
+           
+
+
         
         // Botón de música (icono de altavoz)
         this.renderMusicButton(this.ctx);
@@ -826,7 +863,6 @@ class Game {
         if (key === 'w' || key === 'a' || key === 's' || key === 'd' || 
             key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
             if (this.keys[key.toLowerCase()] === true) {
-                console.log(`Key pressed: ${key}`);
             }
         }
         return this.keys[key.toLowerCase()] === true;

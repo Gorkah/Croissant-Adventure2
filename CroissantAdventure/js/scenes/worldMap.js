@@ -3752,23 +3752,6 @@ class WorldMapScene extends Scene {
      * Renderiza la UI de puntuación
      */
     renderScoreUI(ctx) {
-        // Dibujar fondo para la puntuación
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(this.game.width - 150, 20, 130, 60);
         
-        // Dibujar borde
-        ctx.strokeStyle = '#FFCC00';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.game.width - 150, 20, 130, 60);
-        
-        // Dibujar texto de puntuación
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 16px Arial';
-        ctx.textAlign = 'right';
-        ctx.fillText(`Puntos: ${this.game.points || 0}`, this.game.width - 30, 45);
-        
-        // Dibujar texto de ayuda
-        ctx.font = '10px Arial';
-        ctx.fillText('M: Minimapa | TAB: Puntaje', this.game.width - 30, 65);
     }
 }
