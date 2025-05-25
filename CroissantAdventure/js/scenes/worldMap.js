@@ -86,14 +86,18 @@ class WorldMapScene extends Scene {
                 height: 600,
                 bgColor: '#556B2F', // Verde oliva oscuro para bosque
                 tilesets: {
-                    ground: 'bosque',
-                    decoration: 'árboles densos'
+                    ground: 'hierba',
+                    decoration: 'árboles y arbustos'
                 },
                 hasGrass: true, // Hierba alta donde pueden aparecer encuentros
                 displayName: 'Bosque de Chocolate',
                 color: '#556B2F',
-                borderColor: '#3A4C1F',
-                description: 'Un denso bosque lleno de árboles de chocolate y sorpresas'
+                borderColor: '#3A4B1F',
+                description: 'Un frondoso bosque con árboles de chocolate',
+                music: 'assets/audio/forest-with-small-river-birds-and-nature-field-recording-6735.mp3',
+                lightEffect: 'forest_shade',
+                ambientParticles: 'forest_pollen',
+                specialEffect: 'forest_fireflies'
             },
             {
                 id: 'montaña-galleta',
@@ -110,7 +114,12 @@ class WorldMapScene extends Scene {
                 displayName: 'Montaña Galleta',
                 color: '#A9A9A9',
                 borderColor: '#787878',
-                description: 'Una montaña escarpada hecha de galletas crujientes'
+                description: 'Una montaña escarpada hecha de galletas crujientes',
+                music: 'assets/audio/epic-mountains-157980.mp3',
+                lightEffect: 'mountain_shadows',
+                ambientParticles: 'dust_particles',
+                specialEffect: 'cookie_crumbs',
+                weatherEffect: 'foggy'
             },
             {
                 id: 'playa-caramelizada',
@@ -129,7 +138,11 @@ class WorldMapScene extends Scene {
                 displayName: 'Playa Caramelizada',
                 color: '#F5DEB3',
                 borderColor: '#D4BD93',
-                description: 'Una playa de azúcar con un mar de caramelo líquido'
+                description: 'Una playa de azúcar con un mar de caramelo líquido',
+                lightEffect: 'bright_day',
+                ambientParticles: 'sparkling_sugar',
+                specialEffect: 'caramel_bubbles',
+                weatherEffect: 'light_rain'
             },
             {
                 id: 'ciudad-pastelera',
@@ -146,7 +159,11 @@ class WorldMapScene extends Scene {
                 displayName: 'Ciudad Pastelera',
                 color: '#D3D3D3',
                 borderColor: '#B0B0B0',
-                description: 'Una bulliciosa ciudad con edificios hechos de pasteles'
+                description: 'Una bulliciosa ciudad con edificios hechos de pasteles',
+                music: 'assets/audio/city-ambience-9272.mp3',
+                lightEffect: 'city_lights',
+                ambientParticles: 'city_dust',
+                specialEffect: 'sugar_sparkles'
             },
             {
                 id: 'lago-merengue',
@@ -164,7 +181,11 @@ class WorldMapScene extends Scene {
                 displayName: 'Lago Merengue',
                 color: '#87CEEB',
                 borderColor: '#5DAECB',
-                description: 'Un lago tranquilo con aguas de merengue y nata'
+                description: 'Un lago tranquilo con aguas de merengue y nata',
+                music: 'assets/audio/water-lake-stream-birds-loop-124980.mp3',
+                lightEffect: 'water_reflections',
+                ambientParticles: 'water_bubbles',
+                specialEffect: 'sugar_sparkles'
             },
             {
                 id: 'cueva-caramelo',
@@ -181,8 +202,12 @@ class WorldMapScene extends Scene {
                 isDark: true, // Las cuevas requieren iluminación especial
                 displayName: 'Cueva Caramelo',
                 color: '#696969',
-                borderColor: '#484848',
-                description: 'Una cueva oscura con cristales de caramelo brillantes'
+                borderColor: '#404040',
+                description: 'Una cueva oscura con cristales de caramelo brillante',
+                music: 'assets/audio/cave-of-light-116826.mp3',
+                lightEffect: 'crystal_illumination',
+                ambientParticles: 'sparkling_sugar',
+                specialEffect: 'caramel_bubbles'
             },
             {
                 id: 'pradera-azucarada',
@@ -200,7 +225,12 @@ class WorldMapScene extends Scene {
                 displayName: 'Pradera Azucarada',
                 color: '#98FB98',
                 borderColor: '#78DB78',
-                description: 'Una vasta pradera cubierta de hierba de azúcar y flores de caramelo'
+                description: 'Una vasta pradera cubierta de hierba de azúcar y flores de caramelo',
+                music: 'assets/audio/meadow-gentle-nature-soundtrack-birds-and-insects-on-a-peaceful-day-148403.mp3',
+                lightEffect: 'bright_sunlight',
+                ambientParticles: 'sparkling_sugar',
+                specialEffect: 'sugar_sparkles',
+                weatherEffect: 'falling_leaves'
             },
             {
                 id: 'volcán-brownie',
@@ -218,7 +248,12 @@ class WorldMapScene extends Scene {
                 displayName: 'Volcán Brownie',
                 color: '#8B0000',
                 borderColor: '#6B0000',
-                description: 'Un volcán activo con lava de chocolate caliente'
+                description: 'Un volcán activo con lava de chocolate caliente',
+                music: 'assets/audio/cinematic-dramatic-11120.mp3',
+                lightEffect: 'bright_day',
+                ambientParticles: 'floating_embers',
+                specialEffect: 'volcanic_smoke',
+                weatherEffect: 'heavy_rain'
             }
         ];
         
@@ -2330,6 +2365,861 @@ class WorldMapScene extends Scene {
     }
     
     /**
+     * Renderiza los efectos visuales para la región actual
+     * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
+     * @param {Object} region - Región actual
+     */
+    renderRegionEffects(ctx, region) {
+        // Aplicar efectos de iluminación si la región los tiene definidos
+        if (region.lightEffect) {
+            this.drawLightEffect(ctx, region);
+        }
+        
+        // Aplicar efectos ambientales (partículas, etc.)
+        if (region.ambientParticles) {
+            this.drawAmbientParticles(ctx, region);
+        }
+        
+        // Aplicar efectos climáticos (lluvia, nieve, etc.)
+        if (region.weatherEffect) {
+            this.drawWeatherEffect(ctx, region);
+        }
+        
+        // Aplicar efectos especiales específicos de cada región
+        if (region.specialEffect) {
+            this.drawSpecialEffect(ctx, region);
+        }
+    }
+    
+    /**
+     * Dibuja efectos de luz para diferentes regiones
+     * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
+     * @param {Object} region - Región actual
+     */
+    drawLightEffect(ctx, region) {
+        const time = Date.now() / 1000;
+        const lightType = region.lightEffect;
+        
+        switch (lightType) {
+            case 'bright_day':
+                // Efecto de luz brillante diurna
+                ctx.fillStyle = 'rgba(255, 255, 200, 0.1)';
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                
+                // Brillos aleatorios de luz solar
+                for (let i = 0; i < 5; i++) {
+                    const x = region.x + Math.random() * region.width;
+                    const y = region.y + Math.random() * region.height;
+                    const size = 30 + Math.random() * 50;
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, 'rgba(255, 255, 200, 0.3)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'forest_shade':
+                // Efecto de sombras de bosque
+                ctx.fillStyle = 'rgba(30, 70, 30, 0.1)';
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                
+                // Patrones de luz filtrada a través de los árboles
+                for (let i = 0; i < 15; i++) {
+                    const x = region.x + Math.random() * region.width;
+                    const y = region.y + Math.random() * region.height;
+                    const size = 20 + Math.random() * 30;
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, 'rgba(200, 255, 200, 0.15)');
+                    gradient.addColorStop(1, 'rgba(200, 255, 200, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'mountain_shadows':
+                // Sombras proyectadas en las montañas
+                const mountainGradient = ctx.createLinearGradient(
+                    region.x, region.y,
+                    region.x, region.y + region.height
+                );
+                mountainGradient.addColorStop(0, 'rgba(100, 100, 120, 0.1)');
+                mountainGradient.addColorStop(0.5, 'rgba(70, 70, 90, 0.1)');
+                mountainGradient.addColorStop(1, 'rgba(40, 40, 60, 0.2)');
+                
+                ctx.fillStyle = mountainGradient;
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                break;
+                
+            case 'water_reflections':
+                // Reflejos del agua
+                for (let i = 0; i < 20; i++) {
+                    const x = region.x + Math.random() * region.width;
+                    const y = region.y + Math.random() * region.height;
+                    const width = 10 + Math.random() * 40;
+                    const height = 3 + Math.random() * 10;
+                    const angle = Math.random() * Math.PI;
+                    
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    
+                    const gradient = ctx.createLinearGradient(-width/2, 0, width/2, 0);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                    gradient.addColorStop(0.5, 'rgba(255, 255, 255, ' + (0.1 + Math.random() * 0.1) + ')');
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(-width/2, -height/2, width, height);
+                    ctx.restore();
+                }
+                break;
+                
+            case 'crystal_illumination':
+                // Iluminación de cristales en la cueva
+                for (let i = 0; i < 12; i++) {
+                    const x = region.x + (region.width / 12) * i + Math.random() * 50 - 25;
+                    const y = region.y + (Math.random() > 0.5 ? Math.random() * 100 : region.height - Math.random() * 100);
+                    const size = 20 + Math.random() * 40;
+                    
+                    // Colores de cristal aleatorios
+                    const colors = [
+                        'rgba(100, 200, 255, 0.3)', // Azul
+                        'rgba(255, 100, 200, 0.3)', // Rosa
+                        'rgba(200, 255, 100, 0.3)', // Verde
+                        'rgba(255, 200, 100, 0.3)'  // Ámbar
+                    ];
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, colors[Math.floor(Math.random() * colors.length)]);
+                    gradient.addColorStop(1, 'rgba(100, 100, 100, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'bright_sunlight':
+                // Luz solar brillante para la pradera
+                ctx.fillStyle = 'rgba(255, 255, 230, 0.1)';
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                
+                // Destellos de luz
+                for (let i = 0; i < 8; i++) {
+                    const x = region.x + Math.random() * region.width;
+                    const y = region.y + Math.random() * region.height;
+                    const size = 40 + Math.random() * 60;
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, 'rgba(255, 255, 200, 0.25)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'city_lights':
+                // Luces de la ciudad
+                for (let i = 0; i < 30; i++) {
+                    const x = region.x + 50 + Math.random() * (region.width - 100);
+                    const y = region.y + 50 + Math.random() * (region.height - 100);
+                    const size = 5 + Math.random() * 15;
+                    const alpha = 0.1 + Math.sin(time * 2 + i) * 0.05;
+                    
+                    // Colores variados para las luces de la ciudad
+                    const colors = [
+                        `rgba(255, 255, 150, ${alpha})`, // Amarillo
+                        `rgba(255, 200, 100, ${alpha})`, // Naranja
+                        `rgba(200, 230, 255, ${alpha})`, // Azul claro
+                        `rgba(255, 150, 150, ${alpha})`  // Rosa claro
+                    ];
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, colors[i % colors.length]);
+                    gradient.addColorStop(1, 'rgba(100, 100, 100, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+        }
+    }
+    
+    /**
+     * Dibuja partículas ambientales para diferentes regiones
+     * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
+     * @param {Object} region - Región actual
+     */
+    drawAmbientParticles(ctx, region) {
+        const time = Date.now() / 1000;
+        const particleType = region.ambientParticles;
+        
+        switch (particleType) {
+            case 'forest_pollen':
+                // Polén flotando en el bosque
+                for (let i = 0; i < 50; i++) {
+                    const seed = i * 137.5 + Math.floor(time * 0.2) * 11.3;
+                    const randomX = ((seed * 15485863) % 10000) / 10000;
+                    const randomY = ((seed * 285377) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + randomY * region.height + Math.sin(time + i) * 5;
+                    
+                    // Tamaño variable del polén
+                    const size = 1 + (randomX * randomY) * 3;
+                    
+                    // Colores variables (verde y amarillo)
+                    ctx.fillStyle = `rgba(${180 + randomX * 70}, ${220 + randomY * 35}, 100, ${0.3 + randomY * 0.4})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'dust_particles':
+                // Partículas de polvo
+                for (let i = 0; i < 40; i++) {
+                    const seed = i * 273.5 + Math.floor(time * 0.1) * 23.7;
+                    const randomX = ((seed * 34567) % 10000) / 10000;
+                    const randomY = ((seed * 76543) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + randomY * region.height + Math.sin(time * 0.5 + i) * 2;
+                    
+                    // Tamaño variable del polvo
+                    const size = 0.5 + randomY * 1.5;
+                    
+                    // Colores variables (tonos marrones/beige)
+                    const alpha = 0.2 + randomX * 0.3;
+                    ctx.fillStyle = `rgba(210, 180, 140, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'water_bubbles':
+                // Burbujas en el agua
+                for (let i = 0; i < 30; i++) {
+                    const seed = i * 195.3 + Math.floor(time * 0.3) * 17.1;
+                    const randomX = ((seed * 23456) % 10000) / 10000;
+                    
+                    // Movimiento ascendente de las burbujas
+                    const yOffset = ((time * 15 + seed) % 100) / 100;
+                    const y = region.y + region.height - yOffset * region.height;
+                    const x = region.x + randomX * region.width + Math.sin(time + i) * 3;
+                    
+                    // Tamaño variable de las burbujas
+                    const size = 1 + randomX * 4;
+                    
+                    // Brillo interior
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+                    gradient.addColorStop(0.5, 'rgba(200, 230, 255, 0.3)');
+                    gradient.addColorStop(1, 'rgba(150, 200, 255, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'floating_embers':
+                // Ascuas flotantes para zonas volcánicas
+                for (let i = 0; i < 25; i++) {
+                    const seed = i * 357.9 + Math.floor(time * 0.2) * 19.3;
+                    const randomX = ((seed * 45673) % 10000) / 10000;
+                    
+                    // Movimiento ascendente de las ascuas
+                    const yOffset = ((time * 10 + seed) % 100) / 100;
+                    const y = region.y + region.height - yOffset * region.height * 0.7;
+                    const x = region.x + randomX * region.width + Math.sin(time * 0.3 + i) * 8;
+                    
+                    // Tamaño variable
+                    const size = 1 + randomX * 2;
+                    
+                    // Brillo oscilante
+                    const alpha = 0.5 + Math.sin(time * 3 + i) * 0.3;
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
+                    gradient.addColorStop(0, `rgba(255, 200, 0, ${alpha})`);
+                    gradient.addColorStop(0.5, `rgba(255, 100, 0, ${alpha * 0.7})`);
+                    gradient.addColorStop(1, 'rgba(200, 0, 0, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Núcleo brillante
+                    ctx.fillStyle = `rgba(255, 255, 200, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'sparkling_sugar':
+                // Destellos de azúcar para las praderas azucaradas
+                for (let i = 0; i < 60; i++) {
+                    const seed = i * 239.7 + Math.floor(time * 0.1) * 13.5;
+                    const randomX = ((seed * 98765) % 10000) / 10000;
+                    const randomY = ((seed * 12345) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + randomY * region.height;
+                    
+                    // Brillo parpadeante
+                    const alpha = 0.1 + Math.sin(time * 4 + i * 0.3) * 0.4;
+                    if (alpha <= 0) continue; // Omitir si no es visible
+                    
+                    // Tamaño variable
+                    const size = 0.5 + randomX * 1.5;
+                    
+                    // Colores pasteles
+                    const colors = [
+                        `rgba(255, 255, 255, ${alpha})`, // Blanco
+                        `rgba(255, 230, 240, ${alpha})`, // Rosa claro
+                        `rgba(230, 255, 240, ${alpha})`, // Verde menta
+                        `rgba(240, 240, 255, ${alpha})`  // Azul lavanda
+                    ];
+                    
+                    ctx.fillStyle = colors[Math.floor(i % 4)];
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'city_dust':
+                // Polvo urbano para la ciudad
+                ctx.globalAlpha = 0.3;
+                for (let i = 0; i < 70; i++) {
+                    const seed = i * 179.3 + Math.floor(time * 0.05) * 29.7;
+                    const randomX = ((seed * 67890) % 10000) / 10000;
+                    const randomY = ((seed * 12345) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + randomY * region.height + Math.sin(time * 0.2 + i) * 1;
+                    
+                    // Tamaño variable
+                    const size = 0.3 + randomY * 0.8;
+                    
+                    // Tonos grises para polvo urbano
+                    const brightness = 150 + Math.floor(randomX * 50);
+                    ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1.0;
+                break;
+        }
+    }
+    
+    /**
+     * Dibuja efectos climáticos para diferentes regiones
+     * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
+     * @param {Object} region - Región actual
+     */
+    drawWeatherEffect(ctx, region) {
+        const time = Date.now() / 1000;
+        const weatherType = region.weatherEffect;
+        
+        switch (weatherType) {
+            case 'light_rain':
+                // Lluvia ligera
+                ctx.strokeStyle = 'rgba(150, 190, 255, 0.7)';
+                ctx.lineWidth = 1;
+                
+                for (let i = 0; i < 80; i++) {
+                    const seed = i * 456.7 + Math.floor(time * 2) * 7.3;
+                    const randomX = ((seed * 23456) % 10000) / 10000;
+                    
+                    // Posición vertical variable para efecto de movimiento
+                    const yOffset = ((time * 40 + seed) % 100) / 100;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Línea de lluvia
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 1, y + 8); // Ligera inclinación
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'heavy_rain':
+                // Lluvia intensa
+                for (let i = 0; i < 200; i++) {
+                    const seed = i * 123.4 + Math.floor(time * 3) * 9.7;
+                    const randomX = ((seed * 76543) % 10000) / 10000;
+                    
+                    // Posición vertical variable para efecto de movimiento
+                    const yOffset = ((time * 70 + seed) % 100) / 100;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Grosor variable
+                    const thickness = 1 + randomX * 1.5;
+                    
+                    // Transparencia variable
+                    const alpha = 0.3 + randomX * 0.4;
+                    
+                    // Línea de lluvia
+                    ctx.strokeStyle = `rgba(150, 190, 255, ${alpha})`;
+                    ctx.lineWidth = thickness;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x - 3, y + 15); // Mayor inclinación
+                    ctx.stroke();
+                }
+                
+                // Añadir efecto de salpicaduras
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.4)';
+                for (let i = 0; i < 30; i++) {
+                    const seed = i * 567.8 + Math.floor(time * 2) * 11.3;
+                    const randomX = ((seed * 98765) % 10000) / 10000;
+                    const randomY = ((seed * 56789) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + region.height - 50 + randomY * 40;
+                    
+                    // Tamaño variable de la salpicadura
+                    const size = 1 + randomX * 2;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'light_snow':
+                // Nieve ligera
+                for (let i = 0; i < 60; i++) {
+                    const seed = i * 789.1 + Math.floor(time) * 5.3;
+                    const randomX = ((seed * 34567) % 10000) / 10000;
+                    
+                    // Movimiento ondulante y descendente
+                    const yOffset = ((time * 15 + seed) % 100) / 100;
+                    const xOffset = Math.sin(time + i) * 5;
+                    
+                    const x = region.x + randomX * region.width + xOffset;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Tamaño variable del copo
+                    const size = 1 + randomX * 2;
+                    
+                    // Transparencia variable
+                    const alpha = 0.4 + randomX * 0.4;
+                    
+                    // Copo de nieve
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'heavy_snow':
+                // Nieve intensa
+                for (let i = 0; i < 150; i++) {
+                    const seed = i * 234.5 + Math.floor(time) * 8.7;
+                    const randomX = ((seed * 87654) % 10000) / 10000;
+                    const randomSize = ((seed * 43210) % 10000) / 10000;
+                    
+                    // Movimiento ondulante y descendente
+                    const yOffset = ((time * 25 + seed) % 100) / 100;
+                    const xOffset = Math.sin(time * 0.5 + i) * 10;
+                    
+                    const x = region.x + randomX * region.width + xOffset;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Tamaño variable del copo
+                    const size = 1.5 + randomSize * 3;
+                    
+                    // Transparencia variable
+                    const alpha = 0.5 + randomSize * 0.4;
+                    
+                    // Copo de nieve
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    
+                    // Diferentes formas de copos
+                    if (i % 4 === 0) {
+                        // Copo redondo
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        // Copo estrellado (simplificado)
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(time * 0.1 + i);
+                        
+                        ctx.beginPath();
+                        for (let j = 0; j < 6; j++) {
+                            const angle = (Math.PI * 2 / 6) * j;
+                            const innerRadius = size * 0.5;
+                            const outerRadius = size * 1.5;
+                            
+                            ctx.moveTo(0, 0);
+                            ctx.lineTo(Math.cos(angle) * outerRadius, Math.sin(angle) * outerRadius);
+                        }
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                }
+                
+                // Añadir acumulación de nieve en el suelo
+                const snowLineGradient = ctx.createLinearGradient(
+                    region.x, region.y + region.height - 50,
+                    region.x, region.y + region.height
+                );
+                snowLineGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+                snowLineGradient.addColorStop(1, 'rgba(255, 255, 255, 0.3)');
+                
+                ctx.fillStyle = snowLineGradient;
+                ctx.fillRect(region.x, region.y + region.height - 50, region.width, 50);
+                break;
+                
+            case 'foggy':
+                // Niebla
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                ctx.fillRect(region.x, region.y, region.width, region.height);
+                
+                // Capas de niebla con densidad variable
+                for (let i = 0; i < 5; i++) {
+                    const yPos = region.y + (region.height / 5) * i;
+                    const fogHeight = region.height / 5;
+                    
+                    const fogGradient = ctx.createLinearGradient(
+                        region.x, yPos,
+                        region.x, yPos + fogHeight
+                    );
+                    
+                    const alpha = 0.1 + (Math.sin(time * 0.2 + i) * 0.05);
+                    fogGradient.addColorStop(0, `rgba(220, 220, 220, ${alpha})`);
+                    fogGradient.addColorStop(0.5, `rgba(200, 200, 200, ${alpha + 0.05})`);
+                    fogGradient.addColorStop(1, `rgba(220, 220, 220, ${alpha})`);
+                    
+                    ctx.fillStyle = fogGradient;
+                    ctx.fillRect(region.x, yPos, region.width, fogHeight);
+                }
+                break;
+                
+            case 'falling_leaves':
+                // Hojas cayendo (para bosque en otoño)
+                for (let i = 0; i < 40; i++) {
+                    const seed = i * 345.6 + Math.floor(time) * 7.1;
+                    const randomX = ((seed * 45678) % 10000) / 10000;
+                    
+                    // Movimiento ondulante y descendente
+                    const yOffset = ((time * 10 + seed) % 100) / 100;
+                    const xOffset = Math.sin(time + i * 2.7) * 15;
+                    
+                    const x = region.x + randomX * region.width + xOffset;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Tamaño variable de la hoja
+                    const size = 3 + randomX * 4;
+                    
+                    // Colores otoñales
+                    const colors = [
+                        'rgba(205, 133, 63, 0.8)', // Marrón
+                        'rgba(210, 105, 30, 0.8)', // Chocolate
+                        'rgba(139, 69, 19, 0.8)',  // Silla de montar marrón
+                        'rgba(160, 82, 45, 0.8)'   // Siena
+                    ];
+                    
+                    // Rotación de la hoja
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(time + i);
+                    
+                    ctx.fillStyle = colors[i % 4];
+                    
+                    // Forma de hoja simple
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, size, size * 1.5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Vena central de la hoja
+                    ctx.strokeStyle = 'rgba(100, 50, 0, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -size * 1.5);
+                    ctx.lineTo(0, size * 1.5);
+                    ctx.stroke();
+                    
+                    ctx.restore();
+                }
+                break;
+        }
+    }
+    
+    /**
+     * Dibuja efectos especiales específicos para cada región
+     * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
+     * @param {Object} region - Región actual
+     */
+    drawSpecialEffect(ctx, region) {
+        const time = Date.now() / 1000;
+        const effectType = region.specialEffect;
+        
+        switch (effectType) {
+            case 'chocolate_ripples':
+                // Ondas de chocolate líquido
+                for (let i = 0; i < 5; i++) {
+                    const yPos = region.y + (region.height / 6) * (i + 0.5);
+                    const waveHeight = 20;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(region.x, yPos);
+                    
+                    // Onda sinusoidal con variación temporal
+                    for (let x = 0; x <= region.width; x += 10) {
+                        const y = yPos + Math.sin(x * 0.03 + time + i) * waveHeight;
+                        ctx.lineTo(region.x + x, y);
+                    }
+                    
+                    // Gradient chocolate
+                    const gradient = ctx.createLinearGradient(region.x, yPos - waveHeight, region.x, yPos + waveHeight);
+                    gradient.addColorStop(0, 'rgba(92, 51, 23, 0.5)');
+                    gradient.addColorStop(0.5, 'rgba(139, 69, 19, 0.5)');
+                    gradient.addColorStop(1, 'rgba(92, 51, 23, 0.5)');
+                    
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 10;
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'cookie_crumbs':
+                // Migas de galleta cayendo
+                for (let i = 0; i < 30; i++) {
+                    const seed = i * 987.6 + Math.floor(time) * 13.7;
+                    const randomX = ((seed * 54321) % 10000) / 10000;
+                    
+                    // Movimiento descendente
+                    const yOffset = ((time * 30 + seed) % 100) / 100;
+                    const xOffset = Math.sin(time * 0.5 + i) * 5;
+                    
+                    const x = region.x + randomX * region.width + xOffset;
+                    const y = region.y + yOffset * region.height;
+                    
+                    // Tamaño variable
+                    const size = 1 + randomX * 3;
+                    
+                    // Colores marrones variables
+                    const brightness = 150 + Math.floor(randomX * 50);
+                    ctx.fillStyle = `rgb(${brightness}, ${brightness * 0.7}, ${brightness * 0.4})`;
+                    
+                    // Forma irregular para las migas
+                    ctx.beginPath();
+                    const numPoints = 5 + Math.floor(randomX * 3);
+                    for (let j = 0; j < numPoints; j++) {
+                        const angle = (Math.PI * 2 / numPoints) * j;
+                        const radius = size * (0.8 + Math.random() * 0.4);
+                        const pointX = x + Math.cos(angle) * radius;
+                        const pointY = y + Math.sin(angle) * radius;
+                        
+                        if (j === 0) {
+                            ctx.moveTo(pointX, pointY);
+                        } else {
+                            ctx.lineTo(pointX, pointY);
+                        }
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                break;
+                
+            case 'sugar_sparkles':
+                // Destellos de azúcar
+                ctx.globalCompositeOperation = 'lighter';
+                
+                for (let i = 0; i < 50; i++) {
+                    const seed = i * 567.8 + Math.floor(time * 2) * 11.9;
+                    const randomX = ((seed * 67890) % 10000) / 10000;
+                    const randomY = ((seed * 12345) % 10000) / 10000;
+                    
+                    const x = region.x + randomX * region.width;
+                    const y = region.y + randomY * region.height;
+                    
+                    // Tamaño variable
+                    const size = 1 + randomX * 2;
+                    
+                    // Brillo parpadeante
+                    const alpha = Math.max(0, Math.sin(time * 3 + i));
+                    
+                    // Colores pasteles brillantes
+                    const colors = [
+                        `rgba(255, 255, 255, ${alpha * 0.8})`,
+                        `rgba(255, 240, 245, ${alpha * 0.7})`,
+                        `rgba(240, 255, 240, ${alpha * 0.7})`,
+                        `rgba(240, 248, 255, ${alpha * 0.7})`
+                    ];
+                    
+                    // Destello
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 2);
+                    gradient.addColorStop(0, colors[i % 4]);
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.globalCompositeOperation = 'source-over';
+                break;
+                
+            case 'volcanic_smoke':
+                // Humo volcánico
+                const numClouds = 3;
+                
+                for (let i = 0; i < numClouds; i++) {
+                    // Posición de origen del humo
+                    const originX = region.x + region.width * (0.3 + i * 0.2);
+                    const originY = region.y + region.height * 0.7;
+                    
+                    // Altura variable del humo
+                    const smokeHeight = 150 + Math.sin(time * 0.2 + i) * 30;
+                    
+                    // Gradiente de humo
+                    const smokeGradient = ctx.createLinearGradient(
+                        originX, originY,
+                        originX, originY - smokeHeight
+                    );
+                    
+                    smokeGradient.addColorStop(0, 'rgba(100, 100, 100, 0.8)');
+                    smokeGradient.addColorStop(0.3, 'rgba(120, 120, 120, 0.6)');
+                    smokeGradient.addColorStop(0.7, 'rgba(150, 150, 150, 0.4)');
+                    smokeGradient.addColorStop(1, 'rgba(200, 200, 200, 0)');
+                    
+                    // Dibujamos la columna de humo con formas irregulares
+                    ctx.fillStyle = smokeGradient;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(originX - 40, originY);
+                    
+                    // Lado izquierdo del humo
+                    for (let y = 0; y < smokeHeight; y += 20) {
+                        const waveFactor = 10 + Math.sin(y * 0.1 + time + i) * 15;
+                        const x = originX - 40 - waveFactor - (y * 0.2);
+                        ctx.lineTo(x, originY - y);
+                    }
+                    
+                    // Parte superior
+                    ctx.lineTo(originX, originY - smokeHeight - 20);
+                    
+                    // Lado derecho
+                    for (let y = 0; y < smokeHeight; y += 20) {
+                        const waveFactor = 10 + Math.sin(y * 0.1 + time + i + 10) * 15;
+                        const x = originX + 40 + waveFactor + (y * 0.2);
+                        ctx.lineTo(x, originY - (smokeHeight - y));
+                    }
+                    
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                break;
+                
+            case 'caramel_bubbles':
+                // Burbujas de caramelo
+                for (let i = 0; i < 40; i++) {
+                    const seed = i * 789.1 + Math.floor(time) * 15.3;
+                    const randomX = ((seed * 54321) % 10000) / 10000;
+                    const randomY = ((seed * 98765) % 10000) / 10000;
+                    
+                    // Movimiento ascendente lento
+                    const yOffset = ((time * 5 + seed) % 100) / 100;
+                    const y = region.y + region.height - yOffset * region.height * 0.5;
+                    const x = region.x + randomX * region.width + Math.sin(time + i) * 5;
+                    
+                    // Tamaño variable
+                    const size = 2 + randomX * 8;
+                    
+                    // Colores caramelo
+                    const colors = [
+                        'rgba(210, 105, 30, 0.6)', // Chocolate
+                        'rgba(184, 134, 11, 0.6)', // Oro oscuro
+                        'rgba(160, 82, 45, 0.6)'   // Siena
+                    ];
+                    
+                    // Burbuja
+                    ctx.fillStyle = colors[i % 3];
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Brillo de la burbuja
+                    const gradient = ctx.createRadialGradient(
+                        x - size * 0.3, y - size * 0.3, size * 0.1,
+                        x, y, size
+                    );
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+                    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'forest_fireflies':
+                // Luciérnagas en el bosque
+                ctx.globalCompositeOperation = 'lighter';
+                
+                for (let i = 0; i < 25; i++) {
+                    // Movimiento aleatorio pero suave de las luciérnagas
+                    const t = time * 0.3 + i * 10;
+                    const x = region.x + region.width * 0.5 + Math.sin(t * 0.5) * region.width * 0.4;
+                    const y = region.y + region.height * 0.5 + Math.cos(t * 0.3) * region.height * 0.4;
+                    
+                    // Parpadeo
+                    const blink = 0.2 + Math.sin(time * 2 + i * 1.5) * 0.8;
+                    const alpha = Math.max(0, blink);
+                    
+                    // Tamaño variable
+                    const size = 1 + Math.random() * 2;
+                    
+                    // Luz de la luciérnaga
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, size * 5);
+                    gradient.addColorStop(0, `rgba(230, 255, 100, ${alpha})`);
+                    gradient.addColorStop(0.5, `rgba(180, 255, 0, ${alpha * 0.5})`);
+                    gradient.addColorStop(1, 'rgba(100, 150, 0, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size * 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.globalCompositeOperation = 'source-over';
+                break;
+        }
+    }
+    
+    /**
      * Dibuja el grid de tiles
      */
     drawTileGrid(ctx, region) {
@@ -2999,6 +3889,9 @@ class WorldMapScene extends Scene {
             this.drawTileGrid(ctx, currentRegion);
             
             // Dibujar efectos especiales según la región
+            this.renderRegionEffects(ctx, currentRegion);
+            
+            // Mantener compatibilidad con el código existente para efectos antiguos
             if (currentRegion.hasGrass) {
                 this.drawTallGrass(ctx, currentRegion);
             }
