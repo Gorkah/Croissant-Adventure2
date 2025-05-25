@@ -654,6 +654,30 @@ class Game {
                 console.error('Error registering TriviaGameMinigame:', e);
             }
             
+            // Registrar Carrera de Fondant Ardiente (Racing)
+            try {
+                if (typeof RacingMinigame !== 'undefined') {
+                    this.registerScene('racing', new RacingMinigame(this));
+                    console.log('RacingMinigame registered');
+                } else {
+                    console.error('RacingMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering RacingMinigame:', e);
+            }
+            
+            // Registrar Explorador de Cristales Dulces (Cave Explorer)
+            try {
+                if (typeof CaveExplorerMinigame !== 'undefined') {
+                    this.registerScene('caveExplorer', new CaveExplorerMinigame(this));
+                    console.log('CaveExplorerMinigame registered');
+                } else {
+                    console.error('CaveExplorerMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering CaveExplorerMinigame:', e);
+            }
+            
             // Registrar Admin Panel minigame
             try {
                 if (typeof AdminPanel !== 'undefined') {

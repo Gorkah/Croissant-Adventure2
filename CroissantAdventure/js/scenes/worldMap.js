@@ -364,7 +364,7 @@ class WorldMapScene extends Scene {
                 color: '#5555ff',
                 borderColor: '#3333dd',
                 points: 20,
-                icon: '♞',
+                icon: '♘',
                 region: 'ciudad-pastelera',
                 description: 'Planifica tus movimientos estratégicos'
             },
@@ -382,6 +382,78 @@ class WorldMapScene extends Scene {
                 icon: '🏰',
                 region: 'ciudad-pastelera',
                 description: 'Defiende el castillo de los invasores'
+            },
+            
+            // Volcán Brownie - Juegos temáticos de lava
+            {
+                x: 1700,
+                y: 1350,
+                width: 75,
+                height: 75,
+                name: 'LavaRunner',
+                displayName: 'Corredor de Lava Chocolatada',
+                scene: 'platform',
+                color: '#FF4500',
+                borderColor: '#8B0000',
+                points: 80,
+                icon: '💥',
+                region: 'volcán-brownie',
+                special: true,
+                pulseScale: 1,
+                description: 'Salta entre las plataformas de chocolate flotando sobre la lava'
+            },
+            {
+                x: 1850,
+                y: 1450,
+                width: 75,
+                height: 75,
+                name: 'LavaRacing',
+                displayName: 'Carrera de Fondant Ardiente',
+                scene: 'racing',
+                color: '#FF6347',
+                borderColor: '#CD5C5C',
+                points: 65,
+                icon: '🚗',
+                region: 'volcán-brownie',
+                special: true,
+                pulseScale: 1,
+                description: 'Conduce sobre el último borde del volcán evitando caías de lava'
+            },
+            
+            // Cueva Caramelo - Juegos temáticos de exploración
+            {
+                x: 1200,
+                y: 1550,
+                width: 75,
+                height: 75,
+                name: 'CaveExplorer',
+                displayName: 'Explorador de Cristales Dulces',
+                scene: 'caveExplorer',
+                color: '#9370DB',
+                borderColor: '#6A5ACD',
+                points: 55,
+                icon: '🕳️',
+                region: 'cueva-caramelo',
+                special: true,
+                pulseScale: 1,
+                description: 'Encuentra los pares de cristales en la oscuridad de la cueva'
+            },
+            {
+                x: 1050,
+                y: 1650,
+                width: 75,
+                height: 75,
+                name: 'CaveDigger',
+                displayName: 'Minero de Caramelos',
+                scene: 'puzzle',
+                color: '#8A2BE2',
+                borderColor: '#4B0082',
+                points: 75,
+                icon: '⛏️',
+                region: 'cueva-caramelo',
+                special: true,
+                pulseScale: 1,
+                description: 'Excava en la cueva y descubre tesoros dulces escondidos'
             },
             {
                 x: 1200,
@@ -728,7 +800,7 @@ class WorldMapScene extends Scene {
      * Método que se ejecuta al entrar en la escena
      */
     enter() {
-        console.log("Entrando en el mapa del mundo Pokémon");
+        console.log("Entrando en el mapa del mundo Croissant");
         
         // Cargar posición guardada si existe
         const savedPosition = localStorage.getItem('playerPosition');
@@ -944,7 +1016,8 @@ class WorldMapScene extends Scene {
                 if (nearbyZone.points) {
                     this.game.addPoints(nearbyZone.points, 'minigame');
                 }
-                this.game.changeScene(nearbyZone.scene);
+                // Corregir el método para cambiar escenas - usar switchScene en lugar de changeScene
+                this.game.switchScene(nearbyZone.scene);
             }
         } else {
             this.interactionPrompt = null;
@@ -1235,23 +1308,42 @@ class WorldMapScene extends Scene {
                         // Actualizar región del jugador
                         this.player.region = wall.connectsTo;
                         
-                        // Calcular la posición del jugador en la nueva región
-                        // Si toca el borde izquierdo, reposicionar a la derecha de la nueva región
-                        if (Math.abs(wall.x - fromRegion.x) < 10) { // Borde izquierdo
-                            this.player.x = toRegion.x + toRegion.width - this.player.width - 20;
+                        // Calcular la posición relativa del jugador en la región actual
+                        // para mantener la misma posición relativa en la nueva región
+                        let relativeX, relativeY;
+                        
+                        // Si está saliendo por el borde izquierdo de la región actual
+                        if (Math.abs(rect.x - fromRegion.x) < 20) {
+                            // Entrar por el borde derecho de la nueva región
+                            this.player.x = toRegion.x + toRegion.width - this.player.width - 10;
+                            // Mantener la misma posición vertical relativa
+                            relativeY = (rect.y - fromRegion.y) / fromRegion.height;
+                            this.player.y = toRegion.y + relativeY * toRegion.height;
                         }
-                        // Si toca el borde derecho, reposicionar a la izquierda de la nueva región
-                        else if (Math.abs(wall.x + wall.width - (fromRegion.x + fromRegion.width)) < 10) { // Borde derecho
-                            this.player.x = toRegion.x + 20;
+                        // Si está saliendo por el borde derecho de la región actual
+                        else if (Math.abs((rect.x + rect.width) - (fromRegion.x + fromRegion.width)) < 20) {
+                            // Entrar por el borde izquierdo de la nueva región
+                            this.player.x = toRegion.x + 10;
+                            // Mantener la misma posición vertical relativa
+                            relativeY = (rect.y - fromRegion.y) / fromRegion.height;
+                            this.player.y = toRegion.y + relativeY * toRegion.height;
                         }
                         
-                        // Si toca el borde superior, reposicionar abajo de la nueva región
-                        if (Math.abs(wall.y - fromRegion.y) < 10) { // Borde superior
-                            this.player.y = toRegion.y + toRegion.height - this.player.height - 20;
+                        // Si está saliendo por el borde superior de la región actual
+                        if (Math.abs(rect.y - fromRegion.y) < 20) {
+                            // Entrar por el borde inferior de la nueva región
+                            this.player.y = toRegion.y + toRegion.height - this.player.height - 10;
+                            // Mantener la misma posición horizontal relativa
+                            relativeX = (rect.x - fromRegion.x) / fromRegion.width;
+                            this.player.x = toRegion.x + relativeX * toRegion.width;
                         }
-                        // Si toca el borde inferior, reposicionar arriba de la nueva región
-                        else if (Math.abs(wall.y + wall.height - (fromRegion.y + fromRegion.height)) < 10) { // Borde inferior
-                            this.player.y = toRegion.y + 20;
+                        // Si está saliendo por el borde inferior de la región actual
+                        else if (Math.abs((rect.y + rect.height) - (fromRegion.y + fromRegion.height)) < 20) {
+                            // Entrar por el borde superior de la nueva región
+                            this.player.y = toRegion.y + 10;
+                            // Mantener la misma posición horizontal relativa
+                            relativeX = (rect.x - fromRegion.x) / fromRegion.width;
+                            this.player.x = toRegion.x + relativeX * toRegion.width;
                         }
                         
                         // Asegurarnos que el jugador no esté fuera de los límites de la nueva región
@@ -1785,51 +1877,63 @@ class WorldMapScene extends Scene {
     }
 
     /**
-     * Dibuja hierba alta estilo Pokémon
+     * Dibuja un efecto de hierba alta mejorado visualmente
      */
     drawTallGrass(ctx, region) {
         const tileSize = this.map.tileSize;
+        const grassChance = 0.3; // 30% de probabilidad de hierba en cada tile
         
-        // Crear patrón de hierba semi-aleatorio basado en la región
-        const seedX = region.x;
-        const seedY = region.y;
+        // Solo dibujar hierba visible en la cámara
+        const startX = Math.max(Math.floor(this.camera.x / tileSize), Math.floor(region.x / tileSize));
+        const startY = Math.max(Math.floor(this.camera.y / tileSize), Math.floor(region.y / tileSize));
+        const endX = Math.min(Math.ceil((this.camera.x + this.camera.width) / tileSize), Math.ceil((region.x + region.width) / tileSize));
+        const endY = Math.min(Math.ceil((this.camera.y + this.camera.height) / tileSize), Math.ceil((region.y + region.height) / tileSize));
         
-        // Color base de la hierba (más oscuro que el fondo)
-        const baseColor = region.id === 'bosque-chocolate' ? '#3E5622' : '#4D8A3D';
+        // Usar un valor semilla para mantener consistencia
+        const seed = this.map.seed || 12345;
         
-        ctx.fillStyle = baseColor;
+        // Determinar si estamos en bosque glaseado para usar colores temáticos
+        const isGlazedForest = region.id === 'bosque-glaseado';
         
-        // Dibujar manchas de hierba alta
-        for (let x = region.x; x < region.x + region.width; x += tileSize) {
-            for (let y = region.y; y < region.y + region.height; y += tileSize) {
-                // Solo dibujar si es visible en la cámara
-                if (!this.isRectVisible({x, y, width: tileSize, height: tileSize})) continue;
+        for (let x = startX; x < endX; x++) {
+            for (let y = startY; y < endY; y++) {
+                // Usar una función pseudoaleatoria determinista
+                const value = Math.sin(x * 12.9898 + y * 78.233 + seed) * 43758.5453;
+                const random = value - Math.floor(value);
                 
-                // Pseudo-aleatorio basado en coordenadas
-                const hash = (x * 31 + y * 17 + seedX * 13 + seedY * 7) % 100;
-                
-                if (hash < 30) { // 30% de probabilidad de hierba
-                    // Dibujar hierba alta
-                    ctx.fillRect(x, y, tileSize, tileSize);
+                if (random < grassChance) {
+                    const grassX = x * tileSize + tileSize / 2;
+                    const grassY = y * tileSize + tileSize / 2;
                     
-                    // Dibujar detalles de hierba
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                    ctx.lineWidth = 1;
-                    
-                    // Dibujar las "puntas" de la hierba
+                    // Aplicar efecto de "movimiento" basado en el tiempo
                     const time = Date.now() / 1000;
-                    const waveOffset = Math.sin(time + x * 0.1) * 2;
+                    const swayAmount = Math.sin(time + (x * y * 0.1)) * 2;
                     
+                    // Colores según la región
+                    const baseColor = isGlazedForest ? '#7FFFD4' : '#228B22'; // Aguamarina para bosque glaseado, verde normal para otros
+                    const highlightColor = isGlazedForest ? '#E0FFFF' : '#32CD32'; // Celeste claro para bosque glaseado, verde lima para otros
+                    
+                    // Dibujar hierba con gradiente
+                    const gradient = ctx.createLinearGradient(grassX, grassY + 5, grassX, grassY - 12);
+                    gradient.addColorStop(0, baseColor);
+                    gradient.addColorStop(1, highlightColor);
+                    
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2;
+                    
+                    // Tallos de hierba con efecto de movimiento
                     ctx.beginPath();
-                    // Línea central
-                    ctx.moveTo(x + tileSize/2, y + tileSize);
-                    ctx.lineTo(x + tileSize/2 + waveOffset, y + tileSize/4);
-                    // Línea izquierda
-                    ctx.moveTo(x + tileSize/4, y + tileSize);
-                    ctx.lineTo(x + tileSize/4 + waveOffset, y + tileSize/3);
-                    // Línea derecha
-                    ctx.moveTo(x + tileSize*3/4, y + tileSize);
-                    ctx.lineTo(x + tileSize*3/4 + waveOffset, y + tileSize/3);
+                    for (let i = 0; i < 5; i++) {
+                        const offsetX = (i - 2) * 3;
+                        ctx.moveTo(grassX + offsetX, grassY + 5);
+                        ctx.quadraticCurveTo(
+                            grassX + offsetX + swayAmount, 
+                            grassY - 5,
+                            grassX + offsetX + (random * 6 - 3), 
+                            grassY - 12
+                        );
+                    }
+                    // Eliminar línea problemática que hace referencia a waveOffset no definido
                     
                     ctx.stroke();
                 }
@@ -1838,43 +1942,230 @@ class WorldMapScene extends Scene {
     }
     
     /**
-     * Dibuja playa y agua estilo Pokémon para la Playa Caramelizada
+     * Dibuja una espectacular playa caramelizada con efectos visuales
      */
     drawBeach(ctx, region) {
-        const tileSize = this.map.tileSize;
+        // Crear zonas de la playa
+        const beachWidth = region.width;
+        const beachHeight = region.height;
+        const shoreWidth = beachWidth * 0.4; // 40% de la playa es arena
+        const waterStartX = region.x + shoreWidth;
         
-        // Dibujar agua solo en la parte derecha de la playa
-        const waterStartX = region.x + region.width * 0.6;
-        
-        // Color del agua
-        const waterColor = '#5DA9E9';
-        
-        // Tiempo para la animación
+        // Tiempo para animaciones
         const time = Date.now() / 1000;
         
-        // Dibujar agua
-        for (let x = waterStartX; x < region.x + region.width; x += tileSize) {
-            for (let y = region.y; y < region.y + region.height; y += tileSize) {
-                // Solo dibujar si es visible en la cámara
-                if (!this.isRectVisible({x, y, width: tileSize, height: tileSize})) continue;
+        // Dibujar fondo de arena con degradado
+        const sandGradient = ctx.createLinearGradient(
+            region.x, region.y, 
+            waterStartX, region.y
+        );
+        
+        // Colores temáticos para arena caramelizada
+        sandGradient.addColorStop(0, '#F4A460'); // Arena sáwyer
+        sandGradient.addColorStop(0.7, '#FFD700'); // Dorado
+        sandGradient.addColorStop(1, '#FFDAB9'); // Melocotón
+        
+        ctx.fillStyle = sandGradient;
+        ctx.fillRect(region.x, region.y, shoreWidth, beachHeight);
+        
+        // Crear efecto de agua cristalina
+        const waterGradient = ctx.createLinearGradient(
+            waterStartX, region.y,
+            region.x + beachWidth, region.y
+        );
+        
+        // Colores temáticos para agua de caramelo
+        waterGradient.addColorStop(0, '#87CEEB'); // Azul cielo
+        waterGradient.addColorStop(0.5, '#1E90FF'); // Azul dodger
+        waterGradient.addColorStop(1, '#4169E1'); // Azul real
+        
+        ctx.fillStyle = waterGradient;
+        ctx.fillRect(waterStartX, region.y, beachWidth - shoreWidth, beachHeight);
+        
+        // Dibujar orilla con efecto de olas
+        const shoreLineCount = 5;
+        const shorePadding = 10;
+        
+        for (let i = 0; i < shoreLineCount; i++) {
+            const distFromShore = (i / shoreLineCount) * shorePadding * 2;
+            const alpha = 0.8 - (i / shoreLineCount) * 0.6;
+            
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.lineWidth = 3 - i * 0.5;
+            
+            ctx.beginPath();
+            
+            // Punto inicial de la orilla
+            const startY = region.y;
+            const endY = region.y + beachHeight;
+            
+            ctx.moveTo(waterStartX - distFromShore + Math.sin(time) * 5, startY);
+            
+            // Crear curva de orilla con efecto de olas
+            const segments = 20;
+            for (let j = 1; j <= segments; j++) {
+                const segmentY = startY + (j / segments) * beachHeight;
+                const waveOffset = Math.sin(time * 2 + j * 0.5) * 10;
+                const controlOffset = Math.sin(j / segments * Math.PI) * 15;
                 
-                // Dibujar tile de agua
-                ctx.fillStyle = waterColor;
-                ctx.fillRect(x, y, tileSize, tileSize);
-                
-                // Dibujar reflejos de agua
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 1;
-                
-                // Efecto de olas
-                const wavePhase = (x * 0.1 + y * 0.1 + time) % (Math.PI * 2);
-                const waveHeight = Math.sin(wavePhase) * 2;
-                
-                ctx.beginPath();
-                ctx.moveTo(x, y + tileSize/2 + waveHeight);
-                ctx.lineTo(x + tileSize, y + tileSize/2 - waveHeight);
-                ctx.stroke();
+                ctx.lineTo(
+                    waterStartX - distFromShore + waveOffset + controlOffset, 
+                    segmentY
+                );
             }
+            
+            ctx.stroke();
+        }
+        
+        // Dibujar palmeras decorativas
+        this.drawPalms(ctx, region, waterStartX);
+        
+        // Dibujar conchas de caramelo
+        this.drawCandyShells(ctx, region, waterStartX);
+        
+        // Efecto de brillo en el agua
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        
+        // Dibujar varios destellos en el agua
+        const numGlimmers = 20;
+        for (let i = 0; i < numGlimmers; i++) {
+            const glimmerX = waterStartX + Math.random() * (beachWidth - shoreWidth);
+            const glimmerY = region.y + Math.random() * beachHeight;
+            const glimmerSize = 5 + Math.random() * 15;
+            const glimmerAlpha = Math.sin(time * 2 + i) * 0.5 + 0.5;
+            
+            ctx.globalAlpha = glimmerAlpha * 0.4;
+            ctx.beginPath();
+            ctx.arc(glimmerX, glimmerY, glimmerSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Restaurar alpha
+        ctx.globalAlpha = 1;
+    }
+    
+    /**
+     * Dibuja palmeras decorativas en la playa
+     */
+    drawPalms(ctx, region, waterStartX) {
+        // Dibujar varias palmeras a lo largo de la orilla
+        const numPalms = 4;
+        const shoreX = waterStartX - 30;
+        
+        for (let i = 0; i < numPalms; i++) {
+            const palmY = region.y + (region.height / (numPalms + 1)) * (i + 1);
+            
+            // Tronco de la palmera
+            ctx.fillStyle = '#8B4513'; // Marrón silla
+            ctx.beginPath();
+            ctx.moveTo(shoreX - 5, palmY);
+            ctx.lineTo(shoreX + 5, palmY);
+            ctx.lineTo(shoreX + 3, palmY - 50);
+            ctx.lineTo(shoreX - 3, palmY - 50);
+            ctx.fill();
+            
+            // Hojas de la palmera
+            const leafCount = 5;
+            const time = Date.now() / 1000;
+            const swayAmount = Math.sin(time + i) * 5;
+            
+            for (let j = 0; j < leafCount; j++) {
+                const angle = (j / leafCount) * Math.PI * 2;
+                
+                ctx.fillStyle = '#32CD32'; // Verde lima
+                ctx.beginPath();
+                
+                // Punto de origen de la hoja
+                const leafX = shoreX;
+                const leafY = palmY - 50;
+                
+                // Dirección y longitud de la hoja
+                const leafLength = 30 + Math.random() * 15;
+                const dirX = Math.cos(angle) * leafLength + swayAmount;
+                const dirY = Math.sin(angle) * leafLength;
+                
+                // Puntos de control para la curva de la hoja
+                const cp1X = leafX + dirX * 0.3;
+                const cp1Y = leafY + dirY * 0.3;
+                const cp2X = leafX + dirX * 0.6;
+                const cp2Y = leafY + dirY * 0.6;
+                
+                ctx.moveTo(leafX, leafY);
+                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, leafX + dirX, leafY + dirY);
+                
+                // Hacer la hoja más ancha en el medio
+                const width = 8;
+                const perp = { x: -dirY / leafLength * width, y: dirX / leafLength * width };
+                
+                ctx.lineTo(leafX + dirX + perp.x, leafY + dirY + perp.y);
+                ctx.bezierCurveTo(
+                    cp2X + perp.x, cp2Y + perp.y,
+                    cp1X + perp.x, cp1Y + perp.y,
+                    leafX, leafY
+                );
+                
+                ctx.fill();
+            }
+            
+            // Cocos
+            const coconutCount = 2 + Math.floor(Math.random() * 3);
+            for (let j = 0; j < coconutCount; j++) {
+                const coconutAngle = Math.random() * Math.PI * 2;
+                const coconutDist = 5 + Math.random() * 8;
+                const coconutX = shoreX + Math.cos(coconutAngle) * coconutDist;
+                const coconutY = palmY - 50 + Math.sin(coconutAngle) * coconutDist;
+                
+                ctx.fillStyle = '#8B4513';
+                ctx.beginPath();
+                ctx.arc(coconutX, coconutY, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    }
+    
+    /**
+     * Dibuja conchas de caramelo decorativas en la playa
+     */
+    drawCandyShells(ctx, region, waterStartX) {
+        const numShells = 12;
+        
+        // Colores para las conchas temáticas de caramelo
+        const shellColors = [
+            '#FFB6C1', // Rosa claro
+            '#FFC0CB', // Rosa
+            '#FFD700', // Dorado
+            '#FFDAB9', // Melocotón
+            '#F0E68C'  // Caqui claro
+        ];
+        
+        // Dibujar conchas a lo largo de la orilla
+        for (let i = 0; i < numShells; i++) {
+            const shellX = region.x + Math.random() * (waterStartX - region.x - 20);
+            const shellY = region.y + Math.random() * region.height;
+            const shellSize = 4 + Math.random() * 6;
+            const colorIndex = Math.floor(Math.random() * shellColors.length);
+            
+            ctx.fillStyle = shellColors[colorIndex];
+            
+            // Dibujar concha estilizada
+            ctx.beginPath();
+            ctx.ellipse(
+                shellX, shellY, 
+                shellSize, shellSize * 0.6, 
+                Math.random() * Math.PI * 2, // Rotación aleatoria
+                0, Math.PI * 2
+            );
+            ctx.fill();
+            
+            // Añadir detalles a la concha
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            for (let j = 0; j < 3; j++) {
+                ctx.moveTo(shellX - shellSize * 0.7, shellY + j * shellSize * 0.3 - shellSize * 0.3);
+                ctx.lineTo(shellX + shellSize * 0.7, shellY + j * shellSize * 0.3 - shellSize * 0.3);
+            }
+            ctx.stroke();
         }
     }
     
@@ -1911,51 +2202,131 @@ class WorldMapScene extends Scene {
     }
     
     /**
-     * Dibuja efecto de lava para el volcán
+     * Dibuja un espectacular efecto de lava para el volcán de chocolate
      */
     drawLavaEffect(ctx, region) {
-        const tileSize = this.map.tileSize;
         const time = Date.now() / 1000;
         
-        // Colores de lava
-        const colors = ['#FF5722', '#FF9800', '#FFEB3B'];
+        // Dibujar base de lava en toda la región
+        const lavaBaseGradient = ctx.createRadialGradient(
+            region.x + region.width / 2, region.y + region.height / 2, 20,
+            region.x + region.width / 2, region.y + region.height / 2, region.width / 1.5
+        );
         
-        // Crear patrón de lava aleatorio
-        for (let x = region.x; x < region.x + region.width; x += tileSize) {
-            for (let y = region.y; y < region.y + region.height; y += tileSize) {
-                // Solo dibujar si es visible en la cámara
-                if (!this.isRectVisible({x, y, width: tileSize, height: tileSize})) continue;
+        // Colores temáticos para lava de chocolate
+        lavaBaseGradient.addColorStop(0, '#FF4500'); // Rojo anaranjado brillante
+        lavaBaseGradient.addColorStop(0.4, '#8B4513'); // Marrón silla
+        lavaBaseGradient.addColorStop(0.8, '#A0522D'); // Siena
+        lavaBaseGradient.addColorStop(1, '#800000'); // Granate
+        
+        ctx.fillStyle = lavaBaseGradient;
+        ctx.fillRect(region.x, region.y, region.width, region.height);
+        
+        // Generar "ríos" de lava
+        const numRivers = 5;
+        const riverWidth = 25;
+        
+        for (let i = 0; i < numRivers; i++) {
+            // Crear camino serpenteante para cada río
+            const pathPoints = [];
+            const startX = region.x + (region.width / (numRivers + 1)) * (i + 1);
+            const startY = region.y;
+            
+            let currentX = startX;
+            let currentY = startY;
+            
+            pathPoints.push({x: currentX, y: currentY});
+            
+            // Crear puntos para la curva Bezier
+            const numPoints = 10;
+            for (let j = 1; j <= numPoints; j++) {
+                const targetY = region.y + (region.height / numPoints) * j;
+                const offsetX = Math.sin(j / numPoints * Math.PI * 2 + time * 0.1 + i) * 50;
                 
-                // Pseudoaleatorio basado en coordenadas
-                const hash = (x * 31 + y * 17) % 100;
+                currentX = startX + offsetX;
+                currentY = targetY;
                 
-                if (hash < 40) { // 40% de probabilidad de lava
-                    // Seleccionar color de lava y añadir pulsación
-                    const colorIndex = Math.floor((x * y) % 3);
-                    const pulsation = Math.sin(time + (x * 0.05 + y * 0.05)) * 0.5 + 0.5;
-                    
-                    ctx.fillStyle = colors[colorIndex];
-                    ctx.globalAlpha = 0.5 + pulsation * 0.5;
-                    
-                    // Dibujar mancha de lava
-                    ctx.fillRect(x, y, tileSize, tileSize);
-                    
-                    // Dibujar burbuja de lava ocasionalmente
-                    if (hash < 10 && Math.sin(time * 2 + x + y) > 0.7) {
-                        ctx.beginPath();
-                        ctx.arc(
-                            x + tileSize/2 + Math.sin(time * 3) * 5, 
-                            y + tileSize/2 + Math.cos(time * 2) * 5, 
-                            tileSize/6, 0, Math.PI * 2
-                        );
-                        ctx.fillStyle = '#FFEB3B';
-                        ctx.fill();
-                    }
-                    
-                    ctx.globalAlpha = 1;
-                }
+                pathPoints.push({x: currentX, y: currentY});
             }
+            
+            // Dibujar camino del río de lava
+            ctx.beginPath();
+            ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
+            
+            for (let j = 1; j < pathPoints.length; j++) {
+                const cp1 = {
+                    x: pathPoints[j-1].x,
+                    y: (pathPoints[j-1].y + pathPoints[j].y) / 2
+                };
+                const cp2 = {
+                    x: pathPoints[j].x,
+                    y: (pathPoints[j-1].y + pathPoints[j].y) / 2
+                };
+                
+                ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, pathPoints[j].x, pathPoints[j].y);
+            }
+            
+            // Crear gradiente para el río
+            const riverGradient = ctx.createLinearGradient(
+                startX, startY, startX, region.y + region.height
+            );
+            riverGradient.addColorStop(0, '#FFCC00'); // Amarillo dorado
+            riverGradient.addColorStop(0.5, '#FF6600'); // Naranja
+            riverGradient.addColorStop(1, '#FF3300'); // Rojo fuego
+            
+            ctx.lineWidth = riverWidth + Math.sin(time * 2 + i) * 5; // Anchura pulsante
+            ctx.strokeStyle = riverGradient;
+            ctx.stroke();
         }
+        
+        // Dibujar burbujas y partículas de lava
+        const numBubbles = 50;
+        
+        for (let i = 0; i < numBubbles; i++) {
+            // Posición pseudo-aleatoria pero con cierta estabilidad
+            const bubbleSeed = (i * 1337 + Math.floor(time) * 7919) % 10000;
+            const bubbleRandom = bubbleSeed / 10000;
+            
+            const bubbleX = region.x + bubbleRandom * region.width;
+            const bubbleY = region.y + ((bubbleSeed % 100) / 100) * region.height;
+            
+            // Tamaño variable
+            const bubbleSize = 2 + bubbleRandom * 10;
+            
+            // Animación de ascenso
+            const yOffset = -((time * 20 + bubbleSeed) % 50);
+            
+            // Color variable
+            const brightness = 50 + Math.floor(bubbleRandom * 50);
+            const bubbleColor = `rgb(255, ${brightness}, 0)`;
+            
+            // Dibujar burbuja
+            ctx.beginPath();
+            ctx.arc(bubbleX, bubbleY + yOffset, bubbleSize, 0, Math.PI * 2);
+            
+            // Brillo interior
+            const bubbleGradient = ctx.createRadialGradient(
+                bubbleX, bubbleY + yOffset, 0,
+                bubbleX, bubbleY + yOffset, bubbleSize
+            );
+            bubbleGradient.addColorStop(0, '#FFFFFF');
+            bubbleGradient.addColorStop(0.6, bubbleColor);
+            bubbleGradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+            
+            ctx.fillStyle = bubbleGradient;
+            ctx.globalAlpha = 0.7;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        
+        // Efecto de brillo global
+        ctx.globalCompositeOperation = 'lighter';
+        
+        ctx.fillStyle = 'rgba(255, 50, 0, 0.1)';
+        ctx.fillRect(region.x, region.y, region.width, region.height);
+        
+        // Restaurar modo de composición
+        ctx.globalCompositeOperation = 'source-over';
     }
     
     /**
@@ -2337,6 +2708,273 @@ class WorldMapScene extends Scene {
     }
 
     /**
+     * Dibuja un fondo general para todo el mapa
+     */
+    drawMapBackground(ctx) {
+        // Dibujar un patrón de fondo para las áreas fuera de las regiones
+        const patternSize = 64;
+        const viewportLeft = Math.floor(this.camera.x / patternSize) * patternSize;
+        const viewportTop = Math.floor(this.camera.y / patternSize) * patternSize;
+        const viewportRight = Math.ceil((this.camera.x + this.camera.width) / patternSize) * patternSize;
+        const viewportBottom = Math.ceil((this.camera.y + this.camera.height) / patternSize) * patternSize;
+        
+        // Color base para el fondo exterior
+        ctx.fillStyle = '#2a623d'; // Verde bosque oscuro
+        ctx.fillRect(viewportLeft, viewportTop, viewportRight - viewportLeft, viewportBottom - viewportTop);
+        
+        // Dibujar patrón de "bosque" o "naturaleza" fuera de las regiones
+        for (let x = viewportLeft; x < viewportRight; x += patternSize) {
+            for (let y = viewportTop; y < viewportBottom; y += patternSize) {
+                // Verificar si este punto está dentro de alguna región
+                let isInsideRegion = false;
+                for (const region of this.regions) {
+                    if (x >= region.x && x < region.x + region.width &&
+                        y >= region.y && y < region.y + region.height) {
+                        isInsideRegion = true;
+                        break;
+                    }
+                }
+                
+                // Si no está dentro de una región, dibujar elemento decorativo
+                if (!isInsideRegion) {
+                    // Usar un valor semilla para mantener consistencia
+                    const seed = (x * 1731 + y * 4271) % 10;
+                    
+                    if (seed < 3) { // 30% de probabilidad: árbol
+                        this.drawTree(ctx, x + patternSize/2, y + patternSize/2);
+                    } else if (seed < 5) { // 20% de probabilidad: arbusto
+                        this.drawBush(ctx, x + patternSize/2, y + patternSize/2);
+                    } else if (seed < 6) { // 10% de probabilidad: flor
+                        this.drawFlower(ctx, x + patternSize/2, y + patternSize/2);
+                    }
+                    // 40% restante: espacio vacío
+                }
+            }
+        }
+    }
+    
+    /**
+     * Dibuja bordes decorativos alrededor de una región
+     */
+    drawRegionBorders(ctx, region) {
+        const borderWidth = 8;
+        
+        // Seleccionar estilo de borde según el tipo de región
+        let borderPattern;
+        let borderColor;
+        
+        switch (region.id) {
+            case 'plaza-central':
+                borderColor = '#8B4513'; // Marrón
+                borderPattern = 'stone';
+                break;
+            case 'bosque-glaseado':
+                borderColor = '#228B22'; // Verde bosque
+                borderPattern = 'hedge';
+                break;
+            case 'montaña-chocolate':
+                borderColor = '#8B4513'; // Marrón chocolate
+                borderPattern = 'rock';
+                break;
+            case 'cueva-caramelo':
+                borderColor = '#663399'; // Púrpura
+                borderPattern = 'crystal';
+                break;
+            case 'playa-caramelizada':
+                borderColor = '#FFD700'; // Dorado
+                borderPattern = 'sand';
+                break;
+            default:
+                borderColor = '#8B4513';
+                borderPattern = 'stone';
+        }
+        
+        // Dibujar bordes
+        ctx.fillStyle = borderColor;
+        
+        // Borde superior
+        ctx.fillRect(region.x - borderWidth, region.y - borderWidth, 
+                     region.width + borderWidth * 2, borderWidth);
+        
+        // Borde inferior
+        ctx.fillRect(region.x - borderWidth, region.y + region.height, 
+                     region.width + borderWidth * 2, borderWidth);
+        
+        // Borde izquierdo
+        ctx.fillRect(region.x - borderWidth, region.y, 
+                     borderWidth, region.height);
+        
+        // Borde derecho
+        ctx.fillRect(region.x + region.width, region.y, 
+                     borderWidth, region.height);
+        
+        // Añadir detalles al borde según el patrón
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 1;
+        
+        // Dibujar detalles en los bordes según el patrón seleccionado
+        const segmentSize = 16; // Tamaño de cada segmento de patrón
+        
+        // Patrón para los bordes horizontales
+        for (let x = region.x - borderWidth; x < region.x + region.width + borderWidth; x += segmentSize) {
+            // Borde superior
+            this.drawBorderPattern(ctx, x, region.y - borderWidth/2, borderPattern, 'horizontal');
+            
+            // Borde inferior
+            this.drawBorderPattern(ctx, x, region.y + region.height + borderWidth/2, borderPattern, 'horizontal');
+        }
+        
+        // Patrón para los bordes verticales
+        for (let y = region.y; y < region.y + region.height; y += segmentSize) {
+            // Borde izquierdo
+            this.drawBorderPattern(ctx, region.x - borderWidth/2, y, borderPattern, 'vertical');
+            
+            // Borde derecho
+            this.drawBorderPattern(ctx, region.x + region.width + borderWidth/2, y, borderPattern, 'vertical');
+        }
+    }
+    
+    /**
+     * Dibuja un patrón decorativo en el borde
+     */
+    drawBorderPattern(ctx, x, y, pattern, orientation) {
+        ctx.save();
+        
+        switch (pattern) {
+            case 'stone':
+                // Patrón de piedras
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+                
+            case 'hedge':
+                // Patrón de seto
+                ctx.fillStyle = 'rgba(0, 100, 0, 0.5)';
+                ctx.beginPath();
+                if (orientation === 'horizontal') {
+                    ctx.fillRect(x, y - 2, 8, 4);
+                } else {
+                    ctx.fillRect(x - 2, y, 4, 8);
+                }
+                break;
+                
+            case 'rock':
+                // Patrón de rocas
+                ctx.fillStyle = 'rgba(100, 70, 40, 0.5)';
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'crystal':
+                // Patrón de cristales
+                ctx.fillStyle = 'rgba(200, 150, 255, 0.6)';
+                ctx.beginPath();
+                if (Math.random() > 0.5) {
+                    // Diamante
+                    ctx.moveTo(x, y - 4);
+                    ctx.lineTo(x + 3, y);
+                    ctx.lineTo(x, y + 4);
+                    ctx.lineTo(x - 3, y);
+                } else {
+                    // Cristal hexagonal
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                break;
+                
+            case 'sand':
+                // Patrón de arena
+                ctx.fillStyle = 'rgba(255, 235, 150, 0.4)';
+                ctx.beginPath();
+                ctx.arc(x + (Math.random() * 4 - 2), y + (Math.random() * 4 - 2), 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+        }
+        
+        ctx.restore();
+    }
+    
+    /**
+     * Dibuja un árbol decorativo
+     */
+    drawTree(ctx, x, y) {
+        // Tronco
+        ctx.fillStyle = '#8B4513';
+        ctx.fillRect(x - 4, y - 5, 8, 20);
+        
+        // Follaje
+        ctx.fillStyle = '#006400';
+        ctx.beginPath();
+        ctx.arc(x, y - 15, 15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x - 8, y - 5, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x + 8, y - 8, 13, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    /**
+     * Dibuja un arbusto decorativo
+     */
+    drawBush(ctx, x, y) {
+        ctx.fillStyle = '#228B22';
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x - 7, y - 3, 7, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x + 7, y - 2, 8, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    /**
+     * Dibuja una flor decorativa
+     */
+    drawFlower(ctx, x, y) {
+        // Tallo
+        ctx.strokeStyle = '#006400';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y + 10);
+        ctx.lineTo(x, y - 5);
+        ctx.stroke();
+        
+        // Flor
+        const colors = ['#FF69B4', '#FF1493', '#FFD700', '#FF4500', '#9932CC'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
+        ctx.fillStyle = color;
+        
+        // Pétalos
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            const angle = (i / 5) * Math.PI * 2;
+            const pX = x + Math.cos(angle) * 5;
+            const pY = y - 5 + Math.sin(angle) * 5;
+            ctx.arc(pX, pY, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Centro
+        ctx.fillStyle = '#FFFF00';
+        ctx.beginPath();
+        ctx.arc(x, y - 5, 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    /**
      * Renderiza la escena
      */
     render(ctx) {
@@ -2345,6 +2983,9 @@ class WorldMapScene extends Scene {
         
         // Aplicar offset de la cámara
         ctx.translate(-this.camera.x, -this.camera.y);
+        
+        // Dibujar un fondo general para todo el mapa
+        this.drawMapBackground(ctx);
         
         // Obtener la región actual del jugador
         const currentRegion = this.regions.find(r => r.id === this.player.region);
@@ -2373,6 +3014,9 @@ class WorldMapScene extends Scene {
             if (currentRegion.hasHotSpots) {
                 this.drawLavaEffect(ctx, currentRegion);
             }
+            
+            // Dibujar bordes decorativos alrededor de la región actual
+            this.drawRegionBorders(ctx, currentRegion);
         }
         
         // Dibujar caminos entre minijuegos
@@ -2546,9 +3190,59 @@ class WorldMapScene extends Scene {
             ctx.fill();
         }
         
-        // Dibujar el cuerpo del jugador
-        ctx.fillStyle = '#FF0000'; // Color temporal hasta que tengamos sprites
-        ctx.fillRect(this.player.x, this.player.y, this.player.width, this.player.height);
+        // Dibujar el cuerpo del jugador según el personaje seleccionado
+        // Determinar qué imagen usar según el personaje seleccionado
+        let playerImage;
+        
+        if (window.playerCharacter && window.playerCharacter.character === 'croisa') {
+            playerImage = this.game.croisaImage;
+        } else {
+            playerImage = this.game.croisoImage;
+        }
+        
+        // Dibujar la imagen del personaje seleccionado
+        if (playerImage && playerImage.complete && playerImage.naturalHeight !== 0) {
+            const scale = 2.5; // escala deseada
+            ctx.drawImage(
+                playerImage,
+                this.player.x,
+                this.player.y,
+                this.player.width * scale,
+                this.player.height * scale
+            );
+        } else {
+            // Dibujar un croissant genérico como respaldo
+            const playerCenterX = this.player.x + this.player.width/2;
+            const playerCenterY = this.player.y + this.player.height/2;
+            
+            // Forma principal del croissant
+            ctx.fillStyle = '#e6b266';
+            ctx.beginPath();
+            ctx.moveTo(playerCenterX - 15, playerCenterY + 5);
+            ctx.bezierCurveTo(
+                playerCenterX - 20, playerCenterY - 15,
+                playerCenterX + 10, playerCenterY - 15,
+                playerCenterX + 15, playerCenterY
+            );
+            ctx.bezierCurveTo(
+                playerCenterX + 10, playerCenterY + 15,
+                playerCenterX - 20, playerCenterY + 15,
+                playerCenterX - 15, playerCenterY + 5
+            );
+            ctx.fill();
+            
+            // Detalles del croissant
+            ctx.strokeStyle = '#b38533';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(playerCenterX - 10, playerCenterY + 3);
+            ctx.bezierCurveTo(
+                playerCenterX - 5, playerCenterY - 5,
+                playerCenterX + 5, playerCenterY - 5,
+                playerCenterX + 10, playerCenterY
+            );
+            ctx.stroke();
+        }
         
         // Dibujar indicador de dirección del jugador
         ctx.fillStyle = '#FFFFFF';
