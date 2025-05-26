@@ -176,21 +176,35 @@ class Game {
             console.log(`Loading asset: ${name}`, obj ? 'loaded' : 'failed');
         };
 
-        // Cargar imágenes de personajes (Croiso y Croisa)
+        // Obtener el personaje y outfit seleccionados
+        const selectedCharacter = localStorage.getItem('selectedCharacter') || 'croiso';
+        const selectedOutfit = localStorage.getItem('selectedOutfit') || '1';
+        
+        console.log(`Cargando personaje: ${selectedCharacter} con outfit: ${selectedOutfit}`);
+        
+        // Cargar imágenes de personajes con el outfit seleccionado
         // Croiso (personaje masculino)
         this.croisoImage = new Image();
-        this.croisoImage.onload = () => logAsset('Croiso', true);
-        this.croisoImage.onerror = () => logAsset('Croiso', false);
-        this.croisoImage.src = 'croiso.png';
+        this.croisoImage.onload = () => logAsset(`Croiso outfit ${selectedOutfit}`, true);
+        this.croisoImage.onerror = () => {
+            logAsset(`Croiso outfit ${selectedOutfit}`, false);
+            // Cargar imagen por defecto si falla
+            this.croisoImage.src = 'croiso.png';
+        };
+        this.croisoImage.src = `croiso_outfit${selectedOutfit}.png`;
         
         // Croisa (personaje femenino)
         this.croisaImage = new Image();
-        this.croisaImage.onload = () => logAsset('Croisa', true);
-        this.croisaImage.onerror = () => logAsset('Croisa', false);
-        this.croisaImage.src = 'croisa.png';
+        this.croisaImage.onload = () => logAsset(`Croisa outfit ${selectedOutfit}`, true);
+        this.croisaImage.onerror = () => {
+            logAsset(`Croisa outfit ${selectedOutfit}`, false);
+            // Cargar imagen por defecto si falla
+            this.croisaImage.src = 'croisa.png';
+        };
+        this.croisaImage.src = `croisa_outfit${selectedOutfit}.png`;
         
         // Mantener compatibilidad con código existente
-        this.croissantImage = this.croisoImage;
+        this.croissantImage = selectedCharacter === 'croiso' ? this.croisoImage : this.croisaImage;
         
         // Load basic tileset with better graphics
         this.tilesetImage = new Image();

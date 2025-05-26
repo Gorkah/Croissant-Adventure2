@@ -4095,7 +4095,7 @@ class WorldMapScene extends Scene {
         
         // Dibujar la imagen del personaje seleccionado
         if (playerImage && playerImage.complete && playerImage.naturalHeight !== 0) {
-            const scale = 2.5; // escala deseada
+            const scale = 3.5; // escala deseada
             ctx.drawImage(
                 playerImage,
                 this.player.x,
