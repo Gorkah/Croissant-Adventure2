@@ -28,22 +28,34 @@ document.addEventListener('DOMContentLoaded', function() {
   const characters = [
     { image: 'croiso.png', name: 'Croiso' },
     { image: 'croisa.png', name: 'Croisa' },
-    { image: 'trash.png', name: 'Trash' }
+    { image: 'trash.png', name: 'Trash' },
+    { image: 'croisa_desde_arriba.png', name: 'Croisa' },
+    { image: 'croisa_outfit1.png', name: 'Croisa' },
+    { image: 'croisa_outfit2.png', name: 'Croisa' },
+    { image: 'croisa_outfit3.png', name: 'Croisa' },
+    { image: 'croisa_outfit4.png', name: 'Croisa' },
+    { image: 'croiso_enfadado.png', name: 'Croiso' },
+    { image: 'croiso_outfit1.png', name: 'Croiso' },
+    { image: 'croiso_outfit2.png', name: 'Croiso' },
+    { image: 'croiso_outfit3.png', name: 'Croiso' },
+    { image: 'croiso_outfit4.png', name: 'Croiso' },
+    { image: 'croiso_outfit5.png', name: 'Croiso' },
+    { image: 'croiso_outfit6.png', name: 'Croiso' },
   ];
   
-  // Crear 15 personajes iniciales (5 de cada tipo)
-  for (let i = 0; i < 15; i++) {
-    createMovingCharacter(backgroundAnimation, characters[i % 3]);
+  // Crear 15 personajes iniciales usando toda la variedad disponible
+  for (let i = 0; i < 25; i++) {
+    createMovingCharacter(backgroundAnimation, characters[i % characters.length]);
   }
   
-  // Crear un nuevo personaje cada 3 segundos, alternando entre los tres tipos
+  // Crear un nuevo personaje cada 3 segundos, alternando entre todos los tipos
   let charIndex = 0;
   setInterval(() => {
-    if (document.querySelectorAll('.moving-character').length < 30) {
+    if (document.querySelectorAll('.moving-character').length < 50) {
       createMovingCharacter(backgroundAnimation, characters[charIndex]);
-      charIndex = (charIndex + 1) % 3;
+      charIndex = (charIndex + 1) % characters.length;
     }
-  }, 3000);
+  }, 1500);
 });
 
 function createMovingCharacter(container, character) {
@@ -60,7 +72,7 @@ function createMovingCharacter(container, character) {
   element.style.transition = 'opacity 0.5s ease';
   
   // Random size entre 30px y 80px
-  const size = Math.random() * 40 + 25; // Tamaño ligeramente más pequeño
+  const size = Math.random() * 40 + 30; // Tamaño ligeramente más pequeño
   element.style.width = `${size}px`;
   element.style.height = `${size}px`;
   
@@ -79,7 +91,7 @@ function createMovingCharacter(container, character) {
   
   // Hacer visible gradualmente
   setTimeout(() => {
-    element.style.opacity = '0.4';
+    element.style.opacity = '0.6';
   }, 100);
   
   // Eliminar cuando la animación termina para evitar fugas de memoria
