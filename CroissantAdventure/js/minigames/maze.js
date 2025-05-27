@@ -13,9 +13,9 @@ class MazeMinigame extends Minigame {
      */
     reset() {
         // Maze properties
-        this.cellSize = 40;
-        this.rows = 10;
-        this.cols = 15;
+        this.cellSize = 30;
+        this.rows = 19;
+        this.cols = 40;
         this.mazeWidth = this.cols * this.cellSize;
         this.mazeHeight = this.rows * this.cellSize;
         this.mazeX = (this.game.width - this.mazeWidth) / 2;

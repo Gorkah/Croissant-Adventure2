@@ -16,8 +16,8 @@ class CoinCollectorMinigame extends Minigame {
         this.player = {
             x: this.game.width / 2,
             y: this.game.height / 2,
-            width: 40,
-            height: 40,
+            width: 80,
+            height: 80,
             speed: 200 // pixels per second
         };
         

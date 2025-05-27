@@ -16,8 +16,8 @@ class ShooterMinigame extends Minigame {
         this.player = {
             x: game.width / 2,
             y: game.height - 80,
-            width: 40,
-            height: 40,
+            width: 80,
+            height: 80,
             speed: 300 // pixels per second
         };
         

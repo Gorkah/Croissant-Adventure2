@@ -10,7 +10,7 @@ class SnakeMinigame extends Minigame {
     
     reset() {
         // Grid properties
-        this.gridSize = 20; // Size of each grid cell
+        this.gridSize = 40; // Size of each grid cell
         this.gridWidth = Math.floor(this.game.width / this.gridSize);
         this.gridHeight = Math.floor(this.game.height / this.gridSize);
         

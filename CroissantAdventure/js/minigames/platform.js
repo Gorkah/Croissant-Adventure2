@@ -18,9 +18,9 @@ class PlatformMinigame extends Minigame {
         // Player properties
         this.player = {
             x: this.game.width / 2,
-            y: this.game.height - 100,
-            width: 40,
-            height: 40,
+            y: this.game.height - 200,
+            width: 80,
+            height: 80,
             velocityX: 0,
             velocityY: 0,
             jumping: false,
