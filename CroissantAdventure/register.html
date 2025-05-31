@@ -252,58 +252,7 @@
   <!-- Fondo animado con personajes -->
   <script src="js/animated-background.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const registerButton = document.getElementById('register-button');
-      const usernameInput = document.getElementById('username');
-      const emailInput = document.getElementById('email');
-      const ageInput = document.getElementById('age');
-      const passwordInput = document.getElementById('password');
-      const errorMessage = document.getElementById('error-message');
-
-      ageInput.addEventListener('input', () => {
-        const age = parseInt(ageInput.value);
-        if (age >= 10) {
-          passwordInput.disabled = false;
-          errorMessage.style.display = 'none';
-        } else {
-          passwordInput.disabled = true;
-          errorMessage.textContent = '¡Oh no! Solo un adulto puede escribir la contraseña mágica.';
-          errorMessage.style.display = 'block';
-        }
-      });
-
-      registerButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        const username = usernameInput.value.trim();
-        const email = emailInput.value.trim();
-        const age = parseInt(ageInput.value);
-        const password = passwordInput.value.trim();
-
-        if (!username || !email || isNaN(age) || !password) {
-          errorMessage.textContent = 'Por favor, completa todos los campos.';
-          errorMessage.style.display = 'block';
-          return;
-        }
-
-        if (age < 10) {
-          alert('¡Oh no! Necesitas la ayuda de un adulto para registrarte.');
-          return;
-        }
-
-        const userData = JSON.parse(localStorage.getItem('userData')) || {};
-        if (userData[username]) {
-          alert('El usuario ya existe.');
-          return;
-        }
-
-        userData[username] = { email, age, password, coins: 0, minigamesPlayed: 0 };
-        localStorage.setItem('userData', JSON.stringify(userData));
-
-        alert('¡Registro exitoso! Bienvenido a Croissant Adventure.');
-        window.location.href = 'login.html';
-      });
-    });
-  </script>
+  <script type="module" src="js/register.js"></script>
 </body>
 </html>
+
