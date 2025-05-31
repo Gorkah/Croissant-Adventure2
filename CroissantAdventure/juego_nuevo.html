@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Croissant Adventure - El Mundo de Migalandia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ai-chat.css">
+    <!-- Script del bot externo (Easy-Peasy AI) -->
+    <script 
+        src="https://bots.easy-peasy.ai/chat.min.js" 
+        data-chat-url="https://bots.easy-peasy.ai/bot/8b081267-6cc8-43e2-a078-319a8a1bdd1e" 
+        data-btn-position="bottom-right"
+        data-widget-btn-color="#f1a203"
+        id="easy-peasy-bot"
+        defer>
+    </script>
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe9c7;
+            color: #5c4a38;
+            overflow-x: hidden;
+        }
+        
+        .logout-button {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 12px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        
+        .logout-button:hover {
+            background-color: #ff3300;
+            transform: scale(1.05);
+        }
+        
+        #header {
+            background-color: #ff9900;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Baloo 2', cursive;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background-color: white;
+            padding: 2px;
+            object-fit: contain;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Baloo 2', cursive;
+            background-color: #fff5e5;
+            box-sizing: border-box;
+        }
+        
+        #header {
+            flex: 0 0 auto;
+            z-index: 10;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 0;
+            border-top: 2px solid #ff9900;
+        }
+        
+        #chat-container {
+            flex: 0 0 30%; /* Ancho relativo */
+            max-width: 400px; /* Límite máximo para pantallas grandes */
+            min-width: 250px; /* Límite mínimo para pantallas pequeñas */
+            border-right: 2px solid #ff9900;
+            height: 100%;
+            background-color: #fff5e5;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: #ffe9c7;
+        }
+        
+        #chat-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin: 10px;
+            padding: 8px 16px;
+            background-color: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+        }
+        
+        #game-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: rgba(255, 248, 230, 0.9);
+            border-radius: 10px;
+            text-align: center;
+            z-index: 5;
+            transition: opacity 1s ease-out;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Variables de CSS para configuración global */
+        :root {
+            --header-height: 60px;
+            --chat-width-desktop: 400px;
+            --chat-height-tablet: 350px;
+            --chat-height-mobile: 300px;
+            --primary-color: #ff9900;
+            --secondary-color: #e68a00;
+            --bg-color: #ffe9c7;
+            --text-color: #5c4a38;
+        }
+
+        /* Estilos para tablets (pantallas medianas) */
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+                overflow: visible;
+            }
+            
+            #chat-container {
+                flex: 0 0 var(--chat-height-tablet);
+                width: 100%;
+                border-right: none;
+                border-bottom: 3px solid var(--primary-color);
+            }
+            
+            #game-container {
+                height: calc(100vh - var(--header-height) - var(--chat-height-tablet));
+                min-height: 400px;
+            }
+        }
+        
+        /* Estilos para móviles (pantallas pequeñas) */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            #header h1 {
+                font-size: 1.5rem;
+                padding: 8px 0;
+            }
+            
+            #chat-container {
+                flex: 0 0 var(--chat-height-mobile);
+            }
+            
+            #game-container {
+                height: calc(100vh - var(--header-height) - var(--chat-height-mobile));
+                min-height: 300px;
+            }
+            
+            .back-button {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+                top: 5px;
+                left: 5px;
+            }
+            
+            #game-info {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            
+            #game-info h3 {
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+            }
+            
+            /* Ajustes para orientación horizontal en móviles */
+            @media (orientation: landscape) {
+                .container {
+                    flex-direction: row;
+                    height: calc(100vh - var(--header-height));
+                }
+                
+                #chat-container {
+                    flex: 0 0 40%;
+                    height: 100%;
+                    border-bottom: none;
+                    border-right: 3px solid var(--primary-color);
+                }
+                
+                #game-container {
+                    flex: 0 0 60%;
+                    height: 100%;
+                }
+            }
+        }
+        
+        /* Estilos para móviles muy pequeños */
+        @media (max-width: 480px) {
+            #header h1 {
+                font-size: 1.2rem;
+            }
+            
+            #chat-container {
+                flex: 0 0 250px;
+            }
+            
+            #game-container {
+                height: calc(100vh - var(--header-height) - 250px);
+                min-height: 250px;
+            }
+            
+            .back-button {
+                padding: 4px 10px;
+                font-size: 0.75rem;
+            }
+        }
+/* Cabecera superior modificada */
+        .header-bar {
+            background: #ff9900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 0;
+            width: 90vw;
+            max-width: 1200px;
+            margin: 24px auto 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: relative;
+            height: 65px;
+            overflow: visible;
+        }
+        .header-title-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: flex-start;
+            gap: 18px;
+            position: relative;
+        }
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+            margin: 0;
+            z-index: 2;
+            margin-left: 40px;
+        }
+        .header-outfit-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 0;
+            margin-left: 250px;
+            margin-right: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            object-fit: contain;
+            z-index: 2;
+            opacity: 1;
+            position: absolute;
+            top: -40px;
+            left: 180px;
+        }
+        .header-outfit-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-left: 160px;
+            color: #fff;
+            z-index: 2;
+            text-shadow:
+                -2px -2px 0 #ef476f,
+                2px -2px 0 #ef476f,
+                -2px  2px 0 #ef476f,
+                2px  2px 0 #ef476f,
+                0px  2px 4px rgba(0,0,0,0.10);
+        }
+        .header-logout-btn {
+            background: #ef476f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 32px;
+            margin-left: 32px;
+            z-index: 2;
+        }
+        @media (max-width: 700px) {
+            .header-bar { width: 98vw; max-width: 98vw; }
+            .header-title { font-size: 1.2rem; }
+            .header-outfit-img { width: 40px; height: 40px; margin-left: 8px; }
+            .header-outfit-name { font-size: 0.9rem; margin-left: 8px; }
+            .header-logout-btn { padding: 6px 10px; font-size: 0.9rem; margin-right: 8px; margin-left: 8px; }
+        }
+    </style>
+    
+    <!-- Estilos adicionales para la alternancia de mapa/galería -->
+    <style>
+        /* Importar fuentes de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@400;600;700&display=swap');
+        
+        #toggle-view-button {
+            background-color: #26547c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        #toggle-view-button:hover {
+            background-color: #1d3e5f;
+        }
+        
+        #toggle-view-button.gallery-active {
+            background-color: #ef476f;
+        }
+        
+        #games-gallery {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centra verticalmente todo el contenido */
+            align-items: center;
+            background-color: #ffe9c7;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            margin-top: 15%;
+        }
+        
+        .game-card {
+            width: 110px;
+            height: 165px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .game-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .game-card:hover .game-description {
+            opacity: 1;
+        }
+        
+        .game-card:hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        .game-description {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #ffcc64;
+            font-family: 'Fredoka One', sans-serif;
+            text-align: center;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .game-selection {
+            flex: 1 0 auto;
+            display: grid;
+            grid-template-columns: repeat(6, 110px);
+            gap: 15px;
+            justify-content: center;
+            align-content: center;
+        }
+        
+        .game-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .game-title {
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #5c4a38;
+            max-width: 170px;
+            background-color: rgba(255, 217, 102, 0.7);
+            padding: 4px 8px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+        }
+        
+        .game-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ff9900;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+        
+        .game-buttons button {
+            background-color: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-buttons button:hover {
+            background-color: #ff3300;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 1200px) {
+            .game-selection {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .game-selection {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .game-selection {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    
+    <!-- Cabecera superior -->
+    <div class="header-bar">
+        <div class="header-title-container">
+          <span class="header-title">Croissant Adventure</span>
+          <img id="main-character-img" class="header-outfit-img" src="" alt="Outfit">
+          <span id="main-character-name" class="header-outfit-name"></span>
+        </div>
+        <button id="logout-btn" class="header-logout-btn">Cerrar sesión</button>
+    </div>
+
+    <div class="top-buttons" style="top: 70px;">
+        <button id="toggle-view-button" style="font-family: 'Baloo 2', cursive;">📷 Cambiar vista</button>
+    </div>
+
+    <div class="container">
+        <!-- Columna izquierda - Chatbot -->
+        <div id="chat-container">
+            <!-- El contenido será generado dinámicamente por ChatInterface -->
+            <div id="bot-toggle-container" style="text-align: center; padding: 10px; background-color: #ffe9c7; border-bottom: 1px solid #ff9900;">
+                <button id="toggle-bot-button" class="bot-toggle-button" style="background-color: #ff9900; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    Cambiar a Bot Externo
+                </button>
+            </div>
+        </div>
+        
+        <!-- Columna derecha - Juego -->
+        <div id="game-container">
+            <a href="juego_nuevo.html" class="back-button" id="back-button">Volver al Mapa</a>
+            <div id="game-info" style="display: none;">
+                <!-- Contenido dinámico según el juego seleccionado -->
+            </div>
+            
+            <!-- Vista del mapa mundial (por defecto) -->
+            <canvas id="game-canvas"></canvas>
+            
+            <!-- Vista de selección de juegos (inicialmente oculta) -->
+            <div id="games-gallery" style="display: none;">
+                <div class="game-buttons">
+                    <button id="save-game-button">Guardar Partida</button>
+                    <button id="exit-game-button">Salir</button>
+                </div>
+                <div class="game-selection">
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/coinCollector.jpg');" data-game="coinCollector">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/roulette.jpg');" data-game="roulette">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/chess.jpg');" data-game="chess">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/maze.jpg');" data-game="maze">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/shooter.jpg');" data-game="shooter">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/platform.jpg');" data-game="platform">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/memory.jpg');" data-game="memory">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/snake.jpg');" data-game="snake">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/puzzle.jpg');" data-game="puzzle">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/fishing.jpg');" data-game="fishing">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/surfing.jpg');" data-game="surfing">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/rhythm.jpg');" data-game="rhythm">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/towerDefense.jpg');" data-game="towerDefense">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/paintGame.jpg');" data-game="paintGame">
+                        </div>
+                    </div>
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/triviaGame.jpg');" data-game="triviaGame">
+                        </div>
+                    </div>
+					<div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/Racing.png');" data-game="racing">
+                        </div>
+                    </div>    
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/caveExplorer.png');" data-game="caveExplorer">
+                        </div>
+                    </div>    
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/nuevo3.jpg');" data-game="nuevo3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IA Storyteller -->
+    <script src="js/ai/storytellerAI.js"></script>
+    <script src="js/ai/chatInterface.js"></script>
+    
+    <!-- Sistema de Control Parental -->
+    <script src="js/parentalControl.js"></script>
+    
+    <!-- Sistema de gestión de personajes -->
+    <script>
+        // Objeto global para gestionar el personaje del jugador
+        window.playerCharacter = {
+            // Por defecto es croiso
+            character: 'croiso',
+            // Por defecto outfit 1
+            outfit: 1,
+            
+            // Inicializar el personaje según lo seleccionado en el login
+            initialize: function() {
+                // Obtener el personaje de los parámetros URL o localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                const paramCharacter = urlParams.get('character');
+                const storedCharacter = localStorage.getItem('selectedCharacter');
+                
+                // Priorizar el parámetro URL, luego localStorage, sino usar el valor por defecto
+                if (paramCharacter) {
+                    this.character = paramCharacter;
+                } else if (storedCharacter) {
+                    this.character = storedCharacter;
+                }
+                
+                // Obtener el outfit seleccionado del localStorage
+                const storedOutfit = localStorage.getItem('selectedOutfit');
+                if (storedOutfit) {
+                    this.outfit = parseInt(storedOutfit);
+                }
+                
+                console.log('Personaje inicializado:', this.character, 'Outfit:', this.outfit);
+                
+                // Aplicar el personaje a los elementos de la interfaz
+                this.applyCharacterToUI();
+                
+                return this.character;
+            },
+            
+            // Aplicar el personaje a los elementos de la interfaz
+            applyCharacterToUI: function() {
+                // Obtener la imagen con el outfit seleccionado
+                const characterImage = this.getImage();
+                
+                // Cambiar referencias visuales según el personaje
+                document.querySelectorAll('.player-character-img').forEach(element => {
+                    element.src = characterImage;
+                });
+                
+                // Actualizar la imagen en la cabecera
+                const headerImg = document.getElementById('main-character-img');
+                if (headerImg) {
+                    headerImg.src = characterImage;
+                }
+                
+                // Cambiar referencias de texto según el personaje
+                const characterDisplayName = this.getDisplayName();
+                document.querySelectorAll('.player-character-name').forEach(element => {
+                    element.textContent = characterDisplayName;
+                });
+                
+                // Actualizar el nombre en la cabecera
+                const headerName = document.getElementById('main-character-name');
+                if (headerName) {
+                    headerName.textContent = characterDisplayName;
+                }
+                
+                // Aplicar estilos dinámicos para los mensajes del usuario (con la imagen del personaje)
+                const styleElement = document.createElement('style');
+                styleElement.textContent = `
+                    .message.user::after {
+                        background-image: url('${characterImage}');
+                    }
+                `;
+                document.head.appendChild(styleElement);
+                
+                console.log('Personaje aplicado a la interfaz:', characterDisplayName, 'con outfit:', this.outfit);
+            },
+            
+            // Obtener la imagen del personaje con el outfit seleccionado
+            getImage: function() {
+                return `${this.character}_outfit${this.outfit}.png`;
+            },
+            
+            // Obtener el nombre de visualización del personaje
+            getDisplayName: function() {
+                return this.character === 'croiso' ? 'Croiso' : 'Croisa';
+            }
+        };
+    </script>
+    
+    <!-- Core Game Engine -->
+    <script src="js/game.js"></script>
+    
+    <!-- Scenes -->
+    <script src="js/scenes/scene.js"></script>
+    <script src="js/scenes/mainMenu.js"></script>
+    <script src="js/scenes/worldMap.js"></script>
+    
+    <!-- Minigames -->
+    <script src="js/minigames/minigame.js"></script>
+    <script src="js/minigames/coinCollector.js"></script>
+    <script src="js/minigames/roulette.js"></script>
+    <script src="js/minigames/chess.js"></script>
+    <script src="js/minigames/maze.js"></script>
+    <script src="js/minigames/shooter.js"></script>
+    <script src="js/minigames/racing.js"></script>
+    <script src="js/minigames/caveExplorer.js"></script>
+    
+    
+    <!-- Nuevos Minijuegos -->
+    <script src="js/minigames/platform.js"></script>
+    <script src="js/minigames/memory.js"></script>
+    <script src="js/minigames/snake.js"></script>
+    <script src="js/minigames/puzzle.js"></script>
+    <script src="js/minigames/rhythm.js"></script>
+    <script src="js/minigames/towerDefense.js"></script>
+    <script src="js/minigames/paintGame.js"></script>
+    <script src="js/minigames/triviaGame.js"></script>
+    <script src="js/minigames/adminPanel.js"></script>
+    <script src="js/minigames/fishing_new.js"></script>
+    <script src="js/minigames/surfing_new.js"></script>
+    <script src="js/minigames/storyTeller.js"></script>
+    <script src="js/minigames/tutorial.js"></script>
+    
+    <!-- Initialize Game -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar el sistema de personajes
+            window.playerCharacter.initialize();
+            
+            // Configurar el botón de logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                // Limpiar datos de sesión
+                localStorage.removeItem('username');
+                // No eliminamos selectedCharacter para mantener la preferencia del usuario
+                
+                // Redirigir al menú principal
+                window.location.href = 'index.html';
+            });
+            
+            // Inicializar la interfaz de chat con IA
+            const chatInterface = new ChatInterface();
+            chatInterface.initialize().catch(error => {
+                console.error('Error al inicializar la interfaz de chat:', error);
+                document.getElementById('ai-status').textContent = 'Error al inicializar. Intenta recargar la página.';
+            });
+            
+            // Obtener el parámetro 'game' de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const gameParam = urlParams.get('game');
+            
+            const gameInfoElement = document.getElementById('game-info');
+            const backButton = document.getElementById('back-button');
+            
+            // Información de los juegos
+            const games = {
+                coinCollector: {
+                    name: "El Tesoro del Valle Dorado",
+                    icon: "🪙",
+                    description: "Recoge las monedas doradas antes de que se acabe el tiempo en este mágico valle."
+                },
+                roulette: {
+                    name: "La Rueda de la Fortuna Mágica",
+                    icon: "🎰",
+                    description: "Gira la rueda y prueba tu suerte en la Ciudad de los Deseos."
+                },
+                chess: {
+                    name: "Los Guardianes del Reino Cuadriculado",
+                    icon: "♞",
+                    description: "Planifica tus movimientos estratégicos en el Reino Cuadriculado."
+                },
+                maze: {
+                    name: "El Bosque Enredado de Migalandia",
+                    icon: "🧩",
+                    description: "Encuentra el camino a través del misterioso Bosque Enredado."
+                },
+                shooter: {
+                    name: "Los Burbujeadores del Cielo Azucarado",
+                    icon: "🔫",
+                    description: "Revienta las burbujas mágicas en el colorido Cielo Azucarado."
+                },
+                platform: {
+                    name: "Las Islas Flotantes de Bizcocho",
+                    icon: "🏃",
+                    description: "Salta entre las plataformas flotantes y recoge estrellas fugaces."
+                },
+                memory: {
+                    name: "El Misterio de las Cartas Gemelas",
+                    icon: "🃏",
+                    description: "Encuentra los pares coincidentes en la Villa de los Recuerdos."
+                },
+                snake: {
+                    name: "Las Aventuras de Silbi la Serpiente Golosa",
+                    icon: "🐍",
+                    description: "Ayuda a Silbi a recoger manzanas mágicas sin tropezar con su cola."
+                },
+                puzzle: {
+                    name: "El Cuadro Mágico Despiezado",
+                    icon: "🧠",
+                    description: "Desliza las piezas para completar las imágenes mágicas de la Galería."
+                },
+                fishing: {
+                    name: "Pescador Pastelero",
+                    icon: "🎣",
+                    description: "Captura deliciosos dulces en el mar de caramelo de la Playa Caramelizada."
+                },
+                surfing: {
+                    name: "Surfista Glaseado",
+                    icon: "🏄",
+                    description: "Deslízate sobre las olas de caramelo líquido y esquiva los obstáculos."
+                },
+                rhythm: {
+                    name: "La Orquesta Dulce de Migalandia",
+                    icon: "🎵",
+                    description: "Sigue el ritmo de las notas musicales en el Valle de la Melodía."
+                },
+                towerDefense: {
+                    name: "Los Guardianes del Castillo de Azúcar",
+                    icon: "🏰",
+                    description: "Construye torres para defender el Castillo Glaseado de los invasores."
+                },
+                paintGame: {
+                    name: "Estudio Artístico de Migalandia",
+                    icon: "🎨",
+                    description: "Dibuja y pinta deliciosos pasteles y divertidos personajes."
+                },
+                triviaGame: {
+                    name: "Trivia de Pastelería",
+                    icon: "🥨",
+                    description: "Pon a prueba tus conocimientos sobre croissants y pasteles."
+                },
+                adminPanel: {
+                    name: "Panel de Administración",
+                    icon: "🔧",
+                    description: "Panel administrativo con tablero de planificación interactivo."
+                },
+                caveExplorer: {
+                    name: "Explorador de cuevas",
+                    icon: "⛏️",
+                    description: "Explora cuevas y encuentra tesoros ocultos."
+                },
+                racing: {
+                    name: "Corredor de carreras",
+                    icon: "🏎️",
+                    description: "Corre en una carrera de velocidad."
+                },
+
+            };
+            
+            // Si hay un juego especificado en la URL
+            if (gameParam && games[gameParam]) {
+                const game = games[gameParam];
+                
+                // Mostrar información del juego
+                gameInfoElement.innerHTML = `
+                    <h3><span style="font-size: 1.5em; margin-right: 10px;">${game.icon}</span> ${game.name}</h3>
+                    <p>${game.description}</p>
+                `;
+                
+                gameInfoElement.style.display = 'block';
+                
+                // Ver si el juego está cargado correctamente
+                console.log("Iniciando juego:", gameParam);
+                console.log("¿Existe clase para este juego?", typeof window[gameParam.charAt(0).toUpperCase() + gameParam.slice(1) + "Minigame"]);
+                
+                // Inicializar el juego
+                console.log("Creando nueva instancia de juego para:", gameParam);
+                const gameInstance = new Game();
+                
+                // Inicia el juego y espera a que cargue correctamente
+                gameInstance.start();
+                
+                // Definir una función que intente cambiar a la escena varias veces hasta tener éxito
+                const maxAttempts = 5;
+                let attempts = 0;
+                
+                const tryToSwitchScene = () => {
+                    attempts++;
+                    console.log(`Intento ${attempts}/${maxAttempts} de cambiar a escena: ${gameParam}`);
+                    console.log("Escenas disponibles:", Object.keys(gameInstance.scenes));
+                    
+                    if (gameInstance.scenes[gameParam]) {
+                        console.log("¡Éxito! Cambiando a escena:", gameParam);
+                        gameInstance.switchScene(gameParam);
+                        return true;
+                    } else {
+                        console.warn(`Aún no se encuentra la escena: ${gameParam}`);
+                        if (attempts < maxAttempts) {
+                            setTimeout(tryToSwitchScene, 500);
+                        } else {
+                            console.error(`No se pudo cargar la escena después de ${maxAttempts} intentos`);
+                            return false;
+                        }
+                    }
+                };
+                
+                // Iniciar el primer intento después de un segundo
+                setTimeout(tryToSwitchScene, 1000);
+
+                // Para asegurar que la información del juego desaparezca después de unos segundos
+                setTimeout(() => {
+                    gameInfoElement.style.opacity = '0';
+                    gameInfoElement.style.transition = 'opacity 1s ease-out';
+                    setTimeout(() => {
+                        gameInfoElement.style.display = 'none';
+                    }, 1000);
+                }, 5000);
+            } else {
+                // Si no hay juego especificado, mostrar el mapa del mundo
+                backButton.style.display = 'none';
+                
+                // Inicializar el juego en modo mapa del mundo
+                window.addEventListener('load', () => {
+                    const game = new Game();
+                    game.start();
+                    setTimeout(() => {
+                        if (game.scenes['worldMap']) {
+                            game.switchScene('worldMap');
+                        }
+                    }, 500);
+                });
+            }
+            
+            // Ajustar el link del botón de volver
+            backButton.href = 'juego_nuevo.html'; // Sin parámetro game para volver al mapa
+            
+            // Función para ajustar el tamaño del canvas con respecto al contenedor
+            // Referencias a los botones
+            const toggleViewButton = document.getElementById('toggle-view-button');
+            const saveGameButton = document.getElementById('save-game-button');
+            const exitGameButton = document.getElementById('exit-game-button');
+            const gameCanvas = document.getElementById('game-canvas');
+            const gamesGallery = document.getElementById('games-gallery');
+            
+            // Estado inicial - vista de mapa
+            let isGalleryView = false;
+            
+            // Función para alternar entre vista de mapa y galería
+            function toggleView() {
+                isGalleryView = !isGalleryView;
+                
+                if (isGalleryView) {
+                    // Mostrar galería, ocultar mapa
+                    gameCanvas.style.display = 'none';
+                    gamesGallery.style.display = 'block';
+                    toggleViewButton.innerHTML = '🗺️ Ver Mapa';
+                    toggleViewButton.classList.add('gallery-active');
+                    
+                    // Si hay un juego en curso, pausarlo
+                    if (window.game && typeof window.game.pause === 'function') {
+                        window.game.pause();
+                    }
+                } else {
+                    // Mostrar mapa, ocultar galería
+                    gameCanvas.style.display = 'block';
+                    gamesGallery.style.display = 'none';
+                    toggleViewButton.innerHTML = '📷 Ver Juegos';
+                    toggleViewButton.classList.remove('gallery-active');
+                    
+                    // Si hay un juego en curso, reanudarlo
+                    if (window.game && typeof window.game.resume === 'function') {
+                        window.game.resume();
+                    }
+                }
+            }
+            
+            // Asignar evento al botón de alternancia
+            toggleViewButton.addEventListener('click', toggleView);
+            
+            // Configurar la funcionalidad de las tarjetas de juego
+            document.querySelectorAll('.game-card, .game-title').forEach(element => {
+                element.addEventListener('click', function() {
+                    // Si es un título, buscar la tarjeta asociada
+                    let gameCard;
+                    if (this.classList.contains('game-title')) {
+                        // Navegar hacia abajo desde el título para encontrar la tarjeta
+                        const gameItem = this.closest('.game-item');
+                        if (gameItem) {
+                            gameCard = gameItem.querySelector('.game-card');
+                        }
+                    } else {
+                        gameCard = this;
+                    }
+                    
+                    // Obtener el tipo de juego y redirigir
+                    if (gameCard) {
+                        const gameType = gameCard.getAttribute('data-game');
+                        if (gameType) {
+                            console.log(`Iniciando juego: ${gameType}`);
+                            window.location.href = `juego_nuevo.html?game=${gameType}`;
+                        }
+                    }
+                });
+            });
+
+            // Variables de ejemplo para datos de la partida
+            let coins = 100; // Monedas recolectadas en esta sesión
+            let minigamesPlayed = 3; // Minijuegos jugados en esta sesión
+
+            // Guardar partida y redirigir a login.html
+            saveGameButton.addEventListener('click', function() {
+                // Obtener datos acumulados de sesiones anteriores
+                const savedData = JSON.parse(localStorage.getItem('gameData')) || { coins: 0, minigamesPlayed: 0 };
+
+                // Actualizar los datos acumulados
+                const updatedData = {
+                    coins: savedData.coins + coins,
+                    minigamesPlayed: savedData.minigamesPlayed + minigamesPlayed
+                };
+
+                // Guardar los datos actualizados en localStorage
+                localStorage.setItem('gameData', JSON.stringify(updatedData));
+
+                // Redirigir a login.html
+                window.location.href = 'login.html';
+            });
+
+            // Salir sin guardar y redirigir a login.html
+            exitGameButton.addEventListener('click', function() {
+                window.location.href = 'login.html';
+            });    
+
+            // Función para ajustar el tamaño del canvas con respecto al contenedor
+            function resizeCanvas() {
+                const container = document.getElementById('game-container');
+                const canvas = document.getElementById('game-canvas');
+                
+                // Mantener proporciones adecuadas
+                const containerWidth = container.clientWidth;
+                const containerHeight = container.clientHeight;
+                
+                // Mantener relación de aspecto 3:2 (1200x800)
+                const aspectRatio = 3/2;
+                
+                let width, height;
+                
+                if (containerWidth / containerHeight > aspectRatio) {
+                    // Contenedor más ancho que el aspecto deseado
+                    height = containerHeight;
+                    width = height * aspectRatio;
+                } else {
+                    // Contenedor más alto que el aspecto deseado
+                    width = containerWidth;
+                    height = width / aspectRatio;
+                }
+                
+                // Asegurar que el canvas no sea demasiado grande
+                width = Math.min(width, 1200);
+                height = Math.min(height, 800);
+                
+                // Aplicar dimensiones
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+            }
+            
+            // Ajustar tamaño inicialmente y cuando cambie la ventana
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('load', resizeCanvas);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Nombres personalizados para cada outfit (igual que en login.html)
+            const outfitNames = {
+                croiso: [
+                    "Croiso",
+                    "Croiso Universitario",
+                    "Croiso Surfista",
+                    "Croiso Encantador de Serpientes",
+                    "Croiso Pescador",
+                    "Croiso Pianista"
+                ],
+                croisa: [
+                    "Croisa Exploradora",
+                    "Croisa Pastelera",
+                    "Croisa Sirena",
+                    "Croisa Hada",
+                    "Croisa Deportista",
+                    "Croisa Artista"
+                ]
+            };
+    
+            // Obtener personaje y outfit seleccionados
+            const selectedCharacter = localStorage.getItem('selectedCharacter') || 'croiso';
+            const selectedOutfit = parseInt(localStorage.getItem('selectedOutfit')) || 1;
+    
+            // Actualizar imagen y nombre en cabecera
+            const mainCharacterImg = document.getElementById('main-character-img');
+            const mainCharacterName = document.getElementById('main-character-name');
+            if (mainCharacterImg) {
+                mainCharacterImg.src = `${selectedCharacter}_outfit${selectedOutfit}.png`;
+                mainCharacterImg.alt = outfitNames[selectedCharacter]?.[selectedOutfit-1] || selectedCharacter;
+                mainCharacterImg.style.opacity = "1";
+            }
+            if (mainCharacterName) {
+                mainCharacterName.textContent = outfitNames[selectedCharacter]?.[selectedOutfit-1] || selectedCharacter;
+            }
+        });
+        </script>
+</body>
+</html>

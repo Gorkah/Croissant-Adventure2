@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión - Croissant Adventure</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #ff9900;
+      --secondary-color: #ffd166;
+      --accent-color: #ef476f;
+      --background-color: #fffaf0;
+      --success-color: #06d6a0;
+      --text-color: #5c4a38;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Baloo 2', cursive;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px var(--shadow-color);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo-img {
+      width: 35px;
+      height: 35px;
+      background: url('croiso.png') center/contain no-repeat;
+      margin-right: 10px;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 600;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .auth-container {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 15px var(--shadow-color);
+      overflow: hidden;
+    }
+
+    .login-image {
+      flex: 1;
+      background-color: var(--secondary-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+    }
+        
+        .character-selection {
+      margin-top: 20px;
+      text-align: center;
+    }
+        
+    .character-option {
+      display: inline-block;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+        
+    .character-option.selected {
+      transform: scale(1.1);
+    }
+        
+    .character-option.selected::after {
+      content: '✓';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--success-color);
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .footer {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .auth-container {
+        flex-direction: column;
+      }
+
+      .login-image, .login-form {
+        width: 100%;
+        padding: 20px;
+      }
+    }
+        
+        .character-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 3px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .character-option:hover .character-img {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+        }
+        
+        .character-name {
+            margin-top: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .croissant {
+            width: 200px;
+            height: 200px;
+            background-image: url('croiso.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(0deg); }
+            75% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .login-form {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-form h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid var(--secondary-color);
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px var(--secondary-color);
+    }
+
+    button {
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: var(--accent-color);
+      transform: translateY(-3px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+        
+        .error-message {
+            color: var(--accent-color);
+            margin-top: 20px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+        
+        .clouds {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        
+        .cloud {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        
+        .cloud-1 {
+            width: 100px;
+            height: 60px;
+            top: 20px;
+            left: 20px;
+            animation: driftCloud 30s linear infinite;
+        }
+        
+        .cloud-2 {
+            width: 70px;
+            height: 40px;
+            top: 60px;
+            right: 30px;
+            animation: driftCloud 25s linear infinite 5s;
+        }
+        
+        .cloud-3 {
+            width: 120px;
+            height: 70px;
+            bottom: 30px;
+            left: 50px;
+            animation: driftCloud 35s linear infinite 10s;
+        }
+        
+        @keyframes driftCloud {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        
+        /* Estilos para Control Parental */
+        .parental-controls {
+            background-color: rgba(255, 250, 240, 0.5);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px dashed var(--secondary-color);
+        }
+
+        .parental-controls h3 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .toggle-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .toggle-label {
+            margin-bottom: 0 !important;
+        }
+
+        /* Switch para el toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success-color);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--success-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
+            outline: none;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .login-image, .login-form {
+                width: 100%;
+            }
+            
+            .croissant {
+                width: 150px;
+                height: 150px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <div class="logo-img"></div>
+      <div class="logo-text">Croissant Adventure</div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="login.html">Iniciar Sesión</a>
+      <a href="register.html">Registrarse</a>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="auth-container">
+      <div class="login-image">
+        <div class="croissant" style="width: 180px; height: 180px; background: url('croiso.png') center/contain no-repeat; margin-bottom: 20px; animation: bounce 2s ease-in-out infinite;"></div>
+        <h1 style="font-size: 2rem; color: var(--primary-color);">Croissant Adventure</h1>
+        <h2 style="font-size: 1.2rem; color: var(--text-color); text-align: center;">¡Aventuras llenas de diversión te esperan!</h2>
+            
+        <div class="character-selection">
+          <h3>Elige tu personaje</h3>
+          <div class="character-options">
+            <div class="character-option" data-character="croiso">
+              <div class="character-img" style="background-image: url('croiso.png'); width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px var(--shadow-color); transition: all 0.3s ease; background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+              <div class="character-name">Croiso</div>
+            </div>
+            <div class="character-option" data-character="croisa">
+              <div class="character-img" style="background-image: url('croisa.png'); width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 6px var(--shadow-color); transition: all 0.3s ease; background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+              <div class="character-name">Croisa</div>
+            </div>
+          </div>
+        </div>
+        <!-- Menú de outfits con flechas infantiles y nombre personalizado por outfit -->
+        <div id="outfit-selection" style="display:none; margin-top: 30px; text-align: center;">
+            <h3>Elige tu outfit:</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 30px;">
+                <button id="outfit-prev" style="background: #ffe9c7; border: 4px solid #ffd166; border-radius: 50%; width: 64px; height: 64px; cursor:pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg width="38" height="38" viewBox="0 0 38 38" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="25,8 13,19 25,30" fill="none" stroke="#ff9900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <!-- Cambios aquí: sin fondo, sin borde, tamaño aumentado -->
+                <img id="outfit-viewer" src="" alt="Outfit"
+                  style="width:300px; height:300px; border-radius:0; border:none; background:transparent; box-shadow:none;">
+                <button id="outfit-next" style="background: #ffe9c7; border: 4px solid #ffd166; border-radius: 50%; width: 64px; height: 64px; cursor:pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+                    <svg width="38" height="38" viewBox="0 0 38 38" style="display:block;" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="13,8 25,19 13,30" fill="none" stroke="#ff9900" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="outfit-character-name" style="margin-top:16px; color:#ef476f; font-size:1.3rem; font-weight:800; letter-spacing:1px;"></div>
+        </div>
+      </div>
+      <div class="login-form" style="flex: 1; padding: 40px; display: flex; flex-direction: column; justify-content: center;">
+        <h2>¡Inicia sesión para jugar!</h2>
+            
+            <div class="input-group">
+                <label for="username">Nombre de aventurero:</label>
+                <input type="text" id="username" placeholder="Escribe tu nombre aquí..." autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label for="password">Contraseña secreta:</label>
+                <input type="password" id="password" placeholder="Tu contraseña mágica...">
+            </div>
+
+            <!-- Controles de Control Parental -->
+            <div class="parental-controls">
+                <h3>Control Parental</h3>
+                <div class="input-group">
+                    <label for="play-time">Tiempo de juego (minutos):</label>
+                    <input type="number" id="play-time" placeholder="30" min="1" max="120" value="30">
+                </div>
+                
+                <div class="input-group">
+                    <label for="child-age">Edad del niño:</label>
+                    <input type="number" id="child-age" placeholder="8" min="4" max="16" value="8">
+                </div>
+                
+                <div class="input-group" style="margin-top: 15px;">
+                    <label>Actividades educativas:</label>
+                    <div class="educational-activities" style="display: flex; justify-content: space-between; margin-top: 5px;">
+                        <div style="text-align: center; padding: 5px;">
+                            <div style="font-size: 24px;">✏️</div>
+                            <div style="font-size: 12px;">Caligrafía</div>
+                        </div>
+                        <div style="text-align: center; padding: 5px;">
+                            <div style="font-size: 24px;">📓</div>
+                            <div style="font-size: 12px;">Matemáticas</div>
+                        </div>
+                        <div style="text-align: center; padding: 5px;">
+                            <div style="font-size: 24px;">🧩</div>
+                            <div style="font-size: 12px;">Puzzles</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="task-description">Descripción (opcional):</label>
+                    <textarea id="task-description" placeholder="Información adicional para el niño" rows="2"></textarea>
+                </div>
+
+                <div class="toggle-control">
+                    <label for="parental-control-toggle" class="toggle-label">Activar control parental</label>
+                    <label class="switch">
+                        <input type="checkbox" id="parental-control-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <button id="login-button">¡Comenzar Aventura!</button>
+            
+            <div id="error-message" class="error-message">
+                ¡Ups! Nombre o contraseña incorrectos. ¡Inténtalo de nuevo!
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginButton = document.getElementById('login-button');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const characterOptions = document.querySelectorAll('.character-option');
+            const parentalControlToggle = document.getElementById('parental-control-toggle');
+            const playTimeInput = document.getElementById('play-time');
+            const childAgeInput = document.getElementById('child-age');
+            const taskDescriptionInput = document.getElementById('task-description');
+            const outfitSelection = document.getElementById('outfit-selection');
+            const outfitViewer = document.getElementById('outfit-viewer');
+            const outfitPrev = document.getElementById('outfit-prev');
+            const outfitNext = document.getElementById('outfit-next');
+            const outfitCharacterName = document.getElementById('outfit-character-name');
+            let selectedCharacter = 'croiso'; // Por defecto es Croiso
+            let currentOutfit = 1;
+            const totalOutfits = 6;
+
+            // Nombres personalizados para cada outfit
+            const outfitNames = {
+                croiso: [
+                    "Croiso",
+                    "Croiso Universitario",
+                    "Croiso Surfista",
+                    "Croiso Encantador de Serpientes",
+                    "Croiso Pescador",
+                    "Croiso Pianista"
+                ],
+                croisa: [
+                    "Croisa Exploradora",
+                    "Croisa Pastelera",
+                    "Croisa Sirena",
+                    "Croisa Hada",
+                    "Croisa Deportista",
+                    "Croisa Artista"
+                ]
+            };
+            
+            // Manejo de selección de personaje
+            characterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Quitar clase selected de todas las opciones
+                    characterOptions.forEach(op => op.classList.remove('selected'));
+                    
+                    // Añadir clase selected a la opción clicada
+                    this.classList.add('selected');
+                    
+                    // Guardar el personaje seleccionado
+                    selectedCharacter = this.getAttribute('data-character');
+                    console.log('Personaje seleccionado:', selectedCharacter);
+                    
+                    // Actualizar la imagen principal con el personaje seleccionado
+                    document.querySelector('.croissant').style.backgroundImage = `url('${selectedCharacter}.png')`;
+                                    
+                    // Mostrar selección de outfit
+                    showOutfitSelection(selectedCharacter);
+                });
+            });
+                        // Mostrar visor de outfits con flechas y nombre personalizado
+                        function showOutfitSelection(character) {
+                            outfitSelection.style.display = 'block';
+                            currentOutfit = 1;
+                            updateOutfitViewer(character, currentOutfit);
+                        }
+            
+                        function updateOutfitViewer(character, outfitNum) {
+                            outfitViewer.src = `${character}_outfit${outfitNum}.png`;
+                            outfitViewer.alt = `Outfit ${outfitNum}`;
+                            // Mostrar nombre personalizado del outfit
+                            const namesArr = outfitNames[character] || [];
+                            outfitCharacterName.textContent = namesArr[outfitNum - 1] || '';
+                            // Guardar selección en localStorage
+                            localStorage.setItem('selectedOutfit', outfitNum);
+                        }
+            
+                        outfitPrev.addEventListener('click', function() {
+                            currentOutfit = currentOutfit === 1 ? totalOutfits : currentOutfit - 1;
+                            updateOutfitViewer(selectedCharacter, currentOutfit);
+                        });
+            
+                        outfitNext.addEventListener('click', function() {
+                            currentOutfit = currentOutfit === totalOutfits ? 1 : currentOutfit + 1;
+                            updateOutfitViewer(selectedCharacter, currentOutfit);
+                        });
+            const errorMessage = document.getElementById('error-message');
+            
+            // Control parental - Toggle
+            parentalControlToggle.addEventListener('change', function() {
+                const parentalControls = document.querySelectorAll('.parental-controls input, .parental-controls textarea');
+                
+                // Habilitar/deshabilitar inputs excepto el toggle mismo
+                parentalControls.forEach(control => {
+                    if (control !== parentalControlToggle) {
+                        control.disabled = !this.checked;
+                    }
+                });
+                
+                // Efecto visual
+                if (this.checked) {
+                    document.querySelector('.parental-controls').style.opacity = '1';
+                    playTimeInput.focus();
+                } else {
+                    document.querySelector('.parental-controls').style.opacity = '0.7';
+                }
+            });
+            
+            // Inicializar estado de los controles parentales
+            document.querySelectorAll('.parental-controls input, .parental-controls textarea').forEach(control => {
+                if (control !== parentalControlToggle) {
+                    control.disabled = !parentalControlToggle.checked;
+                }
+            });
+            document.querySelector('.parental-controls').style.opacity = parentalControlToggle.checked ? '1' : '0.7';
+            
+            // Efectos visuales en los campos
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.05)';
+                    errorMessage.style.display = 'none';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+                
+                // Al presionar Enter en el campo de contraseña, intentar iniciar sesión
+                if (input.id === 'password') {
+                    input.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            loginButton.click();
+                        }
+                    });
+                }
+            });
+            
+            // Definir la animación de sacudida
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20%, 60% { transform: translateX(-10px); }
+                    40%, 80% { transform: translateX(10px); }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Función de login
+            loginButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+                const childAge = childAgeInput.value.trim();
+                
+                if (username === '' || password === '') {
+                    errorMessage.textContent = 'Por favor, completa todos los campos.';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                const correctUsername = 'admin';
+                const correctPassword = 'admin';
+                
+                if (username === correctUsername && password === correctPassword) {
+                    // Guardar el personaje seleccionado en localStorage
+                    localStorage.setItem('selectedCharacter', selectedCharacter);
+                    localStorage.setItem('playerName', username);
+                    
+                    // Guardar configuración de control parental si está activado
+                    if (parentalControlToggle.checked) {
+                        const playTime = parseInt(playTimeInput.value) || 30; // Valor por defecto: 30 minutos
+                        const taskDescription = taskDescriptionInput.value.trim() || 'Completar una actividad educativa';
+                        
+                        // Guardar configuración en localStorage
+                        localStorage.setItem('parentalControlEnabled', 'true');
+                        localStorage.setItem('playTimeLimit', playTime.toString());
+                        localStorage.setItem('taskDescription', taskDescription);
+                        
+                        // Configurar tiempo inicial (en milisegundos)
+                        const currentTime = new Date().getTime();
+                        const endTime = currentTime + (playTime * 60 * 1000);
+                        localStorage.setItem('playTimeEnd', endTime.toString());
+                        console.log(`Control parental activado: ${playTime} minutos, hasta ${new Date(endTime).toLocaleTimeString()}`);
+                        
+                        // Guardar la edad del niño para las actividades adaptativas
+                        localStorage.setItem('childAge', childAge || '8');
+                    } else {
+                        // Desactivar control parental
+                        localStorage.removeItem('parentalControlEnabled');
+                        localStorage.removeItem('playTimeLimit');
+                        localStorage.removeItem('taskDescription');
+                        localStorage.removeItem('playTimeEnd');
+                        console.log('Control parental desactivado');
+                    }
+                    
+                    // Iniciar sesión exitoso - Animación de transición
+                    loginButton.innerHTML = '¡Aquí vamos! 🚀';
+                    loginButton.style.backgroundColor = 'var(--success-color)';
+                    
+                    // Iniciar sesión correctamente y pasar el personaje como parámetro
+                    setTimeout(function() {
+                        window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
+                    }, 1000);
+                } else if (username === 'manage' && password === 'manage') {
+                    window.location.href = 'manage.html';
+                } else {
+                    // Validar credenciales contra los datos almacenados (si aplica)
+                    const userData = JSON.parse(localStorage.getItem('userData')) || {};
+                    // Verificar si son las credenciales de demo
+                if (username === 'demo' && password === 'demo') {
+                    // Guardar indicador de modo demo
+                    localStorage.setItem('demoMode', 'true');
+                    localStorage.setItem('selectedCharacter', 'croiso'); // Forzar Croiso para la demo
+                    localStorage.setItem('playerName', 'Demo');
+                    
+                    // Redirigir a la página de demostración
+                    window.location.href = 'demo.html';
+                } else if (userData[username] && userData[username].password === password) {
+                    // Inicio de sesión normal
+                    localStorage.setItem('demoMode', 'false');
+                    localStorage.setItem('selectedCharacter', selectedCharacter);
+                    localStorage.setItem('playerName', username);
+                    
+                    window.location.href = `juego_nuevo.html?character=${selectedCharacter}`;
+                    } else {
+                        // Mostrar error
+                        errorMessage.textContent = '¡Nombre de usuario o contraseña incorrectos!';
+                        errorMessage.style.display = 'block';
+                        
+                        // Animar el mensaje de error
+                        errorMessage.classList.add('shake');
+                        setTimeout(() => {
+                            errorMessage.classList.remove('shake');
+                        }, 500);
+                        
+                        // Agitar los campos
+                        const inputs = [usernameInput, passwordInput];
+                        inputs.forEach(input => {
+                            input.style.borderColor = 'var(--accent-color)';
+                            input.style.animation = 'shake 0.5s ease-in-out';
+                            setTimeout(() => {
+                                input.style.animation = '';
+                            }, 500);
+                        });
+                    }
+                }
+            });
+            
+            // Para fines de demostración, colocar sugerencias sutiles
+            // Esta parte es opcional y se puede eliminar en producción
+            const hintElement = document.createElement('div');
+            hintElement.style.position = 'fixed';
+            hintElement.style.bottom = '10px';
+            hintElement.style.right = '10px';
+            hintElement.style.fontSize = '10px';
+            hintElement.style.color = 'rgba(92, 74, 56, 0.5)';
+            hintElement.innerHTML = 'Pista: admin / admin';
+            document.body.appendChild(hintElement);
+        });
+    </script>
+        </div>
+    </div>
+    
+  <footer class="footer">
+    <span>&copy; 2025 Croissant Adventure</span>
+    <div>
+      <span style="margin-right: 15px;">Contacto</span>
+      <span style="margin-right: 15px;">Acerca de</span>
+      <span>Política de Privacidad</span>
+    </div>
+  </footer>
+
+  <!-- Fondo animado con personajes -->
+  <script src="js/animated-background.js"></script>
+</body>
+</html>
