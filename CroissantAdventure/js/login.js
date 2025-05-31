@@ -193,18 +193,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const correctPassword = 'admin';
         
         try {
-            if (username === correctUsername && password === correctPassword) {
+            // Credenciales especiales que siempre deben funcionar, independientemente de Firebase
+            if (username === 'admin' && password === 'admin') {
                 // Iniciar sesión anónima para admin
-                await signInAnonymously(auth);
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.log('Error en Firebase Auth, continuando de todas formas:', error);
+                    // Continuamos incluso si Firebase falla
+                }
+                
+                // Siempre permitir acceso con admin/admin
+                console.log('¡Inicio de sesión como administrador!');
                 handleSuccessfulLogin('admin', selectedCharacter, childAge, parentalControlToggle.checked);
+                return; // Salimos temprano para garantizar que siempre funcione
                 
             } else if (username === 'manage' && password === 'manage') {
-                await signInAnonymously(auth);
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.log('Error en Firebase Auth, continuando de todas formas:', error);
+                    // Continuamos incluso si Firebase falla
+                }
+                
+                // Redirigir a manage.html siempre con manage/manage
+                console.log('¡Redirigiendo a la página de gestión!');
                 window.location.href = 'manage.html';
+                return; // Salimos temprano para garantizar que siempre funcione
                 
             } else if (username === 'demo' && password === 'demo') {
                 // Iniciar sesión anónima para demo
-                await signInAnonymously(auth);
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.log('Error en Firebase Auth, continuando de todas formas:', error);
+                    // Continuamos incluso si Firebase falla
+                }
                 
                 // Guardar indicador de modo demo
                 localStorage.setItem('demoMode', 'true');
@@ -212,7 +236,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('playerName', 'Demo');
                 
                 // Redirigir a la página de demostración
+                console.log('¡Iniciando modo demo!');
                 window.location.href = 'demo.html';
+                return; // Salimos temprano para garantizar que siempre funcione
                 
             } else {
                 // Consultar usuario en la base de datos de Firebase
