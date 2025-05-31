@@ -542,8 +542,21 @@
             </div>
         </div>
     </div>
-        <script type="module" src="js/login.js"></script>
-
+    <!-- Firebase SDK -->  
+    <script type="module" src="js/login.js"></script>
+    <!-- Animación de carga para el botón de inicio de sesión -->
+    <style>
+      @keyframes loadingDots {
+        0%, 20% { content: '.'; }
+        40%, 60% { content: '..'; }
+        80%, 100% { content: '...'; }
+      }
+      
+      .loading::after {
+        content: '';
+        animation: loadingDots 1.5s infinite;
+      }
+    </style>
         </div>
     </div>
     
