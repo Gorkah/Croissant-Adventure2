@@ -399,19 +399,24 @@
         
         #games-gallery {
             width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding: 20px 10px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centra verticalmente todo el contenido */
+            align-items: center;
             background-color: #ffe9c7;
+            padding: 0;
+            box-sizing: border-box;
             position: relative;
+            margin-top: 15%;
         }
         
         .game-card {
-            width: 180px;
-            height: 180px;
+            width: 110px;
+            height: 165px;
             background-size: cover;
             background-position: center;
-            border-radius: 15px;
+            border-radius: 10px;
             position: relative;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
             cursor: pointer;
@@ -461,12 +466,12 @@
         }
         
         .game-selection {
+            flex: 1 0 auto;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 110px);
             gap: 15px;
-            max-width: 1000px;
-            margin: 0 auto 80px auto;
-            padding: 20px;
+            justify-content: center;
+            align-content: center;
         }
         
         .game-item {
@@ -584,78 +589,75 @@
                 </div>
                 <div class="game-selection">
                     <div class="game-item">
-                        <div class="game-title">EL TESORO DEL VALLE DORADO</div>
                         <div class="game-card" style="background-image: url('minigames/coinCollector.jpg');" data-game="coinCollector">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LA RUEDA DE LA FORTUNA MÁGICA</div>
                         <div class="game-card" style="background-image: url('minigames/roulette.jpg');" data-game="roulette">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LOS GUARDIANES DEL REINO CUADRICULADO</div>
                         <div class="game-card" style="background-image: url('minigames/chess.jpg');" data-game="chess">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">EL BOSQUE ENREDADO DE MIGALANDIA</div>
                         <div class="game-card" style="background-image: url('minigames/maze.jpg');" data-game="maze">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">BURBUJEADORES DEL CIELO AZUCARADO</div>
                         <div class="game-card" style="background-image: url('minigames/shooter.jpg');" data-game="shooter">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LAS ISLAS FLOTANTES DE BIZCOCHO</div>
                         <div class="game-card" style="background-image: url('minigames/platform.jpg');" data-game="platform">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">EL MISTERIO DE LAS CARTAS GEMELAS</div>
                         <div class="game-card" style="background-image: url('minigames/memory.jpg');" data-game="memory">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LAS AVENTURAS DE SILBI LA SERPIENTE</div>
                         <div class="game-card" style="background-image: url('minigames/snake.jpg');" data-game="snake">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">EL CUADRO MÁGICO DESPIEZADO</div>
                         <div class="game-card" style="background-image: url('minigames/puzzle.jpg');" data-game="puzzle">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">PESCADOR PASTELERO</div>
                         <div class="game-card" style="background-image: url('minigames/fishing.jpg');" data-game="fishing">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">SURFISTA GLASEADO</div>
                         <div class="game-card" style="background-image: url('minigames/surfing.jpg');" data-game="surfing">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LA ORQUESTA DULCE DE MIGALANDIA</div>
                         <div class="game-card" style="background-image: url('minigames/rhythm.jpg');" data-game="rhythm">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">LOS GUARDIANES DEL CASTILLO AZÚCAR</div>
                         <div class="game-card" style="background-image: url('minigames/towerDefense.jpg');" data-game="towerDefense">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">ESTUDIO ARTÍSTICO DE MIGALANDIA</div>
                         <div class="game-card" style="background-image: url('minigames/paintGame.jpg');" data-game="paintGame">
                         </div>
                     </div>
                     <div class="game-item">
-                        <div class="game-title">TRIVIA DE PASTELERÍA</div>
                         <div class="game-card" style="background-image: url('minigames/triviaGame.jpg');" data-game="triviaGame">
+                        </div>
+                    </div>
+					<div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/Racing.png');" data-game="racing">
+                        </div>
+                    </div>    
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/caveExplorer.png');" data-game="caveExplorer">
+                        </div>
+                    </div>    
+                    <div class="game-item">
+                        <div class="game-card" style="background-image: url('minigames/nuevo3.jpg');" data-game="nuevo3">
                         </div>
                     </div>
                 </div>

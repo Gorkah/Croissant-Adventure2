@@ -167,7 +167,7 @@
       transform: translate(-50%, -50%);
       width: 150px;
       height: 150px;
-      background-image: url('croiso.png');
+      background-image: url('donglaseado.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
@@ -238,6 +238,227 @@
       margin-top: auto;
     }
   </style>
+
+  <style>
+      /* Personalización de la slide 2 */
+      .slide-content-custom {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 30px;
+      }
+      .slide-image-carousel {
+        flex: 1 1 0;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .slide-text-center {
+        flex: 1.2 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .slide-image-beforeafter {
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        min-width: 350px;
+      }
+      #carousel-img {
+        width: 320px;
+        height: 270px;
+        object-fit: contain;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px var(--shadow-color);
+        background: none;
+        transition: none !important;
+      }
+      #before-after-container {
+        position: relative;
+        width: 320px;
+        height: 270px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px var(--shadow-color);
+        overflow: hidden;
+        background: #fff;
+      }
+      .before-img, .after-img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: contain;
+        border-radius: 15px;
+        user-select: none;
+        pointer-events: none;
+      }
+      .before-img {
+        z-index: 1;
+        clip-path: inset(0 50% 0 0); /* Solo la mitad izquierda visible al inicio */
+        transition: clip-path 0s;
+      }
+      .after-img {
+        z-index: 2;
+        clip-path: inset(0 0 0 50%); /* Solo la mitad derecha visible al inicio */
+        transition: clip-path 0s;
+      }
+      #slider-bar {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 0;
+        height: 100%;
+        z-index: 3;
+        cursor: ew-resize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .slider-handle {
+        width: 36px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        border-radius: 20px;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px #0002;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: calc(50% - 30px);
+        left: -18px;
+        font-size: 2rem;
+        color: #fff;
+        user-select: none;
+      }
+      .slider-handle span {
+        pointer-events: none;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+      </style>
+
+      <script>
+        // Barra interactiva antes/después con clip-path y handle bonito
+        document.addEventListener('DOMContentLoaded', function() {
+          const container = document.getElementById('before-after-container');
+          const beforeImg = container ? container.querySelector('.before-img') : null;
+          const afterImg = container ? container.querySelector('.after-img') : null;
+          const sliderBar = document.getElementById('slider-bar');
+          let dragging = false;
+
+          function setSlider(percent) {
+            percent = Math.max(5, Math.min(percent, 95)); // No dejar la barra en el borde
+            sliderBar.style.left = percent + '%';
+            beforeImg.style.clipPath = `inset(0 ${(100 - percent)}% 0 0)`;
+            afterImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
+          }
+
+          if (container && beforeImg && afterImg && sliderBar) {
+            const moveHandler = (clientX, rect) => {
+              let offsetX = clientX - rect.left;
+              let percent = (offsetX / rect.width) * 100;
+              setSlider(percent);
+            };
+
+            sliderBar.addEventListener('mousedown', function(e) {
+              dragging = true;
+              document.body.style.userSelect = 'none';
+            });
+
+            document.addEventListener('mouseup', function() {
+              dragging = false;
+              document.body.style.userSelect = '';
+            });
+
+            document.addEventListener('mousemove', function(e) {
+              if (!dragging) return;
+              const rect = container.getBoundingClientRect();
+              moveHandler(e.clientX, rect);
+            });
+
+            // Soporte para touch
+            sliderBar.addEventListener('touchstart', function(e) {
+              dragging = true;
+              document.body.style.userSelect = 'none';
+            });
+
+            document.addEventListener('touchend', function() {
+              dragging = false;
+              document.body.style.userSelect = '';
+            });
+
+            document.addEventListener('touchmove', function(e) {
+              if (!dragging) return;
+              const touch = e.touches[0];
+              const rect = container.getBoundingClientRect();
+              moveHandler(touch.clientX, rect);
+            });
+
+            // Inicializa al 50%
+            setSlider(50);
+          }
+        });
+      </script>
+
+      <script>
+        // Carrusel solo para la slide 2
+        document.addEventListener('DOMContentLoaded', function() {
+          const carouselImages = [
+            'croiso_outfit1.png',
+            'croiso_outfit2.png',
+            'croiso_outfit3.png',
+            'croiso_outfit4.png',
+            'croiso_outfit5.png',
+            'croiso_outfit6.png',
+            'croisa_outfit1.png',
+            'croisa_outfit2.png',
+            'croisa_outfit3.png',
+            'croisa_outfit4.png',
+            'croisa_outfit5.png',
+            'croisa_outfit6.png'
+          ]; // Añade aquí las rutas de tus imágenes
+          let carouselIndex = 0;
+          const carouselImg = document.getElementById('carousel-img');
+          const slides = document.querySelectorAll('.demo-slide');
+          let carouselInterval = null;
+
+          function startCarousel() {
+            if (!carouselImg) return;
+            carouselInterval = setInterval(() => {
+              carouselIndex = (carouselIndex + 1) % carouselImages.length;
+              carouselImg.src = carouselImages[carouselIndex]; // Cambio inmediato, sin opacidad ni fondo
+            }, 1000);
+          }
+
+          function stopCarousel() {
+            clearInterval(carouselInterval);
+          }
+
+          // Detectar cuando la slide 2 está activa
+          function observeSlideChange() {
+            const observer = new MutationObserver(() => {
+              if (slides[2].classList.contains('active')) {
+                startCarousel();
+              } else {
+                stopCarousel();
+                carouselIndex = 0;
+                if (carouselImg) carouselImg.src = carouselImages[0];
+              }
+            });
+            observer.observe(slides[2], { attributes: true, attributeFilter: ['class'] });
+            // Si la slide 2 ya está activa al cargar
+            if (slides[2].classList.contains('active')) startCarousel();
+          }
+
+          observeSlideChange();
+        });
+      </script>
+
 </head>
 <body>
   <header class="header">
@@ -261,7 +482,7 @@
     </div>
 
     <div class="demo-slides" id="slides-container">
-      <div class="demo-slide active" data-speech="¡Hola! Soy Croiso y te doy la bienvenida a Croissant Adventure. Acompáñame para descubrir que opinan nuestros primeros clientes">
+      <div class="demo-slide active" data-speech="¡Hola! Soy Don Glaseado y te doy la bienvenida a Croissant Adventure. Acompáñame para descubrir que opinan nuestros primeros clientes">
         <div class="slide-content">
           <div class="slide-video">
             <video src="video-diseno.mp4" controls poster="miniatura-video.png" width="100%"></video>
@@ -279,7 +500,7 @@
       </div>
       
       <!-- Slide 1: Proceso de desarrollo I -->
-      <div class="demo-slide" data-speech="¡Hola! Soy Croiso y te mostraré cómo creamos Croissant Adventure, comenzando por nuestra fase de diseño.">
+      <div class="demo-slide" data-speech="Aquí te mostraré cómo creamos Croissant Adventure, comenzando por nuestra fase de diseño.">
         <div class="slide-content">
           <div class="slide-image">
             <img src="desarrollo1.png" alt="Proceso de diseño">
@@ -296,8 +517,39 @@
         </div>
       </div>
 
+      <!-- Slide 2: Desarrollo de personajes -->
+      <div class="demo-slide" data-speech="Una vez definido el diseño, pasamos a la implementación de los personajes.">
+        <div class="slide-content slide-content-custom">
+          <!-- Carrusel a la izquierda -->
+          <div class="slide-image slide-image-carousel">
+            <img id="carousel-img" src="desarrollo1.png" alt="Proceso de diseño">
+          </div>
+          <!-- Texto en el centro -->
+          <div class="slide-text slide-text-center">
+            <h2>Corrección con Photoshop</h2>
+            <p>Para obtener resultados más limpios de nuestros personajes hicimos lo siguiente:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Obtener diferentes imágenes de outfits con IA a partir del boceto inicial</li>
+              <li>Retocar imágenes con Photoshop</li>
+              <li>Aplicar dichas modificaciones para cada uno de los outfits</li>
+            </ul>
+          </div>
+          <!-- Antes/Después a la derecha -->
+          <div class="slide-image slide-image-beforeafter">
+            <div id="before-after-container">
+              <img src="croisa_outfit2.png" alt="Antes" class="before-img">
+              <img src="croisa_ia.png" alt="Después" class="after-img">
+              <div id="slider-bar">
+                <div class="slider-handle"><span>⇄</span></div>
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 0.9em; color: #888; margin-top: 5px;">
+              <span>Desliza la barra para ver el antes y después</span>
+            </div>
+          </div>
+        </div>
       
-      <!-- Slide 2: Proceso de desarrollo II -->
+      <!-- Slide 3: Proceso de desarrollo II -->
       <div class="demo-slide" data-speech="En esta fase, nos centramos en la implementación técnica y la creación de los minijuegos educativos.">
         <div class="slide-content">
           <div class="slide-text">
