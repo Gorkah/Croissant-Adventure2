@@ -340,6 +340,88 @@
         font-size: 1.5rem;
         font-weight: bold;
       }
+
+      /* Añade esto a tu <style> principal */
+      #before-after-map .before-img,
+      #before-after-map .after-img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: contain;
+        border-radius: 15px;
+        user-select: none;
+        pointer-events: none;
+      }
+      #before-after-map .before-img {
+        z-index: 1;
+        clip-path: inset(0 50% 0 0);
+        transition: clip-path 0s;
+      }
+      #before-after-map .after-img {
+        z-index: 2;
+        clip-path: inset(0 0 0 50%);
+        transition: clip-path 0s;
+      }
+      #slider-bar-map {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 0;
+        height: 100%;
+        z-index: 3;
+        cursor: ew-resize;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #slider-bar-map .slider-handle {
+        width: 36px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        border-radius: 20px;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px #0002;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: calc(50% - 30px);
+        left: -18px;
+        font-size: 2rem;
+        color: #fff;
+        user-select: none;
+      }
+      #slider-bar-map .slider-handle span {
+        pointer-events: none;
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+
+      .slide-content-map {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+      }
+
+      .slide-image-map {
+        flex: 0 0 260px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #before-after-map {
+        position: relative;
+        width: 350px;
+        height: 280px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px var(--shadow-color);
+        overflow: hidden;
+        background: #fff;
+      }
       </style>
 
       <script>
@@ -352,7 +434,7 @@
           let dragging = false;
 
           function setSlider(percent) {
-            percent = Math.max(5, Math.min(percent, 95)); // No dejar la barra en el borde
+            percent = Math.max(0, Math.min(percent, 100)); // No dejar la barra en el borde
             sliderBar.style.left = percent + '%';
             beforeImg.style.clipPath = `inset(0 ${(100 - percent)}% 0 0)`;
             afterImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
@@ -404,6 +486,69 @@
           }
         });
       </script>
+
+      <script>
+      // Barra interactiva antes/después para el mapa
+      document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('before-after-map');
+        const beforeImg = container ? container.querySelector('.before-img') : null;
+        const afterImg = container ? container.querySelector('.after-img') : null;
+        const sliderBar = document.getElementById('slider-bar-map');
+        let dragging = false;
+
+        function setSlider(percent) {
+          percent = Math.max(5, Math.min(percent, 95));
+          sliderBar.style.left = percent + '%';
+          beforeImg.style.clipPath = `inset(0 ${(100 - percent)}% 0 0)`;
+          afterImg.style.clipPath = `inset(0 0 0 ${percent}%)`;
+        }
+
+        if (container && beforeImg && afterImg && sliderBar) {
+          const moveHandler = (clientX, rect) => {
+            let offsetX = clientX - rect.left;
+            let percent = (offsetX / rect.width) * 100;
+            setSlider(percent);
+          };
+
+          sliderBar.addEventListener('mousedown', function(e) {
+            dragging = true;
+            document.body.style.userSelect = 'none';
+          });
+
+          document.addEventListener('mouseup', function() {
+            dragging = false;
+            document.body.style.userSelect = '';
+          });
+
+          document.addEventListener('mousemove', function(e) {
+            if (!dragging) return;
+            const rect = container.getBoundingClientRect();
+            moveHandler(e.clientX, rect);
+          });
+
+          // Soporte para touch
+          sliderBar.addEventListener('touchstart', function(e) {
+            dragging = true;
+            document.body.style.userSelect = 'none';
+          });
+
+          document.addEventListener('touchend', function() {
+            dragging = false;
+            document.body.style.userSelect = '';
+          });
+
+          document.addEventListener('touchmove', function(e) {
+            if (!dragging) return;
+            const touch = e.touches[0];
+            const rect = container.getBoundingClientRect();
+            moveHandler(touch.clientX, rect);
+          });
+
+          // Inicializa al 50%
+          setSlider(50);
+        }
+      });
+    </script>
 
       <script>
         // Carrusel solo para la slide 2
@@ -621,7 +766,7 @@
 
       <!-- Slide 2: El Mapa -->
       <div class="demo-slide" data-speech="Este es nuestro mapa principal. ¡Aquí puedes explorar diferentes regiones y descubrir minijuegos!">
-        <div class="slide-content">
+        <div class="slide-content slide-content-map">
           <div class="slide-text">
             <h2>Mapa Interactivo</h2>
             <p>El mapa es el centro de Croissant Adventure. Desde aquí, los jugadores pueden:</p>
@@ -633,8 +778,17 @@
             </ul>
             <p style="margin-top: 15px;">Nuestra región más popular es "Playa Caramelizada", donde se encuentran los minijuegos "Pescador Pastelero" y "Surfista Glaseado".</p>
           </div>
-          <div class="slide-image">
-            <img src="ingame2.jpg" alt="Mapa del juego">
+          <div class="slide-image slide-image-map">
+            <div id="before-after-map">
+              <img src="mapa_antes.png" alt="Mapa antes" class="before-img">
+              <img src="mapa_despues.png" alt="Mapa después" class="after-img">
+              <div id="slider-bar-map">
+                <div class="slider-handle"><span>⇄</span></div>
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 0.9em; color: #888; margin-top: 5px;">
+              <span>Desliza la barra para ver el antes y después</span>
+            </div>
           </div>
         </div>
       </div>
