@@ -722,6 +722,74 @@
         </div>
       </div>
 
+      <!-- Slide: Arquitectura Global del Proyecto -->
+      <div class="demo-slide" data-speech="Aquí te muestro la arquitectura global de Croissant Adventure, que integra varios sistemas para ofrecer una experiencia completa.">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Arquitectura Global del Proyecto</h2>
+            <p>Croissant Adventure se construye sobre una arquitectura modular y escalable:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Frontend: HTML5, CSS3 y JavaScript para la interfaz de usuario</li>
+              <li>Backend: Firebase para autenticación y base de datos en tiempo real</li>
+              <li>IA: Integración con Hugging Face para procesamiento de lenguaje natural</li>
+              <li>Sistema de minijuegos: Motor de juego personalizado</li>
+              <li>Almacenamiento: Combinación de localStorage y Firebase Realtime Database</li>
+              <li>Seguridad: Control parental y validación de datos</li>
+            </ul>
+            <p style="margin-top: 15px;">Esta arquitectura permite una experiencia fluida mientras mantiene la seguridad y privacidad de los usuarios.</p>
+          </div>
+          <div class="slide-image" style="padding: 20px; background-color: white; border-radius: 15px; box-shadow: 0 5px 15px var(--shadow-color);">
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Estructura del Proyecto</h3>
+            <div style="font-family: monospace; font-size: 14px; line-height: 1.4; text-align: left; overflow: auto; max-height: 400px;">
+              <pre style="margin: 0;">
+CroissantAdventure/
+│
+├── assets/
+│   ├── audio/
+│   ├── music/
+│   └── sounds/
+│
+├── css/
+│   └── (estilos del juego)
+│
+├── js/
+│   ├── ai/
+│   │   ├── chatInterface.js
+│   │   └── storytellerAI.js
+│   │
+│   ├── minigames/
+│   │   ├── fishing_new.js
+│   │   ├── surfing_new.js
+│   │   ├── memory.js
+│   │   ├── puzzle.js
+│   │   └── (otros minijuegos...)
+│   │
+│   ├── scenes/
+│   │   ├── mainMenu.js
+│   │   ├── scene.js
+│   │   ├── worldMap.js
+│   │   └── worldMap_simple.js
+│   │
+│   ├── game.js
+│   ├── login.js
+│   ├── register.js
+│   └── parentalControl.js
+│
+├── minigames/
+│   └── (recursos de minijuegos)
+│
+├── index.html      ← Página principal
+├── login.html      ← Sistema de autenticación
+├── register.html   ← Registro de usuarios
+├── manage.html     ← Control parental
+├── juego_nuevo.html ← Nueva partida
+└── firebase.json   ← Configuración Firebase
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Slide 3: Proceso de desarrollo III -->
       <div class="demo-slide" data-speech="Descubre cómo funciona el núcleo de inteligencia artificial de Croissant Adventure">
         <div class="slide-content">
@@ -793,69 +861,248 @@
         </div>
       </div>
 
-      <!-- Slide 3: Playa Caramelizada -->
-      <div class="demo-slide" data-speech="¡Bienvenido a Playa Caramelizada! Aquí hemos mejorado la interactividad de los minijuegos con un sistema de detección de colisiones y feedback visual.">
-        <div class="slide-content">
-          <div class="slide-image">
-            <img src="ingame3.jpg" alt="Playa Caramelizada">
-          </div>
-          <div class="slide-text">
-            <h2>Playa Caramelizada</h2>
-            <p>Una de nuestras regiones más populares con minijuegos acuáticos y diversión bajo el sol.</p>
-            <p style="margin-top: 10px;"><strong>Mejoras recientes:</strong></p>
-            <ul style="margin-top: 10px; margin-left: 20px;">
-              <li>Mejor detección de colisiones para interactuar con los minijuegos</li>
-              <li>Sistema de feedback visual que muestra un prompt cuando el jugador se acerca</li>
-              <li>Corrección de errores en el código de las decoraciones</li>
-            </ul>
-            <p style="margin-top: 15px;">Estas mejoras hacen que la interacción con los minijuegos sea más intuitiva y divertida para los niños.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 4: Pescador Pastelero -->
-      <div class="demo-slide" data-speech="¡Este es nuestro minijuego Pescador Pastelero! Los niños pueden aprender matemáticas mientras pescan pasteles deliciosos.">
+      <!-- Slide 3: Regiones del Mapa -->
+      <div class="demo-slide" data-speech="El mundo de Croissant Adventure está dividido en 9 regiones temáticas, cada una con sus propios minijuegos y desafíos educativos.">
         <div class="slide-content">
           <div class="slide-text">
-            <h2>Minijuego: Pescador Pastelero</h2>
-            <p>En este divertido minijuego, los niños practican:</p>
-            <ul style="margin-top: 10px; margin-left: 20px;">
-              <li>Operaciones matemáticas básicas</li>
-              <li>Coordinación mano-ojo</li>
-              <li>Toma de decisiones rápidas</li>
-            </ul>
-            <p style="margin-top: 15px;">Los jugadores deben pescar pasteles con el valor correcto para resolver ecuaciones, combinando aprendizaje y diversión.</p>
-            <div style="margin-top: 20px;">
-              <button class="demo-btn" style="margin-right: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Probar minijuego</button>
+            <h2>Regiones del Mundo de Croissant</h2>
+            <p>El mapa de Croissant Adventure contiene <strong>9 regiones temáticas</strong>, cada una diseñada para estimular diferentes áreas de aprendizaje:</p>
+            
+            <div id="region-description" style="margin-top: 15px;">
+              <h3 style="color: var(--primary-color); margin-bottom: 10px;">Playa Caramelizada</h3>
+              <p>Región de playa con minijuegos acuáticos como Pescador Pastelero y Surfista Glaseado. Perfecta para aprender matemáticas y ortografía mientras se disfruta del sol.</p>
+            </div>
+            
+            <div style="margin-top: 15px;">
+              <div id="map-carousel-controls" style="display: flex; justify-content: center;">
+                <button id="prev-region" class="demo-btn" style="margin-right: 10px;">Anterior</button>
+                <span id="region-counter" style="align-self: center; padding: 0 15px;">1/9</span>
+                <button id="next-region" class="demo-btn" style="margin-left: 10px;">Siguiente</button>
+              </div>
             </div>
           </div>
           <div class="slide-image">
-            <img src="minigames/fishing.jpg" alt="Minijuego Pescador Pastelero">
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 5: Surfista Glaseado -->
-      <div class="demo-slide" data-speech="¡Y aquí está nuestro minijuego Surfista Glaseado! Los niños aprenden mientras surfean sobre olas de glaseado.">
-        <div class="slide-content">
-          <div class="slide-image">
-            <img src="minigames/surfing.jpg" alt="Minijuego Surfista Glaseado">
-          </div>
-          <div class="slide-text">
-            <h2>Minijuego: Surfista Glaseado</h2>
-            <p>En este emocionante minijuego, los niños desarrollan:</p>
-            <ul style="margin-top: 10px; margin-left: 20px;">
-              <li>Reconocimiento de palabras y ortografía</li>
-              <li>Velocidad de reacción</li>
-              <li>Memoria visual</li>
-            </ul>
-            <p style="margin-top: 15px;">Los jugadores surfean olas de glaseado mientras recogen letras para formar palabras correctas.</p>
-            <div style="margin-top: 20px;">
-              <button class="demo-btn" style="margin-right: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Probar minijuego</button>
+            <div id="map-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 15px; box-shadow: 0 5px 15px var(--shadow-color);">
+              <!-- Imágenes del carrusel generadas dinámicamente -->
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Script para el carrusel de regiones del mapa -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Lista de regiones con sus descripciones
+          const mapRegions = [
+            { 
+              name: "Playa Caramelizada", 
+              image: "mapa1.png", 
+              fallbackImage: "mapa_despues.png",
+              description: "Región de playa con minijuegos acuáticos como Pescador Pastelero y Surfista Glaseado. Perfecta para aprender matemáticas y ortografía mientras se disfruta del sol."
+            },
+            { 
+              name: "Bosque de Galletas", 
+              image: "mapa2.png", 
+              fallbackImage: "mapa_antes.png",
+              description: "Un denso bosque donde los árboles son galletas gigantes. Alberga minijuegos de exploración como 'Explorador de Cuevas' que fomentan la curiosidad y resolución de enigmas."
+            },
+            { 
+              name: "Montañas de Merengue", 
+              image: "mapa3.png", 
+              fallbackImage: "ingame3.jpg",
+              description: "Altas montañas cubiertas de merengue donde los niños pueden practicar minijuegos de escalada y orientación espacial como 'Laberinto Mágico'."
+            },
+            { 
+              name: "Valle de Chocolate", 
+              image: "mapa4.png", 
+              fallbackImage: "ingame1.jpg",
+              description: "Un valle atravesado por ríos de chocolate. Aquí se encuentran minijuegos como 'Coleccionista de Monedas' para aprender conceptos de economía."
+            },
+            { 
+              name: "Ciudad Pastelera", 
+              image: "mapa5.png", 
+              fallbackImage: "ingame2.jpg",
+              description: "La metrópolis principal del mundo Croissant, con edificios de pasteles y calles de caramelo. Aquí se encuentran minijuegos como 'Trivia Pastelera' y 'Ajedrez de Croissant'."
+            },
+            { 
+              name: "Islas Flotantes", 
+              image: "mapa6.png", 
+              fallbackImage: "desarrollo1.png",
+              description: "Un archipiélago de islas que flotan en el cielo, conectadas por puentes de caramelo. Alberga minijuegos como 'Plataformas Dulces' que mejoran la coordinación."
+            },
+            { 
+              name: "Desierto Crujiente", 
+              image: "mapa7.png", 
+              fallbackImage: "desarrollo3.png",
+              description: "Un vasto desierto de azúcar con oasis de sirope. Incluye minijuegos como 'Carreras de Pasteles' que enseñan conceptos de velocidad y tiempo."
+            },
+            { 
+              name: "Cavernas Glaseadas", 
+              image: "mapa8.png", 
+              fallbackImage: "croisa_outfit2.png",
+              description: "Red de cavernas de glaseado con cristales de azúcar. Aquí se encuentran minijuegos como 'Memoria Dulce' que desarrollan la concentración."
+            },
+            { 
+              name: "Polo Helado", 
+              image: "mapa9.png", 
+              fallbackImage: "croiso_outfit3.png",
+              description: "Región polar con glaciares de helado. Incluye minijuegos como 'Torre de Defensa' y 'Disparos Matemáticos' que fomentan el pensamiento lógico."
+            }
+          ];
+
+          // Crear elementos del carrusel
+          const carousel = document.getElementById('map-carousel');
+          const regionCounter = document.getElementById('region-counter');
+          const regionDescription = document.getElementById('region-description');
+          let currentIndex = 0;
+
+          // Función para actualizar el carrusel
+          function updateMapCarousel() {
+            // Limpiar carrusel
+            carousel.innerHTML = '';
+            
+            // Añadir imagen actual
+            const img = document.createElement('img');
+            img.src = mapRegions[currentIndex].image;
+            img.alt = mapRegions[currentIndex].name;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            // Manejar error de imagen no encontrada
+            img.onerror = function() {
+              this.src = mapRegions[currentIndex].fallbackImage;
+              this.onerror = null;
+            };
+            carousel.appendChild(img);
+            
+            // Actualizar contador
+            regionCounter.textContent = `${currentIndex + 1}/${mapRegions.length}`;
+            
+            // Actualizar descripción
+            regionDescription.innerHTML = `
+              <h3 style="color: var(--primary-color); margin-bottom: 10px;">${mapRegions[currentIndex].name}</h3>
+              <p>${mapRegions[currentIndex].description}</p>
+            `;
+          }
+          
+          // Botones de navegación
+          document.getElementById('prev-region').addEventListener('click', function() {
+            currentIndex = (currentIndex - 1 + mapRegions.length) % mapRegions.length;
+            updateMapCarousel();
+          });
+          
+          document.getElementById('next-region').addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % mapRegions.length;
+            updateMapCarousel();
+          });
+          
+          // Inicializar carrusel
+          updateMapCarousel();
+        });
+      </script>
+
+      <!-- Slide 4: Colección de Minijuegos -->
+      <div class="demo-slide" data-speech="¡Croissant Adventure cuenta con 17 minijuegos educativos! Cada uno está diseñado para desarrollar diferentes habilidades mientras los niños se divierten.">
+        <div class="slide-content">
+          <div class="slide-text">
+            <h2>Colección de Minijuegos</h2>
+            <p>Croissant Adventure ofrece <strong>17 minijuegos educativos</strong> que cubren diferentes áreas de aprendizaje:</p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+              <li>Matemáticas: Operaciones, lógica y resolución de problemas</li>
+              <li>Lenguaje: Vocabulario, ortografía y lectura</li>
+              <li>Habilidades cognitivas: Memoria, atención y coordinación</li>
+              <li>Creatividad: Dibujo, música y expresión artística</li>
+            </ul>
+            <p style="margin-top: 15px;">Cada minijuego está integrado con Firebase para guardar el progreso y adaptarse al nivel del jugador.</p>
+            <div style="margin-top: 15px;">
+              <div id="carousel-controls" style="display: flex; justify-content: center;">
+                <button id="prev-game" class="demo-btn" style="margin-right: 10px;">Anterior</button>
+                <span id="game-counter" style="align-self: center; padding: 0 15px;">1/17</span>
+                <button id="next-game" class="demo-btn" style="margin-left: 10px;">Siguiente</button>
+              </div>
+            </div>
+          </div>
+          <div class="slide-image">
+            <div id="minigames-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 15px; box-shadow: 0 5px 15px var(--shadow-color);">
+              <!-- Los elementos del carrusel se crean dinámicamente con JavaScript -->
+            </div>
+            <div id="game-description" style="background: white; border-radius: 10px; padding: 15px; margin-top: 15px; min-height: 80px;">
+              <h3 style="color: var(--primary-color); margin-bottom: 10px;">Pescador Pastelero</h3>
+              <p>Los niños practican matemáticas básicas mientras pescan pasteles con valores numéricos para resolver ecuaciones.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Script para el carrusel de minijuegos -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Lista de minijuegos con sus descripciones
+          const minigames = [
+            { name: "Pescador Pastelero", image: "minigames/fishing.jpg", description: "Los niños practican matemáticas básicas mientras pescan pasteles con valores numéricos para resolver ecuaciones." },
+            { name: "Surfista Glaseado", image: "minigames/surfing.jpg", description: "Juego de ortografía donde los niños surfean olas mientras recogen letras para formar palabras correctas." },
+            { name: "Memoria Dulce", image: "minigames/memory.jpg", description: "Juego de memoria que ayuda a desarrollar la concentración y reconocimiento de patrones." },
+            { name: "Rompecabezas Glaseado", image: "minigames/puzzle.jpg", description: "Rompecabezas que desarrollan habilidades espaciales y resolución de problemas." },
+            { name: "Carreras de Pasteles", image: "minigames/Racing.png", description: "Carreras divertidas que enseñan conceptos de velocidad, distancia y tiempo." },
+            { name: "Explorador de Cuevas", image: "minigames/caveExplorer.png", description: "Aventura de exploración que fomenta la curiosidad y resolución de enigmas." },
+            { name: "Ajedrez de Croissant", image: "minigames/chess.jpg", description: "Versión temática de ajedrez que desarrolla el pensamiento estratégico." },
+            { name: "Coleccionista de Monedas", image: "minigames/coinCollector.jpg", description: "Juego para aprender conceptos básicos de economía y valor." },
+            { name: "Laberinto Mágico", image: "minigames/maze.jpg", description: "Laberintos que mejoran la orientación espacial y resolución de problemas." },
+            { name: "Pintando Aventuras", image: "minigames/paintGame.jpg", description: "Juego creativo que fomenta la expresión artística y el reconocimiento de colores." },
+            { name: "Plataformas Dulces", image: "minigames/platform.jpg", description: "Juego de plataformas que mejora la coordinación y los reflejos." },
+            { name: "Ritmo Musical", image: "minigames/rhythm.jpg", description: "Juego musical que desarrolla el sentido del ritmo y la coordinación." },
+            { name: "Ruleta Educativa", image: "minigames/roulette.jpg", description: "Ruleta con preguntas de diferentes materias educativas." },
+            { name: "Disparos Matemáticos", image: "minigames/shooter.jpg", description: "Juego de disparos donde se resuelven operaciones matemáticas." },
+            { name: "Serpiente Numérica", image: "minigames/snake.jpg", description: "Versión educativa del clásico juego de la serpiente con retos matemáticos." },
+            { name: "Torre de Defensa", image: "minigames/towerDefense.jpg", description: "Juego de estrategia que fomenta el pensamiento lógico y la planificación." },
+            { name: "Trivia Pastelera", image: "minigames/triviaGame.jpg", description: "Juego de preguntas y respuestas sobre diversos temas educativos." }
+          ];
+
+          // Crear elementos del carrusel
+          const carousel = document.getElementById('minigames-carousel');
+          const gameCounter = document.getElementById('game-counter');
+          const gameDescription = document.getElementById('game-description');
+          let currentIndex = 0;
+
+          // Función para actualizar el carrusel
+          function updateCarousel() {
+            // Limpiar carrusel
+            carousel.innerHTML = '';
+            
+            // Añadir imagen actual
+            const img = document.createElement('img');
+            img.src = minigames[currentIndex].image;
+            img.alt = minigames[currentIndex].name;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            carousel.appendChild(img);
+            
+            // Actualizar contador
+            gameCounter.textContent = `${currentIndex + 1}/${minigames.length}`;
+            
+            // Actualizar descripción
+            gameDescription.innerHTML = `
+              <h3 style="color: var(--primary-color); margin-bottom: 10px;">${minigames[currentIndex].name}</h3>
+              <p>${minigames[currentIndex].description}</p>
+            `;
+          }
+          
+          // Botones de navegación
+          document.getElementById('prev-game').addEventListener('click', function() {
+            currentIndex = (currentIndex - 1 + minigames.length) % minigames.length;
+            updateCarousel();
+          });
+          
+          document.getElementById('next-game').addEventListener('click', function() {
+            currentIndex = (currentIndex + 1) % minigames.length;
+            updateCarousel();
+          });
+          
+          // Inicializar carrusel
+          updateCarousel();
+        });
+      </script>
 
       <!-- Slide 6: Chat Inteligente -->
       <div class="demo-slide" data-speech="Nuestro chat inteligente ayuda a los niños con preguntas y les brinda asistencia personalizada.">
@@ -872,29 +1119,233 @@
             <p style="margin-top: 15px;">El chat está diseñado para ser seguro y educativo, fomentando el aprendizaje mientras los niños juegan.</p>
             <div style="margin-top: 20px;">
               <div style="display: flex; align-items: center;">
-                <input type="text" placeholder="Haz una pregunta..." style="padding: 10px; border-radius: 8px; border: 2px solid var(--primary-color); width: 70%;">
-                <button class="demo-btn" style="margin-left: 10px;" onclick="alert('Esta función estará disponible en la versión completa del juego.')">Enviar</button>
+                <input type="text" id="demo-chat-input" placeholder="Haz una pregunta..." style="padding: 10px; border-radius: 8px; border: 2px solid var(--primary-color); width: 70%;">
+                <button id="demo-chat-send" class="demo-btn" style="margin-left: 10px;">Enviar</button>
               </div>
+              <div id="ai-status" style="font-size: 12px; color: #666; margin-top: 5px; height: 15px;"></div>
             </div>
           </div>
           <div class="slide-image">
-            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px var(--shadow-color);">
-              <div style="display: flex; align-items: flex-start; margin-bottom: 15px;">
-                <div style="width: 40px; height: 40px; background-image: url('croiso.png'); background-size: contain; background-repeat: no-repeat; margin-right: 10px;"></div>
-                <div style="background: #f0f0f0; padding: 10px; border-radius: 10px; max-width: 80%;">¡Hola! Soy Croiso. ¿En qué puedo ayudarte hoy?</div>
-              </div>
-              <div style="display: flex; align-items: flex-start; margin-bottom: 15px; justify-content: flex-end;">
-                <div style="background: var(--secondary-color); padding: 10px; border-radius: 10px; max-width: 80%;">¿Cómo puedo jugar al Pescador Pastelero?</div>
-                <div style="width: 40px; height: 40px; background-image: url('croisa.png'); background-size: contain; background-repeat: no-repeat; margin-left: 10px;"></div>
-              </div>
-              <div style="display: flex; align-items: flex-start;">
-                <div style="width: 40px; height: 40px; background-image: url('croiso.png'); background-size: contain; background-repeat: no-repeat; margin-right: 10px;"></div>
-                <div style="background: #f0f0f0; padding: 10px; border-radius: 10px; max-width: 80%;">¡Claro! Para jugar al Pescador Pastelero, dirígete a la Playa Caramelizada en el mapa. Cuando veas un icono de caña de pescar, haz clic en él. El objetivo es pescar los pasteles con el valor numérico correcto para resolver la ecuación que aparece en pantalla. ¡Es divertido y aprenderás matemáticas!</div>
+            <div id="demo-chat-container" style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px var(--shadow-color); height: 300px; overflow-y: auto;">
+              <div id="demo-chat-messages">
+                <!-- Los mensajes serán agregados dinámicamente aquí -->
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      <!-- Script para el Chat Inteligente -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Mini versión de StorytellerAI para la demo
+          class DemoStorytellerAI {
+            constructor() {
+              this.messages = [];
+              this.isFetchingResponse = false;
+              this.loadingTime = 800; // Tiempo simulado de carga
+              
+              // Palabras clave para destacar
+              this.gameKeywords = {
+                'monedas': 'coinCollector',
+                'tesoro': 'coinCollector',
+                'ruleta': 'roulette',
+                'ajedrez': 'chess',
+                'laberinto': 'maze',
+                'disparar': 'shooter',
+                'plataforma': 'platform',
+                'memoria': 'memory',
+                'serpiente': 'snake',
+                'rompecabezas': 'puzzle',
+                'música': 'rhythm',
+                'torre': 'towerDefense',
+                'pintar': 'paintGame',
+                'trivia': 'triviaGame',
+                'pescador': 'fishing',
+                'surfista': 'surfing',
+                'matemáticas': 'math',
+                'lenguaje': 'language'
+              };
+              
+              // Respuestas predefinidas para la demo
+              this.responses = {
+                'pescador': 'El minijuego Pescador Pastelero se encuentra en la Playa Caramelizada. ¡Atrapa pasteles con valores numéricos para resolver ecuaciones matemáticas!',
+                'surfista': 'En Surfista Glaseado montarás sobre las olas recogiendo letras para formar palabras. Está ubicado en la costa sur de la Playa Caramelizada.',
+                'minijuegos': 'Croissant Adventure tiene 17 minijuegos educativos. Están distribuidos por todo el mapa y cada uno enseña habilidades diferentes, desde matemáticas hasta lenguaje y creatividad.',
+                'regiones': 'El mundo de Croissant Adventure tiene 9 regiones temáticas: Playa Caramelizada, Bosque de Galletas, Montañas de Merengue, Valle de Chocolate, Ciudad Pastelera, Islas Flotantes, Desierto Crujiente, Cavernas Glaseadas y Polo Helado.',
+                'matemáticas': 'Los minijuegos de matemáticas incluyen Pescador Pastelero, Disparos Matemáticos y Serpiente Numérica. ¡Aprenderás operaciones básicas mientras te diviertes!',
+                'lenguaje': 'Para practicar lenguaje, prueba los minijuegos de Surfista Glaseado o Trivia Pastelera. Son perfectos para ampliar vocabulario y mejorar ortografía.',
+                'croiso': 'Soy Croiso, el guía principal de Croissant Adventure. Mi misión es acompañarte en tu aventura educativa y ayudarte a descubrir todos los secretos de Migalandia.',
+                'firebase': 'Usamos Firebase para guardar tu progreso en los minijuegos, gestionar tu perfil y permitirte acceder desde cualquier dispositivo. ¡Así nunca perderás tus avances!'
+              };
+              
+              this.defaultResponse = 'Lo siento, no tengo información sobre eso en esta demostración. En el juego completo podré responderte cualquier pregunta sobre Croissant Adventure y sus minijuegos educativos.';
+              
+              // Inicializar chat
+              this.addMessage('bot', '¡Hola! Soy Croiso. ¿En qué puedo ayudarte hoy?');
+            }
+            
+            // Actualiza el estado mostrado al usuario
+            updateStatus(message) {
+              const statusElement = document.getElementById('ai-status');
+              if (statusElement) {
+                statusElement.textContent = message;
+              }
+            }
+            
+            // Añade un mensaje al historial de conversación
+            addMessage(role, content) {
+              this.messages.push({ role, content });
+              this.renderMessages();
+              return this.messages.length - 1;
+            }
+            
+            // Renderiza los mensajes en el interfaz
+            renderMessages() {
+              const chatMessages = document.getElementById('demo-chat-messages');
+              if (!chatMessages) return;
+              
+              chatMessages.innerHTML = '';
+              
+              this.messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.style.display = 'flex';
+                messageElement.style.alignItems = 'flex-start';
+                messageElement.style.marginBottom = '15px';
+                
+                if (message.role === 'bot') {
+                  // Mensaje del bot (izquierda)
+                  const avatar = document.createElement('div');
+                  avatar.style.width = '40px';
+                  avatar.style.height = '40px';
+                  avatar.style.backgroundImage = "url('croiso.png')";
+                  avatar.style.backgroundSize = 'contain';
+                  avatar.style.backgroundRepeat = 'no-repeat';
+                  avatar.style.marginRight = '10px';
+                  
+                  const bubble = document.createElement('div');
+                  bubble.style.background = '#f0f0f0';
+                  bubble.style.padding = '10px';
+                  bubble.style.borderRadius = '10px';
+                  bubble.style.maxWidth = '80%';
+                  
+                  // Marcar palabras clave
+                  let content = message.content;
+                  Object.keys(this.gameKeywords).forEach(keyword => {
+                    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                    content = content.replace(regex, match => `<span style="color: var(--primary-color); font-weight: bold;">${match}</span>`);
+                  });
+                  
+                  bubble.innerHTML = content;
+                  
+                  messageElement.appendChild(avatar);
+                  messageElement.appendChild(bubble);
+                } else {
+                  // Mensaje del usuario (derecha)
+                  messageElement.style.justifyContent = 'flex-end';
+                  
+                  const bubble = document.createElement('div');
+                  bubble.style.background = 'var(--secondary-color)';
+                  bubble.style.padding = '10px';
+                  bubble.style.borderRadius = '10px';
+                  bubble.style.maxWidth = '80%';
+                  bubble.textContent = message.content;
+                  
+                  const avatar = document.createElement('div');
+                  avatar.style.width = '40px';
+                  avatar.style.height = '40px';
+                  avatar.style.backgroundImage = "url('croisa.png')";
+                  avatar.style.backgroundSize = 'contain';
+                  avatar.style.backgroundRepeat = 'no-repeat';
+                  avatar.style.marginLeft = '10px';
+                  
+                  messageElement.appendChild(bubble);
+                  messageElement.appendChild(avatar);
+                }
+                
+                chatMessages.appendChild(messageElement);
+              });
+              
+              // Scroll al final
+              const container = document.getElementById('demo-chat-container');
+              if (container) {
+                container.scrollTop = container.scrollHeight;
+              }
+            }
+            
+            // Procesa un mensaje del usuario y genera una respuesta
+            async processUserMessage(userInput) {
+              if (this.isFetchingResponse) {
+                return;
+              }
+              
+              try {
+                this.isFetchingResponse = true;
+                
+                // Añadir mensaje del usuario
+                this.addMessage('user', userInput);
+                this.updateStatus('Pensando...');
+                
+                // Simular tiempo de procesamiento
+                await new Promise(resolve => setTimeout(resolve, this.loadingTime));
+                
+                // Buscar palabras clave en la entrada del usuario
+                let response = this.defaultResponse;
+                const inputLower = userInput.toLowerCase();
+                
+                // Verificar qué palabras clave están en la entrada
+                for (const keyword in this.responses) {
+                  if (inputLower.includes(keyword)) {
+                    response = this.responses[keyword];
+                    break;
+                  }
+                }
+                
+                // Si no hay coincidencias específicas pero pregunta sobre minijuegos
+                if (response === this.defaultResponse && 
+                    (inputLower.includes('juego') || inputLower.includes('jugar'))) {
+                  response = this.responses['minijuegos'];
+                }
+                
+                // Añadir la respuesta del bot
+                this.addMessage('bot', response);
+                this.updateStatus('');
+              } catch (error) {
+                console.error('Error en el procesamiento del mensaje:', error);
+                this.updateStatus('Error al procesar el mensaje');
+              } finally {
+                this.isFetchingResponse = false;
+              }
+            }
+          }
+          
+          // Inicializar el sistema de chat para la demo
+          const demoAI = new DemoStorytellerAI();
+          
+          // Configurar los eventos de la interfaz
+          const inputElement = document.getElementById('demo-chat-input');
+          const sendButton = document.getElementById('demo-chat-send');
+          
+          // Función para enviar mensaje
+          const sendMessage = () => {
+            const userInput = inputElement.value.trim();
+            if (userInput) {
+              demoAI.processUserMessage(userInput);
+              inputElement.value = '';
+            }
+          };
+          
+          // Evento para el botón de enviar
+          sendButton.addEventListener('click', sendMessage);
+          
+          // Evento para presionar Enter
+          inputElement.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              sendMessage();
+            }
+          });
+        });
+      </script>
 
       <!-- Slide 7: Control Parental -->
       <div class="demo-slide" data-speech="El control parental permite a los padres supervisar y gestionar la experiencia de juego de sus hijos.">
