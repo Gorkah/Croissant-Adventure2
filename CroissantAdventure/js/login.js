@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
             "Croisa",
             "Croisa Universitaria",
             "Croisa playera",
-            "Croisa Hada",
+            "Croisa Princesa",
             "Croisa la exploradora",
             "Croisa Experta en Volcanes"
         ]
