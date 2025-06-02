@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
             "Croiso Pianista"
         ],
         croisa: [
-            "Croisa Exploradora",
-            "Croisa Pastelera",
-            "Croisa Sirena",
+            "Croisa",
+            "Croisa Universitaria",
+            "Croisa playera",
             "Croisa Hada",
-            "Croisa Deportista",
-            "Croisa Artista"
+            "Croisa la exploradora",
+            "Croisa Experta en Volcanes"
         ]
     };
     
