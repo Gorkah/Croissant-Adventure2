@@ -19,8 +19,8 @@ class PlatformMinigame extends Minigame {
         this.player = {
             x: this.game.width / 2,
             y: this.game.height - 200,
-            width: 80,
-            height: 80,
+            width: 70,
+            height: 70,
             velocityX: 0,
             velocityY: 0,
             jumping: false,
@@ -31,7 +31,7 @@ class PlatformMinigame extends Minigame {
         // Physics
         this.gravity = 0.5;
         this.friction = 0.8;
-        this.jumpPower = -12;
+        this.jumpPower = -14;
         
         // Platforms
         this.platforms = this.generatePlatforms();

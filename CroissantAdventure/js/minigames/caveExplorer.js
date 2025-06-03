@@ -329,7 +329,7 @@ window.CaveExplorerMinigame = class CaveExplorerMinigame extends Minigame {
             if (crystal.matched) {
                 // Rotar y hacer flotar los cristales emparejados
                 crystal.rotation += deltaTime * 2;
-                crystal.y += Math.sin(time + crystal.animOffset) * 0.5;
+                crystal.y += Math.sin(time + crystal.animOffset) * 0.2;
             }
         }
         
