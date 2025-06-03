@@ -54,6 +54,10 @@ class Game {
             lastLogin: new Date()
         };
         
+        // Firebase status
+        this.firebaseReady = false;
+        this.syncWithFirebase = false;
+        
         // Cargar datos de control parental si existen
         this.loadParentalControls();
         
@@ -62,6 +66,9 @@ class Game {
         
         // Load assets
         this.loadAssets();
+        
+        // Inicializar Firebase y cargar datos del usuario
+        this.initializeFirebase();
     }
     
     /**
@@ -267,14 +274,47 @@ class Game {
         if (source === 'coin') {
             this.playerCoins++;
             this.achievements.coinsCollected++;
+            // Sincronizar con Firebase
+            if (this.syncWithFirebase && window.firebaseGameUtils) {
+                window.firebaseGameUtils.logPlayerAchievement('coinsCollected', this.achievements.coinsCollected);
+            }
         } else if (source === 'minigame') {
             this.achievements.minigamesPlayed++;
+            // Sincronizar con Firebase
+            if (this.syncWithFirebase && window.firebaseGameUtils) {
+                window.firebaseGameUtils.logPlayerAchievement('minigamesPlayed', this.achievements.minigamesPlayed);
+            }
         } else if (source === 'chess') {
             this.achievements.chessMoves++;
+            // Sincronizar con Firebase
+            if (this.syncWithFirebase && window.firebaseGameUtils) {
+                window.firebaseGameUtils.logPlayerAchievement('chessMoves', this.achievements.chessMoves);
+            }
         } else if (source === 'maze') {
             this.achievements.mazeCompleted = true;
+            // Sincronizar con Firebase
+            if (this.syncWithFirebase && window.firebaseGameUtils) {
+                window.firebaseGameUtils.logPlayerAchievement('mazeCompleted', true);
+            }
         } else if (source === 'shooter') {
             this.achievements.shooterHighscore = Math.max(this.achievements.shooterHighscore, points);
+            // Sincronizar con Firebase
+            if (this.syncWithFirebase && window.firebaseGameUtils) {
+                window.firebaseGameUtils.logPlayerAchievement('shooterHighscore', this.achievements.shooterHighscore);
+            }
+        }
+        
+        // Actualizar puntuación en Firebase
+        if (this.syncWithFirebase && window.firebaseGameUtils) {
+            window.firebaseGameUtils.updatePlayerScore(this.playerScore, source)
+                .then(success => {
+                    if (success) {
+                        console.log('Puntuación sincronizada con Firebase');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al sincronizar puntuación:', error);
+                });
         }
     }
     
@@ -418,7 +458,14 @@ class Game {
             lastLogin: new Date().toISOString()
         };
         
+        // Guardar en localStorage
         localStorage.setItem('croissantAdventure_parentalControl', JSON.stringify(parentalData));
+        
+        // Guardar en Firebase si está disponible
+        if (this.syncWithFirebase) {
+            // Guardar todos los datos del jugador, incluyendo control parental
+            this.saveGameDataToFirebase();
+        }
     }
     
     /**
@@ -493,8 +540,148 @@ class Game {
         // Actualizar estadísticas generales
         this.achievements.minigamesPlayed++;
         
+        // Sincronizar con Firebase si está disponible
+        if (this.syncWithFirebase && window.firebaseGameUtils) {
+            window.firebaseGameUtils.logPlayerAchievement('minigamesPlayed', this.achievements.minigamesPlayed);
+        }
+        
         // Guardar datos actualizados
         this.saveParentalControls();
+    }
+    
+    /**
+     * Inicializar Firebase y cargar datos del usuario
+     */
+    async initializeFirebase() {
+        try {
+            // Verificar si está disponible firebaseGameUtils
+            if (!window.firebaseGameUtils) {
+                console.warn('Las utilidades de Firebase no están disponibles');
+                this.firebaseReady = false;
+                this.syncWithFirebase = false;
+                return;
+            }
+            
+            // Inicializar Firebase
+            const initialized = window.firebaseGameUtils.initializeFirebaseGame();
+            if (!initialized) {
+                console.warn('No se pudo inicializar Firebase');
+                return;
+            }
+            
+            // Obtener nombre de usuario del localStorage
+            const username = localStorage.getItem('playerName');
+            if (!username) {
+                console.warn('No hay usuario logueado para sincronizar con Firebase');
+                return;
+            }
+            
+            // Configurar nombre de usuario para Firebase
+            window.firebaseGameUtils.setUsername(username);
+            
+            // Inicializar autenticación de Firebase
+            const user = await window.firebaseGameUtils.initializeFirebaseAuth();
+            
+            if (user) {
+                console.log('Usuario autenticado en Firebase:', user.uid);
+                this.firebaseReady = true;
+                this.syncWithFirebase = true;
+                
+                // Cargar datos del jugador desde Firebase
+                await this.loadGameDataFromFirebase();
+            } else {
+                // Si no hay autenticación pero tenemos usuario en localStorage,
+                // intentamos cargar datos de todas formas (modo sin conexión)
+                console.log('Usando Firebase en modo sin autenticación');
+                this.firebaseReady = true;
+                this.syncWithFirebase = true;
+                
+                // Cargar datos del jugador desde Firebase
+                await this.loadGameDataFromFirebase();
+            }
+        } catch (error) {
+            console.error('Error al inicializar Firebase:', error);
+            this.firebaseReady = false;
+            this.syncWithFirebase = false;
+        }
+    }
+    
+    /**
+     * Guardar datos del juego en Firebase
+     */
+    async saveGameDataToFirebase() {
+        if (!this.syncWithFirebase || !window.firebaseGameUtils) {
+            return false;
+        }
+        
+        try {
+            // Preparar datos del juego para guardar
+            const gameData = {
+                playerScore: this.playerScore,
+                playerCoins: this.playerCoins,
+                achievements: this.achievements,
+                parentalControl: this.parentalControl
+            };
+            
+            // Guardar datos en Firebase
+            const success = await window.firebaseGameUtils.savePlayerData(gameData);
+            return success;
+        } catch (error) {
+            console.error('Error al guardar datos del juego en Firebase:', error);
+            return false;
+        }
+    }
+    
+    /**
+     * Cargar datos del juego desde Firebase
+     */
+    async loadGameDataFromFirebase() {
+        if (!this.syncWithFirebase || !window.firebaseGameUtils) {
+            return false;
+        }
+        
+        try {
+            // Cargar datos desde Firebase
+            const gameData = await window.firebaseGameUtils.loadPlayerData();
+            
+            if (gameData) {
+                console.log('Datos cargados desde Firebase:', gameData);
+                
+                // Actualizar datos del juego con los datos cargados
+                this.playerScore = gameData.playerScore;
+                this.playerCoins = gameData.playerCoins;
+                
+                // Actualizar logros, manteniendo los que ya existen
+                if (gameData.achievements) {
+                    this.achievements = {
+                        ...this.achievements,
+                        ...gameData.achievements
+                    };
+                }
+                
+                // Actualizar control parental si existe
+                if (gameData.parentalControl) {
+                    // Mantener la sesión actual
+                    const currentSession = this.parentalControl.timeTracking.sessionStart;
+                    
+                    this.parentalControl = {
+                        ...this.parentalControl,
+                        ...gameData.parentalControl
+                    };
+                    
+                    // Restaurar la sesión actual
+                    this.parentalControl.timeTracking.sessionStart = currentSession;
+                }
+                
+                console.log('Datos del juego actualizados con Firebase');
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Error al cargar datos del juego desde Firebase:', error);
+            return false;
+        }
     }
     
     /**
