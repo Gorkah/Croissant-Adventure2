@@ -307,12 +307,33 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Guardar la edad del niño para las actividades adaptativas
             localStorage.setItem('childAge', childAge || '8');
+            
+            // Guardar la tarea personalizada si existe
+            if (taskDescription && taskDescription.trim() !== '') {
+                try {
+                    // Obtener tareas existentes o crear un array vacío
+                    const existingTasks = JSON.parse(localStorage.getItem('customTasks') || '[]');
+                    
+                    // Agregar la nueva tarea personalizada
+                    existingTasks.push({
+                        description: taskDescription,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    // Guardar el array actualizado
+                    localStorage.setItem('customTasks', JSON.stringify(existingTasks));
+                    console.log('Tarea personalizada guardada:', taskDescription);
+                } catch (e) {
+                    console.error('Error al guardar tarea personalizada:', e);
+                }
+            }
         } else {
             // Desactivar control parental
             localStorage.removeItem('parentalControlEnabled');
             localStorage.removeItem('playTimeLimit');
             localStorage.removeItem('taskDescription');
             localStorage.removeItem('playTimeEnd');
+            localStorage.removeItem('customTasks'); // También eliminar las tareas personalizadas
             console.log('Control parental desactivado');
         }
         

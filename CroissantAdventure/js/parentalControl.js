@@ -12,6 +12,7 @@ class ParentalControl {
         this.taskDescription = localStorage.getItem('taskDescription') || 'Completar una actividad educativa';
         this.playTimeEnd = parseInt(localStorage.getItem('playTimeEnd')) || 0;
         this.childAge = parseInt(localStorage.getItem('childAge')) || 8; // Edad por defecto
+        this.customTasks = JSON.parse(localStorage.getItem('customTasks')) || []; // Tareas extra añadidas en el login
         this.timerInterval = null;
         this.timerElement = null;
         this.containerElement = null;
@@ -378,8 +379,28 @@ class ParentalControl {
         const mathActivity = this.generateMathActivity();
         const puzzleActivity = this.generatePuzzleActivity();
         
+        // Array de actividades que incluye las predefinidas
+        let activities = [writingActivity, mathActivity, puzzleActivity];
+        
+        // Añadir tareas personalizadas si existen
+        if (this.customTasks && this.customTasks.length > 0) {
+            for (const customTask of this.customTasks) {
+                // Solo añadir si la descripción de tarea no está vacía
+                if (customTask && customTask.description && customTask.description.trim() !== '') {
+                    activities.push({
+                        type: 'custom',
+                        icon: '📝',
+                        title: 'Tarea extra',
+                        instruction: customTask.description || 'Completa la tarea extra',
+                        content: '',
+                        difficulty: 'personalizada'
+                    });
+                }
+            }
+        }
+        
         // Crear tarjetas para cada actividad
-        [writingActivity, mathActivity, puzzleActivity].forEach(activity => {
+        activities.forEach(activity => {
             const activityCard = document.createElement('div');
             activityCard.className = 'activity-card';
             activityCard.style.width = '120px';
@@ -518,6 +539,60 @@ class ParentalControl {
             const password = passwordInput.value.trim();
             // Verificar con la contraseña usada en el login (admin)
             if (password === 'admin') {
+                // Comprobar si hay una tarea personalizada en curso
+                // Buscar tanto por tarjetas de actividad como por contenido de actividad
+                const customActivityCard = overlay.querySelector('[data-activity-type="custom"]');
+                const customActivityContent = overlay.querySelector('div[data-activity-type="custom"]');
+                
+                if (customActivityCard || customActivityContent) {
+                    console.log('Desbloqueando tarea personalizada con contraseña parental');
+                    
+                    // Si hay una tarea personalizada en curso, marcarla como completada
+                    if (customActivityContent) {
+                        const resultMessage = overlay.querySelector('div[style*="margin-top: 15px"]');
+                        if (resultMessage) {
+                            resultMessage.textContent = '¡Desbloqueado con contraseña parental!';
+                            resultMessage.style.backgroundColor = 'rgba(119, 221, 119, 0.3)';
+                            resultMessage.style.color = '#2b9348';
+                            resultMessage.style.display = 'block';
+                            
+                            const submitButton = overlay.querySelector('button[style*="margin-top: 20px"]');
+                            if (submitButton) {
+                                submitButton.disabled = true;
+                                submitButton.style.backgroundColor = '#cccccc';
+                            }
+                            
+                            // Extender el tiempo y cerrar después de un segundo
+                            setTimeout(() => {
+                                // Extender el tiempo de juego
+                                const playTimeInMinutes = parseInt(localStorage.getItem('playTimeLimit')) || 30;
+                                const currentTime = new Date().getTime();
+                                const newEndTime = currentTime + (playTimeInMinutes * 60 * 1000);
+                                localStorage.setItem('playTimeEnd', newEndTime.toString());
+                                
+                                // Reiniciar el temporizador
+                                this.playTimeEnd = newEndTime;
+                                if (this.timerElement) {
+                                    this.timerElement.textContent = this.formatTimeRemaining();
+                                    this.timerElement.style.color = '#5c4a38';
+                                    this.containerElement.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                                    this.containerElement.style.animation = 'none';
+                                }
+                                
+                                // Iniciar temporizador
+                                this.startTimer();
+                                
+                                // Eliminar pantalla de tarea
+                                document.body.removeChild(overlay);
+                                
+                                console.log(`Tarea personalizada desbloqueada. Tiempo extendido por ${playTimeInMinutes} minutos más.`);
+                            }, 1000);
+                            return;
+                        }
+                    }
+                }
+                
+                // Si no hay tarea personalizada o no se pudo desbloquear, proceder normalmente
                 // Extender el tiempo de juego
                 const playTimeInMinutes = parseInt(localStorage.getItem('playTimeLimit')) || 30;
                 const currentTime = new Date().getTime();
@@ -595,7 +670,7 @@ class ParentalControl {
         
         // Contenido de la actividad
         let activityContent;
-        if (activity.type === 'writing') {
+        if (activity.type === 'writing' || activity.type === 'custom') { // Tratar las tareas personalizadas como actividades de escritura
             activityContent = document.createElement('div');
             activityContent.style.width = '100%';
             activityContent.style.marginBottom = '20px';
@@ -671,6 +746,7 @@ class ParentalControl {
             
             // Opciones
             const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'puzzle-options-container'; // Añadir clase para identificarla fácilmente
             optionsContainer.style.display = 'flex';
             optionsContainer.style.flexWrap = 'wrap';
             optionsContainer.style.justifyContent = 'center';
@@ -706,6 +782,7 @@ class ParentalControl {
             
             activityContent.appendChild(puzzleContent);
             activityContent.appendChild(optionsContainer);
+            activityContent.setAttribute('data-activity-type', 'puzzle'); // Atributo para identificar el tipo
         }
         
         // Botón de enviar
@@ -737,6 +814,15 @@ class ParentalControl {
                 const answer = activityContent.querySelector('textarea').value.trim();
                 // Verificación básica: al menos ha escrito algo similar en longitud
                 correct = answer.length >= activity.content.length * 0.5;
+            } else if (activity.type === 'custom') {
+                const answer = activityContent.querySelector('textarea').value.trim();
+                // Para tareas personalizadas, cualquier texto se considera correcto
+                correct = answer.length > 0;
+                
+                // También verificar si es la contraseña parental para desbloqueo inmediato
+                if (answer === 'admin') {
+                    correct = true;
+                }
             } else if (activity.type === 'math') {
                 const answers = activityContent.querySelectorAll('input');
                 correct = Array.from(answers).every((answer, index) => {
@@ -746,7 +832,8 @@ class ParentalControl {
                     return userAnswer === expectedAnswer;
                 });
             } else if (activity.type === 'puzzle') {
-                const selectedOption = optionsContainer.querySelector('button.selected');
+                const puzzleOptionsContainer = activityContent.querySelector('.puzzle-options-container');
+                const selectedOption = puzzleOptionsContainer ? puzzleOptionsContainer.querySelector('button.selected') : null;
                 correct = selectedOption && selectedOption.textContent === activity.answer;
             }
             
