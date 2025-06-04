@@ -757,6 +757,18 @@ class Game {
                 console.error('Error registering PlatformMinigame:', e);
             }
             
+            // Register new minigames
+            try {
+                if (typeof PlatformMinigame !== 'undefined') {
+                    this.registerScene('platform_lava', new PlatformMinigame(this));
+                    console.log('PlatformMinigame registered');
+                } else {
+                    console.error('PlatformMinigame class is not defined');
+                }
+            } catch (e) {
+                console.error('Error registering PlatformMinigame:', e);
+            }
+
             try {
                 if (typeof MemoryMinigame !== 'undefined') {
                     this.registerScene('memory', new MemoryMinigame(this));

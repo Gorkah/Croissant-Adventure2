@@ -427,7 +427,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'LavaRunner',
                 displayName: 'Corredor de Lava Chocolatada',
-                scene: 'platform',
+                scene: 'platform_lava',
                 color: '#FF4500',
                 borderColor: '#8B0000',
                 points: 80,
