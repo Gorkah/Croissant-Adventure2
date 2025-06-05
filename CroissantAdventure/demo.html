@@ -422,6 +422,24 @@
         overflow: hidden;
         background: #fff;
       }
+
+      /* Ajuste para el carrusel de minijuegos */
+      #minigames-carousel {
+        height: auto !important;
+        min-width: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: none !important;
+      }
+      #minigames-carousel img {
+        max-width: 100%;
+        max-height: 360px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        box-shadow: none !important;
+      }
       </style>
 
       <script>
@@ -930,7 +948,7 @@ CroissantAdventure/
             </div>
           </div>
           <div class="slide-image">
-            <div id="map-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 15px; box-shadow: 0 5px 15px var(--shadow-color);">
+            <div id="map-carousel" style="position: relative; width: 100%; height: 300px; overflow: hidden; border-radius: 15px; box-shadow: none;">
               <!-- Imágenes del carrusel generadas dinámicamente -->
             </div>
           </div>
@@ -943,58 +961,58 @@ CroissantAdventure/
           // Lista de regiones con sus descripciones
           const mapRegions = [
             { 
-              name: "Playa Caramelizada", 
+              name: "Jardín del Aprendiz", 
               image: "mapa1.png", 
+              fallbackImage: "mapa_despues.png",
+              description: "Un bonito jardín para todos los recién llegados a Migalandia. Perfecto para aprender las bases del juego y familiarizarse con los controles. ¡Completa el tutorial y prepárate para la aventura!"
+            },
+            { 
+              name: "Bosque Enredado de Migalandia", 
+              image: "mapa2.png", 
+              fallbackImage: "mapa_antes.png",
+              description: "Un denso bosque donde puedes perderte fácilmente. Alberga minijuegos de pensar como 'Bosque Enredado' donde hay que completar un laberinto, o alimentar a 'Silvi la Sssserpiente Golosa'."
+            },
+            { 
+              name: "Cielo Azucarado", 
+              image: "mapa3.png", 
+              fallbackImage: "ingame3.jpg",
+              description: "Un inmenso mar cubierta por un cielo de nubes de algodón de azúcar. Aquí se encuentran minijuegos como 'Los Burbujeadores del Cielo Azucarado' y 'Las Islas Flotantes de Bizcocho'"
+            },
+            { 
+              name: "Playa Caramelizada", 
+              image: "mapa4.png", 
               fallbackImage: "mapa_despues.png",
               description: "Región de playa con minijuegos acuáticos como Pescador Pastelero y Surfista Glaseado. Perfecta para aprender matemáticas y ortografía mientras se disfruta del sol."
             },
             { 
-              name: "Bosque de Galletas", 
-              image: "mapa2.png", 
-              fallbackImage: "mapa_antes.png",
-              description: "Un denso bosque donde los árboles son galletas gigantes. Alberga minijuegos de exploración como 'Explorador de Cuevas' que fomentan la curiosidad y resolución de enigmas."
-            },
-            { 
-              name: "Montañas de Merengue", 
-              image: "mapa3.png", 
-              fallbackImage: "ingame3.jpg",
-              description: "Altas montañas cubiertas de merengue donde los niños pueden practicar minijuegos de escalada y orientación espacial como 'Laberinto Mágico'."
-            },
-            { 
-              name: "Valle de Chocolate", 
-              image: "mapa4.png", 
-              fallbackImage: "ingame1.jpg",
-              description: "Un valle atravesado por ríos de chocolate. Aquí se encuentran minijuegos como 'Coleccionista de Monedas' para aprender conceptos de economía."
-            },
-            { 
-              name: "Ciudad Pastelera", 
+              name: "Reino Cuadriculado", 
               image: "mapa5.png", 
               fallbackImage: "ingame2.jpg",
-              description: "La metrópolis principal del mundo Croissant, con edificios de pasteles y calles de caramelo. Aquí se encuentran minijuegos como 'Trivia Pastelera' y 'Ajedrez de Croissant'."
+              description: "Un reino dirigido por un emperador, con minijuegos de la era medieval. Aquí se encuentran minijuegos como 'Los Guardianes del Reino Cuadriculado' y 'Los Guardianes del Castillo de Azúcar'."
             },
             { 
-              name: "Islas Flotantes", 
+              name: "Lago de la Fortuna", 
               image: "mapa6.png", 
               fallbackImage: "desarrollo1.png",
-              description: "Un archipiélago de islas que flotan en el cielo, conectadas por puentes de caramelo. Alberga minijuegos como 'Plataformas Dulces' que mejoran la coordinación."
-            },
-            { 
-              name: "Desierto Crujiente", 
-              image: "mapa7.png", 
-              fallbackImage: "desarrollo3.png",
-              description: "Un vasto desierto de azúcar con oasis de sirope. Incluye minijuegos como 'Carreras de Pasteles' que enseñan conceptos de velocidad y tiempo."
+              description: "Un pequeño lago situado a la afueras de Migalandia que contempla mucho oro en su interior. Alberga minijuegos como 'El Tesoro de Valle Dorado' y 'La Rueda de la Fortuna Mágica', que ayudan a conseguir unas monedas."
             },
             { 
               name: "Cavernas Glaseadas", 
-              image: "mapa8.png", 
+              image: "mapa7.png", 
               fallbackImage: "croisa_outfit2.png",
-              description: "Red de cavernas de glaseado con cristales de azúcar. Aquí se encuentran minijuegos como 'Memoria Dulce' que desarrollan la concentración."
+              description: "Red de cavernas de glaseado con cristales de azúcar. Aquí se encuentra el minijuego 'Explorador de Cuevas', que ayudar a tener la memoria fresca."
             },
             { 
-              name: "Polo Helado", 
+              name: "Villa de los Recuerdos", 
+              image: "mapa8.png", 
+              fallbackImage: "croisa_outfit2.png",
+              description: "Un lugar mágico donde los recuerdos cobran vida. Incluye minijuegos como 'El Misterio de las Cartas Gemelas' o 'La Orquesta Dulce de Migalandia', que fomentan la memoria y la atención."
+            },
+            { 
+              name: "Lavalandia, vecinos de Migalandia", 
               image: "mapa9.png", 
               fallbackImage: "croiso_outfit3.png",
-              description: "Región polar con glaciares de helado. Incluye minijuegos como 'Torre de Defensa' y 'Disparos Matemáticos' que fomentan el pensamiento lógico."
+              description: "Un agresivo volcán en erupción que no deja de tener actividad. Incluye minijuegos como 'Carrera de FOndant Ardiente' que ayudan a relajarse un poco."
             }
           ];
 
@@ -1013,9 +1031,9 @@ CroissantAdventure/
             const img = document.createElement('img');
             img.src = mapRegions[currentIndex].image;
             img.alt = mapRegions[currentIndex].name;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
+            img.style.width = '400px';
+            img.style.height = 'auto';
+            img.style.objectFit = 'contain';
             // Manejar error de imagen no encontrada
             img.onerror = function() {
               this.src = mapRegions[currentIndex].fallbackImage;
@@ -1054,7 +1072,7 @@ CroissantAdventure/
         <div class="slide-content">
           <div class="slide-text">
             <h2>Colección de Minijuegos</h2>
-            <p>Croissant Adventure ofrece <strong>17 minijuegos educativos</strong> que cubren diferentes áreas de aprendizaje:</p>
+            <p>Croissant Adventure ofrece <strong>18 minijuegos educativos</strong> que cubren diferentes áreas de aprendizaje:</p>
             <ul style="margin-top: 10px; margin-left: 20px;">
               <li>Matemáticas: Operaciones, lógica y resolución de problemas</li>
               <li>Lenguaje: Vocabulario, ortografía y lectura</li>
@@ -1103,7 +1121,8 @@ CroissantAdventure/
             { name: "Disparos Matemáticos", image: "minigames/shooter.jpg", description: "Juego de disparos donde se resuelven operaciones matemáticas." },
             { name: "Serpiente Numérica", image: "minigames/snake.jpg", description: "Versión educativa del clásico juego de la serpiente con retos matemáticos." },
             { name: "Torre de Defensa", image: "minigames/towerDefense.jpg", description: "Juego de estrategia que fomenta el pensamiento lógico y la planificación." },
-            { name: "Trivia Pastelera", image: "minigames/triviaGame.jpg", description: "Juego de preguntas y respuestas sobre diversos temas educativos." }
+            { name: "Trivia Pastelera", image: "minigames/triviaGame.jpg", description: "Juego de preguntas y respuestas sobre diversos temas educativos." },
+            { name: "Corredor de Lava Chocolatada", image: "minigames/lavaRunner.jpg", description: "Recolecta monedas de las plataformas pero, ¡CUIDADO QUE LA LAVA SUBE!" }
           ];
 
           // Crear elementos del carrusel
@@ -1121,9 +1140,9 @@ CroissantAdventure/
             const img = document.createElement('img');
             img.src = minigames[currentIndex].image;
             img.alt = minigames[currentIndex].name;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
+            img.style.width = '400px';
+            img.style.height = 'auto';
+            img.style.objectFit = 'contain';
             carousel.appendChild(img);
             
             // Actualizar contador

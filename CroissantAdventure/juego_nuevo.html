@@ -382,19 +382,29 @@
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@400;600;700&display=swap');
         
         #toggle-view-button {
-            background-color: #26547c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            background: #fff;
+            color: #ef476f;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 0;
+            margin-left: 32px;
+            z-index: 2;
+            transition: background 0.2s, transform 0.2s;
         }
-        
         #toggle-view-button:hover {
-            background-color: #1d3e5f;
+            background: #fff;
+            transform: scale(1.05);
         }
-        
-        #toggle-view-button.gallery-active {
-            background-color: #ef476f;
+        @media (max-width: 700px) {
+            #toggle-view-button {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+                margin-left: 8px;
+            }
         }
         
         #games-gallery {
@@ -537,11 +547,9 @@
           <img id="main-character-img" class="header-outfit-img" src="" alt="Outfit">
           <span id="main-character-name" class="header-outfit-name"></span>
         </div>
+        <!-- Botón de alternar vista -->
+        <button id="toggle-view-button" class="toggle-view-btn">📷 Ver Juegos</button>
         <button id="logout-btn" class="header-logout-btn">Cerrar sesión</button>
-    </div>
-
-    <div class="top-buttons" style="top: 70px;">
-        <button id="toggle-view-button" style="font-family: 'Baloo 2', cursive;">📷 Cambiar vista</button>
     </div>
 
     <div class="container">
@@ -641,7 +649,7 @@
                         </div>
                     </div>    
                     <div class="game-item">
-                        <div class="game-card" style="background-image: url('minigames/nuevo3.jpg');" data-game="nuevo3">
+                        <div class="game-card" style="background-image: url('minigames/lavaRunner.jpg');" data-game="platform_lava">
                         </div>
                     </div>
                 </div>
@@ -923,6 +931,11 @@
                     name: "Corredor de carreras",
                     icon: "🏎️",
                     description: "Corre en una carrera de velocidad."
+                },
+                platform_lava: {
+                    name: "Corredor de Lava Chocolatada",
+                    icon: "🌋",
+                    description: "Recolecta monedas de las plataformas pero, ¡CUIDADO QUE LA LAVA SUBE!"
                 },
 
             };
