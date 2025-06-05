@@ -75,7 +75,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
             speed: 0,              // Velocidad horizontal
             speedY: 0,             // Velocidad vertical
             power: 0,              // Potencia del motor (aceleración)
-            maxPower: 0.3,         // Reducida para más control suave
+            maxPower: 0.1,         // Reducida para más control suave
             brake: 0,              // Fuerza de frenado
             flipped: false,        // Si el vehículo ha volcado
             grounded: false,       // Si el vehículo está en contacto con el suelo
@@ -84,7 +84,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
             wheelFront: {
                 x: 0,              // Posición relativa X (se actualiza)
                 y: 0,              // Posición relativa Y (se actualiza)
-                radius: 20,        // Radio de la rueda
+                radius: 8,        // Radio de la rueda
                 rotation: 0,       // Rotación de la rueda
                 grounded: false,   // Si la rueda toca el suelo
                 springForce: 0,    // Fuerza de resorte aplicada a la rueda
@@ -93,7 +93,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
             wheelBack: {
                 x: 0,              // Posición relativa X (se actualiza)
                 y: 0,              // Posición relativa Y (se actualiza)
-                radius: 20,        // Radio de la rueda
+                radius: 8,        // Radio de la rueda
                 rotation: 0,       // Rotación de la rueda
                 grounded: false,   // Si la rueda toca el suelo
                 springForce: 0,    // Fuerza de resorte aplicada a la rueda
@@ -117,7 +117,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
         };
         
         // Generar terreno ondulado con colinas y valles
-        const terrainLength = this.optimizedRendering ? 500 : 1000;
+        const terrainLength = this.optimizedRendering ? 500 : 2000;
         this.terrain = this.generateTerrain(terrainLength);
         this.terrainSegmentCount = this.terrain.length;
         
@@ -132,13 +132,13 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
         
         // Meta final
         this.finish = {
-            x: (terrainLength - 10) * 400, // Cerca del final del terreno
+            x: (terrainLength - 10) * 31, // Cerca del final del terreno
             y: 0, // Se ajustará al terreno
-            width: 50,
+            width: 300,
             height: 100,
             reached: false,
             flag: {
-                height: 80,
+                height: 150,
                 waving: 0
             }
         };
@@ -187,17 +187,12 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
      * Actualiza las posiciones de las ruedas relativas al vehículo
      */
     updateWheelPositions() {
-        // Posiciones de las ruedas relativas al centro del vehículo
-        const wheelOffset = this.vehicle.width * 0.4;
-        
-        // Rueda trasera
-        this.vehicle.wheelBack.x = this.vehicle.x - wheelOffset;
-        this.vehicle.wheelBack.y = this.vehicle.y + this.vehicle.height / 2;
-        
-        // Rueda delantera
-        this.vehicle.wheelFront.x = this.vehicle.x + wheelOffset;
-        this.vehicle.wheelFront.y = this.vehicle.y + this.vehicle.height / 2;
-    }
+    const wheelBase = this.vehicle.width * 0.8;
+    
+    // Actualizar solo las rotaciones de las ruedas
+    this.vehicle.wheelBack.rotation += this.vehicle.speed * 0.1;
+    this.vehicle.wheelFront.rotation += this.vehicle.speed * 0.1;
+}
     
     /**
      * Genera un terreno ondulado para el juego de hill climbing
@@ -211,7 +206,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
         for (let i = 0; i < 10; i++) {
             terrain.push({
                 x: i * segmentWidth,
-                y: this.game.height - 100, // Altura base
+                y: this.game.height - 100, // Altura base 
                 checkpoint: false,
                 fuel: false,
                 coin: false
@@ -546,6 +541,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
      * Actualiza el estado del juego de Hill Climbing
      */
     update(deltaTime) {
+        // Call parent update method first to handle common functionality like exit button
         super.update(deltaTime);
         
         // Medir rendimiento
@@ -567,7 +563,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
         
         // Manejar entrada del usuario
         this.handleInput(normalizedDelta);
-        
+         
         if (!this.gameOver && !this.victory) {
             // Actualizar física del vehículo
             this.updateVehiclePhysics(physicsStep);
@@ -979,7 +975,7 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
             ctx.beginPath();
             ctx.moveTo(this.terrain[startIndex].x, this.terrain[startIndex].y);
             
-            // Dibujar la línea superior del terreno con una curva suave
+            // Dibujar la línea superior del terreno with una curva suave
             for (let i = startIndex + 1; i <= endIndex; i++) {
                 ctx.lineTo(this.terrain[i].x, this.terrain[i].y);
             }
@@ -1203,100 +1199,96 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
      * @param {CanvasRenderingContext2D} ctx - Contexto del canvas
      */
     renderVehicle(ctx) {
-        // Guardar el estado actual del contexto
         ctx.save();
         
-        // Trasladar al centro del vehículo
+        // Trasladar al centro del vehículo y rotar
         ctx.translate(this.vehicle.x, this.vehicle.y);
         ctx.rotate(this.vehicle.rotation);
         
-        // Dibujar el chasis principal del vehículo
         const w = this.vehicle.width;
         const h = this.vehicle.height;
+        const wheelRadius = 15;
+        const wheelBase = w * 0.8;
         
-        // Sombra para dar profundidad
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 5;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        
-        // Base del vehículo
+        // 1. Dibujar chasis primero
         ctx.fillStyle = this.colors.car;
         ctx.beginPath();
-        ctx.moveTo(-w/2, 0);                 // Parte inferior izquierda
-        ctx.lineTo(-w/2, -h/2);              // Lateral izquierdo
-        ctx.lineTo(-w/4, -h/2 - h/4);        // Capó izquierdo
-        ctx.lineTo(w/4, -h/2 - h/4);         // Techo frontal
-        ctx.lineTo(w/2, -h/2);               // Capó derecho
-        ctx.lineTo(w/2, 0);                  // Lateral derecho
+        ctx.moveTo(-w/2, h/4);      // Base izquierda
+        ctx.lineTo(-w/2, -h/2);     // Lateral izquierdo
+        ctx.lineTo(-w/4, -h*0.7);   // Capó izquierdo
+        ctx.lineTo(w/4, -h*0.7);    // Techo
+        ctx.lineTo(w/2, -h/2);      // Capó derecho
+        ctx.lineTo(w/2, h/4);       // Base derecha
         ctx.closePath();
         ctx.fill();
         
-        // Quitar sombra para otros elementos
-        ctx.shadowColor = 'transparent';
-        
-        // Ventana/cabina
-        ctx.fillStyle = 'rgba(200, 230, 255, 0.8)';
-        ctx.beginPath();
-        ctx.moveTo(-w/4, -h/2);              // Esquina inferior izquierda
-        ctx.lineTo(-w/6, -h/2 - h/6);        // Esquina superior izquierda
-        ctx.lineTo(w/6, -h/2 - h/6);         // Esquina superior derecha
-        ctx.lineTo(w/4, -h/2);               // Esquina inferior derecha
-        ctx.closePath();
-        ctx.fill();
-        
-        // Detalles del vehículo
+        // Contorno del chasis
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1.5;
-        
-        // Contorno del vehículo
-        ctx.beginPath();
-        ctx.moveTo(-w/2, 0);                 // Parte inferior izquierda
-        ctx.lineTo(-w/2, -h/2);              // Lateral izquierdo
-        ctx.lineTo(-w/4, -h/2 - h/4);        // Capó izquierdo
-        ctx.lineTo(w/4, -h/2 - h/4);         // Techo frontal
-        ctx.lineTo(w/2, -h/2);               // Capó derecho
-        ctx.lineTo(w/2, 0);                  // Lateral derecho
-        ctx.closePath();
+        ctx.lineWidth = 2;
         ctx.stroke();
         
-        // Si el vehículo está acelerando, mostrar efectos de humo/fuego en el escape
-        if (this.vehicle.accelerating && this.vehicle.grounded) {
-            // Posición del escape
-            const exhaustX = -w/2 - 5;
-            const exhaustY = -h/4;
-            
-            // Colores del escape
-            const gradientExhaust = ctx.createRadialGradient(
-                exhaustX, exhaustY, 0,
-                exhaustX, exhaustY, 10
-            );
-            
-            gradientExhaust.addColorStop(0, 'rgba(255, 140, 0, 0.8)');
-            gradientExhaust.addColorStop(0.6, 'rgba(130, 130, 130, 0.5)');
-            gradientExhaust.addColorStop(1, 'rgba(100, 100, 100, 0)');
-            
-            ctx.fillStyle = gradientExhaust;
+        // Ventana
+        ctx.fillStyle = '#87CEEB';
+        ctx.beginPath();
+        ctx.moveTo(-w/4, -h*0.5);
+        ctx.lineTo(-w/8, -h*0.65);
+        ctx.lineTo(w/8, -h*0.65);
+        ctx.lineTo(w/4, -h*0.5);
+        ctx.closePath();
+        ctx.fill();
+        
+        // 2. Dibujar las ruedas encima del chasis
+        const wheels = [
+            { x: -wheelBase/2, y: h/4 }, // Rueda trasera
+            { x: wheelBase/2, y: h/4 }   // Rueda delantera
+        ];
+        
+        wheels.forEach((wheel, index) => {
+            // Neumático exterior
+            ctx.fillStyle = this.colors.wheel;
             ctx.beginPath();
-            ctx.arc(exhaustX, exhaustY, 5 + Math.random() * 5, 0, Math.PI * 2);
+            ctx.arc(wheel.x, wheel.y, wheelRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Llanta
+            ctx.fillStyle = this.colors.wheelInner;
+            ctx.beginPath();
+            ctx.arc(wheel.x, wheel.y, wheelRadius * 0.6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Radios de la rueda
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            const rotation = index === 0 ? this.vehicle.wheelBack.rotation : this.vehicle.wheelFront.rotation;
+            
+            for (let i = 0; i < 4; i++) {
+                const angle = (Math.PI / 2) * i + rotation;
+                ctx.beginPath();
+                ctx.moveTo(wheel.x, wheel.y);
+                ctx.lineTo(
+                    wheel.x + Math.cos(angle) * wheelRadius * 0.6,
+                    wheel.y + Math.sin(angle) * wheelRadius * 0.6
+                );
+                ctx.stroke();
+            }
+            
+            // Borde de la rueda
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(wheel.x, wheel.y, wheelRadius, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+        
+        // Efectos de aceleración
+        if (this.vehicle.accelerating && this.vehicle.grounded && this.fuel > 0) {
+            ctx.fillStyle = 'rgba(255, 100, 0, 0.6)';
+            ctx.beginPath();
+            ctx.arc(-w/2 - 10, 0, 5 + Math.random() * 3, 0, Math.PI * 2);
             ctx.fill();
         }
         
-        // Estado del vehículo - mostrar indicadores visuales
-        if (this.vehicle.flipped) {
-            // Mostrar daño/humo si está volcado
-            ctx.fillStyle = 'rgba(80, 80, 80, 0.6)';
-            ctx.beginPath();
-            ctx.ellipse(0, -h/2, w/3, h/3, 0, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // Restaurar contexto
         ctx.restore();
-        
-        // Dibujar ruedas
-        this.renderWheel(ctx, this.vehicle.wheelBack);
-        this.renderWheel(ctx, this.vehicle.wheelFront);
     }
     
     /**
@@ -1494,6 +1486,43 @@ window.RacingMinigame = class RacingMinigame extends Minigame {
             ctx.fillText('Presiona ESPACIO para jugar de nuevo', this.game.width / 2, this.game.height / 2 + 40);
             ctx.fillText('ESC para volver al mapa', this.game.width / 2, this.game.height / 2 + 70);
             ctx.textAlign = 'left';
+        }
+        
+        // Draw exit button in top-left corner
+        const exitButtonSize = 40;
+        const exitButtonPadding = 10;
+        const exitButtonX = exitButtonPadding; // Cambiado a la izquierda
+        const exitButtonY = exitButtonPadding;
+
+        // Button background
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+        ctx.beginPath();
+        ctx.arc(
+            exitButtonX + exitButtonSize/2,
+            exitButtonY + exitButtonSize/2,
+            exitButtonSize/2,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+
+        // X symbol
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(exitButtonX + exitButtonSize*0.3, exitButtonY + exitButtonSize*0.3);
+        ctx.lineTo(exitButtonX + exitButtonSize*0.7, exitButtonY + exitButtonSize*0.7);
+        ctx.moveTo(exitButtonX + exitButtonSize*0.7, exitButtonY + exitButtonSize*0.3);
+        ctx.lineTo(exitButtonX + exitButtonSize*0.3, exitButtonY + exitButtonSize*0.7);
+        ctx.stroke();
+
+        // Check for exit button click
+        if (this.game.mouseDown) {
+            const dx = this.game.mouseX - (exitButtonX + exitButtonSize/2);
+            const dy = this.game.mouseY - (exitButtonY + exitButtonSize/2);
+            if (dx*dx + dy*dy < (exitButtonSize/2)*(exitButtonSize/2)) {
+                this.game.switchScene('worldMap');
+            }
         }
     }
 
