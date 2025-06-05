@@ -312,11 +312,11 @@
             display: flex;
             align-items: center;
             flex: 1;
-            justify-content: flex-start;
-            gap: 18px;
+            justify-content: space-between;
             position: relative;
         }
         .header-title {
+            width: 55%;
             font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: 1px;
@@ -339,12 +339,12 @@
             opacity: 1;
             position: absolute;
             top: -20px;
-            left: 180px;
+            left: 160px;
         }
         .header-outfit-name {
+            width: 45%;
             font-size: 1.5rem;
             font-weight: 600;
-            margin-left: 160px;
             color: #fff;
             z-index: 2;
             text-shadow:
@@ -355,16 +355,17 @@
                 0px  2px 4px rgba(0,0,0,0.10);
         }
         .header-logout-btn {
+            width: 10%;
             background: #ef476f;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 18px;
             padding: 8px 18px;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
-            margin-right: 32px;
-            margin-left: 32px;
+            margin-right: 10px;
+            margin-left: 15px;
             z-index: 2;
         }
         @media (max-width: 700px) {
@@ -382,11 +383,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@400;600;700&display=swap');
         
         #toggle-view-button {
+            width: 10%;
             background: #fff;
             color: #ef476f;
             border: none;
-            border-radius: 8px;
-            padding: 8px 18px;
+            border-radius: 18px;
+            padding: 5px 12px;
             font-weight: 700;
             font-size: 1rem;
             cursor: pointer;
