@@ -218,7 +218,7 @@ class Game {
         this.tilesetImage.onload = () => logAsset('Tileset', true);
         this.tilesetImage.onerror = () => logAsset('Tileset', false);
         // A nicer colored grid as tileset
-        this.tilesetImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><rect width="40" height="40" fill="%234a6c2a"/><path d="M0,0 L40,0 L40,40 L0,40 Z M0,10 L40,10 M0,20 L40,20 M0,30 L40,30 M10,0 L10,40 M20,0 L20,40 M30,0 L30,40" stroke="%235a7c3a" stroke-width="1"/><rect x="40" width="40" height="40" fill="%238B4513"/><path d="M40,0 L80,0 L80,40 L40,40 Z M40,8 L80,8 M40,16 L80,16 M40,24 L80,24 M40,32 L80,32 M48,0 L48,40 M56,0 L56,40 M64,0 L64,40 M72,0 L72,40" stroke="%23654321" stroke-width="1"/></svg>';
+        this.tilesetImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="40"><rect width="40" height="40" fill="%234a6c2a"/><path d="M0,0 L40,0 L40,40 L0,40 Z M0,10 L40,10 M0,20 L40,20 M0,30 L40,30 M10,0 L10,40 M20,0 L20,40 M30,0 L30,40 M72,0 L72,40" stroke="%235a7c3a" stroke-width="1"/><rect x="40" width="40" height="40" fill="%238B4513"/><path d="M40,0 L80,0 L80,40 L40,40 Z M40,8 L80,8 M40,16 L80,16 M40,24 L80,24 M40,32 L80,32 M48,0 L48,40 M56,0 L56,40 M64,0 L64,40 M72,0 L72,40" stroke="%23654321" stroke-width="1"/></svg>';
         
         // Load UI elements
         this.uiElements = new Image();
@@ -748,27 +748,30 @@ class Game {
             // Register new minigames
             try {
                 if (typeof PlatformMinigame !== 'undefined') {
-                    this.registerScene('platform', new PlatformMinigame(this));
+                    // Registrar la versión normal
+                    const normalPlatform = new PlatformMinigame(this);
+                    normalPlatform.isLavaVersion = false; // Explícitamente establecer a false
+                    this.registerScene('platform', normalPlatform);
                     console.log('PlatformMinigame registered');
                 } else {
                     console.error('PlatformMinigame class is not defined');
                 }
             } catch (e) {
-                console.error('Error registering PlatformMinigame:', e);
+                console.error('Error registering normal PlatformMinigame:', e);
             }
             
-            // Register new minigames
+            // Registro del Platform Lava (completamente separado)
             try {
-                if (typeof PlatformMinigame !== 'undefined') {
-                    this.registerScene('platform_lava', new PlatformMinigame(this));
-                    console.log('PlatformMinigame registered');
+                if (typeof PlatformLavaMinigame !== 'undefined') {
+                    this.registerScene('platform_lava', new PlatformLavaMinigame(this));
+                    console.log('PlatformLavaMinigame (Lava version) registered');
                 } else {
-                    console.error('PlatformMinigame class is not defined');
+                    console.error('PlatformLavaMinigame class is not defined');
                 }
             } catch (e) {
-                console.error('Error registering PlatformMinigame:', e);
+                console.error('Error registering PlatformLavaMinigame:', e);
             }
-
+            
             try {
                 if (typeof MemoryMinigame !== 'undefined') {
                     this.registerScene('memory', new MemoryMinigame(this));

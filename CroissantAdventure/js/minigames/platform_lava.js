@@ -2,9 +2,16 @@
  * Platform Jump Minigame
  * A platform jumping game where the croissant needs to reach the top
  */
-class PlatformMinigame extends Minigame {
+window.PlatformLavaMinigame = class PlatformLavaMinigame extends Minigame {
     constructor(game) {
         super(game);
+        this.reset();
+        // Identificar explícitamente como versión de lava
+        this.isLavaVersion = true;
+    }
+    
+    enter() {
+        console.log("Entering Lava Platform Jump minigame");
         this.reset();
     }
     
@@ -24,7 +31,7 @@ class PlatformMinigame extends Minigame {
             velocityX: 0,
             velocityY: 0,
             jumping: false,
-            grounded: false,
+            grounded: false, 
             facing: 'right'
         };
         
@@ -116,11 +123,6 @@ class PlatformMinigame extends Minigame {
         }
         
         return collectibles;
-    }
-    
-    enter() {
-        console.log("Entering Platform Jump minigame");
-        this.reset();
     }
     
     exit() {

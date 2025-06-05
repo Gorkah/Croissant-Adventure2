@@ -2,7 +2,7 @@
  * Platform Jump Minigame
  * A platform jumping game where the croissant needs to reach the top
  */
-class PlatformMinigame extends Minigame {
+window.PlatformMinigame = class PlatformMinigame extends Minigame {
     constructor(game) {
         super(game);
         this.reset();
@@ -114,11 +114,13 @@ class PlatformMinigame extends Minigame {
     
     enter() {
         console.log("Entering Platform Jump minigame");
+        console.log("Game instance:", this);
+        console.log("Previous scene:", this.game.previousScene);
         this.reset();
     }
     
     exit() {
-        console.log("Exiting Platform Jump minigame");
+        console.log("Exiting Platform Jump minigame"); 
     }
     
     update(deltaTime) {
@@ -266,209 +268,216 @@ class PlatformMinigame extends Minigame {
     }
     
     render(ctx) {
-        // Sky background
-        const gradient = ctx.createLinearGradient(0, 0, 0, this.game.height);
-        gradient.addColorStop(0, '#87CEEB'); // Sky blue
-        gradient.addColorStop(1, '#E0F7FA'); // Light blue
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, this.game.width, this.game.height);
-        
-        // Decorative clouds
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        for (let i = 0; i < 5; i++) {
-            const x = (i * 300 + Date.now() / 100) % this.game.width;
-            const y = 100 + i * 50;
+        // Usar diferentes estilos basados en la versión
+        if (this.isLavaVersion) {
+            // Renderizar versión de lava
+            // ...
+        } else {
+            // Renderizar versión normal
+            // Sky background
+            const gradient = ctx.createLinearGradient(0, 0, 0, this.game.height);
+            gradient.addColorStop(0, '#87CEEB'); // Sky blue
+            gradient.addColorStop(1, '#E0F7FA'); // Light blue
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, this.game.width, this.game.height);
             
-            // Draw cloud
-            ctx.beginPath();
-            ctx.arc(x, y, 30, 0, Math.PI * 2);
-            ctx.arc(x + 20, y - 15, 25, 0, Math.PI * 2);
-            ctx.arc(x + 40, y, 30, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // Draw goal
-        ctx.fillStyle = '#FFD700'; // Gold
-        ctx.fillRect(this.goal.x, this.goal.y - this.cameraY, this.goal.width, this.goal.height);
-        ctx.strokeStyle = '#B8860B'; // Dark golden rod
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.goal.x, this.goal.y - this.cameraY, this.goal.width, this.goal.height);
-        
-        // Draw star on goal
-        ctx.fillStyle = '#FF4500';
-        ctx.beginPath();
-        const starX = this.goal.x + this.goal.width / 2;
-        const starY = this.goal.y - this.cameraY + this.goal.height / 2;
-        const spikes = 5;
-        const outerRadius = 15;
-        const innerRadius = 7;
-        
-        for (let i = 0; i < spikes * 2; i++) {
-            const radius = i % 2 === 0 ? outerRadius : innerRadius;
-            const angle = Math.PI * i / spikes - Math.PI / 2;
-            if (i === 0) {
-                ctx.moveTo(starX + radius * Math.cos(angle), starY + radius * Math.sin(angle));
-            } else {
-                ctx.lineTo(starX + radius * Math.cos(angle), starY + radius * Math.sin(angle));
-            }
-        }
-        ctx.closePath();
-        ctx.fill();
-        
-        // Draw platforms
-        for (const platform of this.platforms) {
-            ctx.fillStyle = platform.color;
-            ctx.fillRect(platform.x, platform.y - this.cameraY, platform.width, platform.height);
-        }
-        
-        // Draw collectibles
-        ctx.fillStyle = '#FFD700'; // Gold
-        for (const collectible of this.collectibles) {
-            if (!collectible.collected) {
-                // Draw coin
-                ctx.beginPath();
-                ctx.arc(collectible.x, collectible.y - this.cameraY, collectible.size / 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#B8860B';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+            // Decorative clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            for (let i = 0; i < 5; i++) {
+                const x = (i * 300 + Date.now() / 100) % this.game.width;
+                const y = 100 + i * 50;
                 
-                // Draw dollar sign
-                ctx.fillStyle = '#B8860B';
-                ctx.font = '10px Arial';
+                // Draw cloud
+                ctx.beginPath();
+                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.arc(x + 20, y - 15, 25, 0, Math.PI * 2);
+                ctx.arc(x + 40, y, 30, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw goal
+            ctx.fillStyle = '#FFD700'; // Gold
+            ctx.fillRect(this.goal.x, this.goal.y - this.cameraY, this.goal.width, this.goal.height);
+            ctx.strokeStyle = '#B8860B'; // Dark golden rod
+            ctx.lineWidth = 2;
+            ctx.strokeRect(this.goal.x, this.goal.y - this.cameraY, this.goal.width, this.goal.height);
+            
+            // Draw star on goal
+            ctx.fillStyle = '#FF4500';
+            ctx.beginPath();
+            const starX = this.goal.x + this.goal.width / 2;
+            const starY = this.goal.y - this.cameraY + this.goal.height / 2;
+            const spikes = 5;
+            const outerRadius = 15;
+            const innerRadius = 7;
+            
+            for (let i = 0; i < spikes * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = Math.PI * i / spikes - Math.PI / 2;
+                if (i === 0) {
+                    ctx.moveTo(starX + radius * Math.cos(angle), starY + radius * Math.sin(angle));
+                } else {
+                    ctx.lineTo(starX + radius * Math.cos(angle), starY + radius * Math.sin(angle));
+                }
+            }
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw platforms
+            for (const platform of this.platforms) {
+                ctx.fillStyle = platform.color;
+                ctx.fillRect(platform.x, platform.y - this.cameraY, platform.width, platform.height);
+            }
+            
+            // Draw collectibles
+            ctx.fillStyle = '#FFD700'; // Gold
+            for (const collectible of this.collectibles) {
+                if (!collectible.collected) {
+                    // Draw coin
+                    ctx.beginPath();
+                    ctx.arc(collectible.x, collectible.y - this.cameraY, collectible.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#B8860B';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    
+                    // Draw dollar sign
+                    ctx.fillStyle = '#B8860B';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('$', collectible.x, collectible.y - this.cameraY);
+                    ctx.fillStyle = '#FFD700';
+                }
+            }
+            
+            // Draw player (croissant)
+            if (this.game.croissantImage.complete && this.game.croissantImage.naturalHeight !== 0) {
+                // Use the croissant image with appropriate flipping based on direction
+                ctx.save();
+                if (this.player.facing === 'left') {
+                    ctx.translate(this.player.x + this.player.width, this.player.y);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(this.game.croissantImage, 0, 0, this.player.width, this.player.height);
+                } else {
+                    ctx.drawImage(
+                        this.game.croissantImage,
+                        this.player.x,
+                        this.player.y,
+                        this.player.width,
+                        this.player.height
+                    );
+                }
+                ctx.restore();
+            } else {
+                // Fallback shape
+                ctx.fillStyle = '#e6b266';
+                ctx.beginPath();
+                ctx.arc(
+                    this.player.x + this.player.width / 2,
+                    this.player.y + this.player.height / 2,
+                    this.player.width / 2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+            
+            // Draw UI
+            super.render(ctx); // Draw exit button
+            
+            // Draw score and time
+            ctx.fillStyle = '#000000';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Score: ${this.score}`, this.game.width - 20, 30);
+            ctx.fillText(`Time: ${Math.ceil(this.timeLeft)}s`, this.game.width - 20, 60);
+            
+            // Draw instructions if needed
+            if (this.showInstructions) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, this.game.width, this.game.height);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '32px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('$', collectible.x, collectible.y - this.cameraY);
-                ctx.fillStyle = '#FFD700';
+                ctx.fillText('Platform Jump', this.game.width / 2, this.game.height / 3 - 50);
+                
+                ctx.font = '20px Arial';
+                ctx.fillText('Use A/D or Arrow Keys to move', this.game.width / 2, this.game.height / 3);
+                ctx.fillText('Press W, Up Arrow, or SPACE to jump', this.game.width / 2, this.game.height / 3 + 30);
+                ctx.fillText('Collect coins for points', this.game.width / 2, this.game.height / 3 + 60);
+                ctx.fillText('Reach the star at the top to win!', this.game.width / 2, this.game.height / 3 + 90);
             }
-        }
-        
-        // Draw player (croissant)
-        if (this.game.croissantImage.complete && this.game.croissantImage.naturalHeight !== 0) {
-            // Use the croissant image with appropriate flipping based on direction
-            ctx.save();
-            if (this.player.facing === 'left') {
-                ctx.translate(this.player.x + this.player.width, this.player.y);
-                ctx.scale(-1, 1);
-                ctx.drawImage(this.game.croissantImage, 0, 0, this.player.width, this.player.height);
-            } else {
-                ctx.drawImage(
-                    this.game.croissantImage,
-                    this.player.x,
-                    this.player.y,
-                    this.player.width,
-                    this.player.height
+            
+            // Draw game over screen
+            if (this.gameOver) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, this.game.width, this.game.height);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Game Over', this.game.width / 2, this.game.height / 2 - 40);
+                
+                ctx.font = '24px Arial';
+                ctx.fillText(`Score: ${this.score}`, this.game.width / 2, this.game.height / 2);
+                
+                // Restart button
+                ctx.fillStyle = '#ff5555';
+                const buttonX = this.game.width / 2;
+                const buttonY = this.game.height / 2 + 50;
+                const buttonWidth = 150;
+                const buttonHeight = 40;
+                
+                ctx.fillRect(
+                    buttonX - buttonWidth / 2,
+                    buttonY - buttonHeight / 2,
+                    buttonWidth,
+                    buttonHeight
                 );
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '20px Arial';
+                ctx.fillText('Try Again', buttonX, buttonY);
             }
-            ctx.restore();
-        } else {
-            // Fallback shape
-            ctx.fillStyle = '#e6b266';
-            ctx.beginPath();
-            ctx.arc(
-                this.player.x + this.player.width / 2,
-                this.player.y + this.player.height / 2,
-                this.player.width / 2,
-                0,
-                Math.PI * 2
-            );
-            ctx.fill();
-        }
-        
-        // Draw UI
-        super.render(ctx); // Draw exit button
-        
-        // Draw score and time
-        ctx.fillStyle = '#000000';
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'right';
-        ctx.fillText(`Score: ${this.score}`, this.game.width - 20, 30);
-        ctx.fillText(`Time: ${Math.ceil(this.timeLeft)}s`, this.game.width - 20, 60);
-        
-        // Draw instructions if needed
-        if (this.showInstructions) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, this.game.width, this.game.height);
             
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '32px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Platform Jump', this.game.width / 2, this.game.height / 3 - 50);
-            
-            ctx.font = '20px Arial';
-            ctx.fillText('Use A/D or Arrow Keys to move', this.game.width / 2, this.game.height / 3);
-            ctx.fillText('Press W, Up Arrow, or SPACE to jump', this.game.width / 2, this.game.height / 3 + 30);
-            ctx.fillText('Collect coins for points', this.game.width / 2, this.game.height / 3 + 60);
-            ctx.fillText('Reach the star at the top to win!', this.game.width / 2, this.game.height / 3 + 90);
-        }
-        
-        // Draw game over screen
-        if (this.gameOver) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, this.game.width, this.game.height);
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '48px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Game Over', this.game.width / 2, this.game.height / 2 - 40);
-            
-            ctx.font = '24px Arial';
-            ctx.fillText(`Score: ${this.score}`, this.game.width / 2, this.game.height / 2);
-            
-            // Restart button
-            ctx.fillStyle = '#ff5555';
-            const buttonX = this.game.width / 2;
-            const buttonY = this.game.height / 2 + 50;
-            const buttonWidth = 150;
-            const buttonHeight = 40;
-            
-            ctx.fillRect(
-                buttonX - buttonWidth / 2,
-                buttonY - buttonHeight / 2,
-                buttonWidth,
-                buttonHeight
-            );
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '20px Arial';
-            ctx.fillText('Try Again', buttonX, buttonY);
-        }
-        
-        // Draw victory screen
-        if (this.victory) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, this.game.width, this.game.height);
-            
-            ctx.fillStyle = '#ffdd00';
-            ctx.font = '48px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Victory!', this.game.width / 2, this.game.height / 2 - 60);
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '24px Arial';
-            ctx.fillText(`Score: ${this.score}`, this.game.width / 2, this.game.height / 2 - 20);
-            ctx.fillText(`Time Bonus: ${Math.floor(this.timeLeft)}`, this.game.width / 2, this.game.height / 2 + 10);
-            
-            // Continue button
-            ctx.fillStyle = '#55aa55';
-            const buttonX = this.game.width / 2;
-            const buttonY = this.game.height / 2 + 60;
-            const buttonWidth = 150;
-            const buttonHeight = 40;
-            
-            ctx.fillRect(
-                buttonX - buttonWidth / 2,
-                buttonY - buttonHeight / 2,
-                buttonWidth,
-                buttonHeight
-            );
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '20px Arial';
-            ctx.fillText('Continue', buttonX, buttonY);
+            // Draw victory screen
+            if (this.victory) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, this.game.width, this.game.height);
+                
+                ctx.fillStyle = '#ffdd00';
+                ctx.font = '48px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Victory!', this.game.width / 2, this.game.height / 2 - 60);
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '24px Arial';
+                ctx.fillText(`Score: ${this.score}`, this.game.width / 2, this.game.height / 2 - 20);
+                ctx.fillText(`Time Bonus: ${Math.floor(this.timeLeft)}`, this.game.width / 2, this.game.height / 2 + 10);
+                
+                // Continue button
+                ctx.fillStyle = '#55aa55';
+                const buttonX = this.game.width / 2;
+                const buttonY = this.game.height / 2 + 60;
+                const buttonWidth = 150;
+                const buttonHeight = 40;
+                
+                ctx.fillRect(
+                    buttonX - buttonWidth / 2,
+                    buttonY - buttonHeight / 2,
+                    buttonWidth,
+                    buttonHeight
+                );
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '20px Arial';
+                ctx.fillText('Continue', buttonX, buttonY);
+            }
         }
     }
 }
