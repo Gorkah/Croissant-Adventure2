@@ -278,6 +278,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Tutorial',
                 displayName: 'Tutorial de Aventura',
+                image: 'minigames/tutorial.png',
                 scene: 'tutorial',
                 color: '#00BFFF',
                 borderColor: '#0099CC',
@@ -295,6 +296,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Maze',
                 displayName: 'El Bosque Enredado',
+                image: 'minigames/maze.jpg',
                 scene: 'maze',
                 color: '#66cc66',
                 borderColor: '#44aa44',
@@ -310,6 +312,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Snake',
                 displayName: 'Silbi la Serpiente',
+                image: 'minigames/snake.jpg',
                 scene: 'snake',
                 color: '#44cc44',
                 borderColor: '#33aa33',
@@ -327,6 +330,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Shooter',
                 displayName: 'Burbujeadores del Cielo',
+                image: 'minigames/shooter.jpg',
                 scene: 'shooter',
                 color: '#ff6666',
                 borderColor: '#ff4444',
@@ -342,6 +346,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Platform',
                 displayName: 'Islas Flotantes',
+                image: 'minigames/platform.jpg',
                 scene: 'platform',
                 color: '#66aaff',
                 borderColor: '#4488ff',
@@ -359,6 +364,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Fishing',
                 displayName: 'Pescador Pastelero',
+                image: 'minigames/fishing.jpg',
                 scene: 'fishing',
                 color: '#00ccff',
                 borderColor: '#0099cc',
@@ -376,6 +382,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Surfing',
                 displayName: 'Surfista Glaseado',
+                image: 'minigames/surfing.jpg',
                 scene: 'surfing',
                 color: '#66eeff',
                 borderColor: '#00bbcc',
@@ -395,6 +402,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Chess',
                 displayName: 'Guardianes del Reino',
+                image: 'minigames/chess.jpg',
                 scene: 'chess',
                 color: '#5555ff',
                 borderColor: '#3333dd',
@@ -410,6 +418,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Tower Defense',
                 displayName: 'Castillo de Azúcar',
+                image: 'minigames/towerDefense.jpg',
                 scene: 'towerDefense',
                 color: '#9966ff',
                 borderColor: '#7744ff',
@@ -427,6 +436,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'LavaRunner',
                 displayName: 'Corredor de Lava Chocolatada',
+                image: 'minigames/lavaRunner.jpg',
                 scene: 'platform_lava',
                 color: '#FF4500',
                 borderColor: '#8B0000',
@@ -444,6 +454,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'LavaRacing',
                 displayName: 'Carrera de Fondant Ardiente',
+                image: 'minigames/Racing.png',
                 scene: 'racing',
                 color: '#FF6347',
                 borderColor: '#CD5C5C',
@@ -463,6 +474,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'CaveExplorer',
                 displayName: 'Explorador de Cristales Dulces',
+                image: 'minigames/caveExplorer.png',
                 scene: 'caveExplorer',
                 color: '#9370DB',
                 borderColor: '#6A5ACD',
@@ -480,6 +492,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'CaveDigger',
                 displayName: 'Minero de Caramelos',
+                image: 'minigames/caveDigger.jpg',
                 scene: 'puzzle',
                 color: '#8A2BE2',
                 borderColor: '#4B0082',
@@ -497,6 +510,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Admin Panel',
                 displayName: 'Panel de Administración',
+                image: 'minigames/paneladmin.jpg',
                 scene: 'adminPanel',
                 color: '#aaaaaa',
                 borderColor: '#888888',
@@ -514,6 +528,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Coin Collector',
                 displayName: 'El Tesoro del Lago',
+                image: 'minigames/coinCollector.jpg',
                 scene: 'coinCollector',
                 color: '#ffcc00',
                 borderColor: '#ffaa00',
@@ -529,6 +544,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Roulette',
                 displayName: 'La Rueda de la Fortuna',
+                image: 'minigames/roulette.jpg',
                 scene: 'roulette',
                 color: '#ff9900',
                 borderColor: '#ff7700',
@@ -546,6 +562,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Cave Explorer',
                 displayName: 'Explorador de Cuevas',
+                image: 'minigames/caveExplorer.png',
                 scene: 'caveExplorer',
                 color: '#cc99ff',
                 borderColor: '#aa77ff',
@@ -563,6 +580,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Memory',
                 displayName: 'Cartas Gemelas',
+                image: 'minigames/memory.jpg',
                 scene: 'memory',
                 color: '#cc66ff',
                 borderColor: '#aa44ff',
@@ -578,6 +596,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Puzzle',
                 displayName: 'Cuadro Mágico',
+                image: 'minigames/puzzle.jpg',
                 scene: 'puzzle',
                 color: '#ff9966',
                 borderColor: '#ff7744',
@@ -593,6 +612,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Rhythm',
                 displayName: 'Orquesta Dulce',
+                image: 'minigames/rhythm.jpg',
                 scene: 'rhythm',
                 color: '#ff66cc',
                 borderColor: '#ff44aa',
@@ -608,6 +628,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Paint Game',
                 displayName: 'Estudio Artístico',
+                image: 'minigames/paintGame.jpg',
                 scene: 'paintGame',
                 color: '#ff99cc',
                 borderColor: '#ff77aa',
@@ -623,6 +644,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Trivia Game',
                 displayName: 'Trivia de Pastelería',
+                image: 'minigames/triviaGame.jpg',
                 scene: 'triviaGame',
                 color: '#ffaa66',
                 borderColor: '#ff8844',
@@ -638,6 +660,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Story Teller',
                 displayName: 'Narrador de Historias',
+                image: 'minigames/storyTeller.png',
                 scene: 'storyTeller',
                 color: '#66cccc',
                 borderColor: '#44aaaa',
@@ -655,6 +678,7 @@ class WorldMapScene extends Scene {
                 height: 75,
                 name: 'Lava Runner',
                 displayName: 'Corredor de Lava',
+                image: 'minigames/lavaRunner.jpg',
                 scene: 'lavaRunner',
                 color: '#ff4500',
                 borderColor: '#cc3700',
@@ -1035,27 +1059,64 @@ class WorldMapScene extends Scene {
         // Comprobar interacción con zonas de minijuego
         const nearbyZone = this.getNearbyMinigameZone();
         
+        // Función para ventana pop-up de cada minijuego
+        function showMiniGamePanel(nearbyZone, Posx, Posy, posWidth) {
+            const panel = document.getElementById('miniGamePanel');
+            document.getElementById('miniGameTitle').innerText = nearbyZone.displayName;
+            document.getElementById('miniGameDescription').innerText = nearbyZone.description || "Sin descripción.";
+            document.getElementById('miniGameImage').src = nearbyZone.image || "minigames/racing.jpg";
+            
+            // const offsetX = -140; // la mitad del ancho del panel
+            // const offsetY = -180; // un poco por encima del personaje
+
+            // panel.style.left = (Posx + offsetX) + 'px';
+            // panel.style.top = (Posy + offsetY) + 'px';
+            panel.style.display = 'block';
+        }
+
+        function closeMiniGamePanel() {
+            const panel = document.getElementById('miniGamePanel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        }  
+
         // Mostrar prompt de interacción si hay una zona cercana
         if (nearbyZone) {
             // Establecer texto y posición del prompt
-            this.interactionPrompt = {
-                text: `Presiona 'E' para jugar ${nearbyZone.displayName}`,
-                x: this.player.x + this.player.width / 2,
-                y: this.player.y - 20,
-                visible: true,
-                zone: nearbyZone
-            };
+            // this.interactionPrompt = {
+            //     text: `Presiona 'E' para jugar ${nearbyZone.displayName}`,
+            //     x: this.player.x + this.player.width / 2,
+            //     y: this.player.y - 20,
+            //     visible: true,
+            //     zone: nearbyZone
+            if (!this.panelVisible || this.lastZoneShown !== nearbyZone) {
+                // const posX = this.player.x;
+                // const posY = this.player.y;
+                // const posWidth = this.player.width;
+                // Mostrar panel del minijuego
+                showMiniGamePanel(nearbyZone);
+                this.panelVisible = true;
+                this.lastZoneShown = nearbyZone;
+            }
+            
             
             // Si presiona E, iniciar el minijuego
             if (this.game.isKeyPressed('e')) {
                 if (nearbyZone.points) {
+                    closeMiniGamePanel();
+                    this.panelVisible = false;
+                    this.lastZoneShown = null;
                     this.game.addPoints(nearbyZone.points, 'minigame');
                 }
                 // Corregir el método para cambiar escenas - usar switchScene en lugar de changeScene
                 this.game.switchScene(nearbyZone.scene);
             }
         } else {
-            this.interactionPrompt = null;
+
+            closeMiniGamePanel();
+            this.panelVisible = false;
+            this.lastZoneShown = null;
         }
         
         // Efectos especiales para los minijuegos de la Playa Caramelizada
