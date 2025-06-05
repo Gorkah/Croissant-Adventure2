@@ -26,20 +26,20 @@ class FishingMinigame extends Minigame {
         // Propiedades del jugador
         this.player = {
             x: this.game.width / 2,
-            y: 50, // Arriba de la pantalla
+            y: 50,
             width: 40,
             height: 60,
-            speed: 300, // pixels per second
-            casting: false, // Si está pescando
+            speed: 300,
+            casting: false,
             line: {
                 length: 0,
-                maxLength: 300,
-                speed: 150, // Velocidad de extensión
+                maxLength: 650,     
+                speed: 200,         
                 hooked: false,
                 hookX: 0,
                 hookY: 0,
                 retracting: false,
-                retractSpeed: 250 // Velocidad al retraer
+                retractSpeed: 300   
             }
         };
         
